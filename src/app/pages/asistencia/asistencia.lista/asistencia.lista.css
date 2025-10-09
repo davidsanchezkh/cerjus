@@ -1,0 +1,167 @@
+/* =========================
+   Estilos ordenados A–Z
+   ========================= */
+.card--flat {
+  background: transparent;
+}
+
+/* Altura de fila unificada (ajuste si su tema usa otro alto) */
+.tabla-wrap {
+  contain: paint;
+  overflow: auto;
+  position: relative;
+
+  /* Altura exacta por fila (la que indicó) */
+  --row-h: 24px;
+
+  /* Tomamos el padding horizontal real de Bootstrap si existe */
+  --thead-h: 96px;
+  --cell-px: var(--bs-table-cell-padding-x, .75rem);
+}
+
+/* Contenedor principal tabla */
+.tabla-wrap {
+  contain: paint;
+  overflow: auto;
+  position: relative;
+}
+
+/* Tabla base */
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+td, th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* altura y centrado vertical en TODAS las celdas de datos */
+  height: var(--row-h);
+  vertical-align: middle;
+}
+
+/* Altura y centrado VERTICAL de TODAS las filas reales */
+.table > :not(caption) > * > td,
+.table > :not(caption) > * > th {
+  /* mismos paddings para todas las celdas */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  /* centrado vertical del contenido real */
+  vertical-align: middle;
+  /* reservar altura mínima de la fila */
+  height: var(--row-h);
+}
+
+/* ---------- SKELETON ---------- */
+
+/* Fila skeleton: altura exacta y sin rayado alterno */
+.tbody-skeleton {
+  height: var(--row-h);
+  background: transparent !important; /* base */
+}
+.table-striped tbody tr.tbody-skeleton:nth-of-type(odd),
+.table-striped tbody tr.tbody-skeleton:nth-of-type(even) {
+  --bs-table-accent-bg: transparent;
+  background-color: transparent !important;
+}
+
+/* Envoltorio para centrar verticalmente las barras skeleton */
+.sk-wrap {
+  display: flex;
+  align-items: center;
+  height: var(--row-h);
+  /* IMPORTANTE: sin padding; lo aporta el <td> para alinear con el texto real */
+  padding: 0;
+  width: 100%;
+}
+
+/* Barras skeleton (contraste suficiente en claros/osc.) */
+.sk-cell {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: .25rem;
+  height: .9rem;
+}
+
+/* Anchos típicos por celda */
+.sk-id    { width: 2.5rem; }
+.sk-text  { width: 60%; }
+.sk-date  { width: 80%; height: .85rem; }
+.sk-badge { width: 70%; height: .85rem; }
+.sk-btn   { width: 60%; height: 1.4rem; border-radius: .375rem; }
+
+/* =========================
+   Overlays
+   ========================= */
+
+/* Overlay de “vacío” que ocupa TODO el área de lista (menos head+filtros) */
+.empty-overlay {
+  position: absolute;
+  inset: var(--thead-h) 0 0 0;   /* ⬅️ desde debajo del thead hasta el final */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;  
+  opacity: 1;
+  transition: opacity .18s ease;        /* no bloquear interacción con los filtros */
+}
+
+.empty-message {
+  font-size: .95rem;
+  text-align: center;
+}
+/* Overlay suave mientras hay datos previos */
+.loading-overlay {
+  backdrop-filter: blur(1px);
+  background: rgba(255,255,255,0.6);
+  font-weight: 600;
+  inset: 0;
+  position: absolute;
+}
+
+/* Hover neutro mientras está “is-loading” */
+.is-loading .table-hover tbody tr:hover { background-color: inherit; }
+
+/* Paginación reservada (opcional, si ya lo tenía en otro archivo) */
+.pager-wrap.invisible { visibility: hidden; min-height: 40px; }
+
+/* Scrollbar estable */
+html, body { scrollbar-gutter: stable both-edges; }
+
+/* Animación */
+@keyframes shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position:   0% 0; }
+}
+/* Paginación */
+.pager-wrap {
+  min-height: 2rem;        /* altura estable del bloque */
+  padding: 0 1rem .5rem;     /* padding superior/laterales */
+}
+
+.pager-wrap .num-range,
+.pager-wrap .total-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums; /* dígitos de ancho fijo */
+  min-width: 9ch;                     /* reserve según su máximo esperado */
+  text-align: right;
+  transition: opacity .15s ease;      /* crossfade leve en cambios */
+}
+
+.pager-wrap.is-loading .num-range,
+.pager-wrap.is-loading .total-num {
+  opacity: .75;
+}
+
+
+.pager-wrap.invisible {
+  min-height: 40px;
+  visibility: hidden;
+}
+
+.prewrap {
+  white-space: pre-wrap;
+}
+

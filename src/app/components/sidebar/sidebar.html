@@ -1,0 +1,58 @@
+<div class="d-flex flex-column flex-shrink-0 p-3 text-white color_azul min-vh-100" style="width: 280px; user-select: none;">
+  <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <span class="fs-4">Cerjus</span>
+  </a>
+  <hr>
+
+  <ul class="nav nav-pills flex-column mb-auto">
+
+    <!-- Asesor (lvl 3) y superiores (2,1) -->
+    @if (canSee(3)) {
+      <li class="nav-item">
+        <a class="nav-link text-white"
+           [routerLink]="['/asistencia']"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }">
+          Asistencia
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link text-white"
+           [routerLink]="['/ciudadano']"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: false }">
+          Ciudadano
+        </a>
+      </li>
+    }
+
+    <!-- Supervisor (lvl 2) y admin (lvl 1) -->
+    @if (canSee(2)) {
+      <li class="nav-item">
+        <a class="nav-link text-white"
+           [routerLink]="['/usuarios']"
+           routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: false }">
+          Usuarios
+        </a>
+      </li>
+    }
+
+    <!-- Admin-only (lvl 1) – opcional -->
+    @if (canSee(1)) {
+      <!-- Más opciones exclusivas de admin aquí -->
+      <!--
+      <li class="nav-item">
+        <a class="nav-link text-white"
+           [routerLink]="['/admin']"
+           routerLinkActive="active">
+          Admin
+        </a>
+      </li>
+      -->
+    }
+  </ul>
+
+  <hr>
+</div>

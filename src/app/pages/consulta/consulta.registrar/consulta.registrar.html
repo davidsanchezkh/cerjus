@@ -1,0 +1,87 @@
+<!-- ciudadano.registrar.html -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar consulta</h5>
+
+          <!-- Formulario reactivo -->
+          <form [formGroup]="form" novalidate>
+
+            <!-- Fila 1: Hechos de la consulta -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Hechos de la consulta</label>
+              <textarea class="form-control" formControlName="hechos" rows="3"></textarea>
+            </div>
+            <!-- Fila 2: Materia de la consulta -->
+            <div class="row mb-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Materia de la consulta</label>
+                <select class="form-select" formControlName="materias">
+                  <option value="INICIAL" disabled selected>Seleccione una opción</option>
+                  <option value="DERECHO CIVIL">Derecho Civil</option>
+                  <option value="DERECHO FAMILIAR">Derecho Familiar</option>
+                  <option value="DERECHO LABORAL">Derecho Laboral</option>
+                  <option value="DERECHO PENAL">Derecho Penal</option>
+                  <option value="DERECHO CONSTITUCIONAL">Derecho Constitucional</option>
+                  <option value="DERECHO SUCESORIO">Derecho Sucesorio</option>
+                  <option value="OTROS">Otros</option>
+                </select>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Especifique otros</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  formControlName="materiaOtros" 
+                  placeholder="Especifique la materia">
+              </div>
+            </div>
+            <!-- Fila 3: Absolucion de la consulta -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold"> Absolución de la consulta </label>
+              <textarea class="form-control" formControlName="absolucion" rows="3"></textarea>
+            </div>
+            <!-- Fila 4: Regresa de la consulta -->
+            <div class="mb-3">
+              <div class="form-label fw-semibold mb-2">¿Seguimiento?</div>
+              <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="regresa" value="SI" id="si">
+                    <label class="form-check-label" for="si">Si</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="regresa" value="NO" id="no">
+                    <label class="form-check-label" for="no">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold"> Resumen corto </label>
+              <textarea class="form-control" formControlName="resumen" rows="1"></textarea>
+            </div>
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning"
+                      (click)="onBack()">
+                Regresar
+              </button>
+              <button type="button" class="btn btn-success"
+                      (click)="onSubmit()"
+                      >
+                Registrar
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

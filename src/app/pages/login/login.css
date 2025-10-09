@@ -1,0 +1,54 @@
+/* Colores de panel y botón */
+.bg-login-custom { background-color: #017199; color: #ffffff; }
+.btn-login { background-color: #017199; color: #fff; border: none; }
+.btn-login:hover { background-color: #015675; color: #fff; }
+.btn-login:active { box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+
+/* ====== LOGO BOX sin flash ====== */
+.logo-box { width: 245px; height: 80px; position: relative; margin-bottom: 1rem; }
+.logo-box .hidden { display: none !important; }
+.logo-fallback, .logo-img { position: absolute; inset: 0; display: block; }
+.logo-fallback { background: rgba(255,255,255,.12); border-radius: .25rem; display: grid; place-items: center; }
+.logo-fallback svg { width: 60%; height: 60%; fill: rgba(255,255,255,.5); }
+.logo-fallback text { fill: rgba(255,255,255,.9); font-weight: 600; }
+.logo-img { object-fit: contain; width: 245px; height: 80px; opacity: 0; transition: opacity .18s ease; }
+.logo-img.loaded { opacity: 1; }
+
+/* ====== Skeleton SOLO encima del campo (no del form) ====== */
+.input-shell { position: relative; }
+.sk-input-overlay {
+  position: absolute; inset: 0;
+  border-radius: var(--bs-border-radius, .375rem);
+  animation: shimmer 1.2s ease-in-out infinite;
+  background: linear-gradient(90deg, #f0f3f5 25%, #e6eaed 37%, #f0f3f5 63%);
+  background-size: 400% 100%;
+  pointer-events: none; /* evita bloquear el mouse si aparece un instante */
+}
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+
+/* Error con altura reservada */
+.error-reserved {
+  min-height: 1.5rem;
+  margin: 0;
+  color: #dc3545;
+  opacity: 0;
+  transition: opacity .15s ease;
+}
+.error-reserved.visible { opacity: 1; }
+
+/* Autofill estable y azul suave */
+.af-stable {
+  background-color: #fff;
+  box-shadow: 0 0 0 1000px #fff inset;
+  -webkit-box-shadow: 0 0 0 1000px #fff inset;
+  background-clip: padding-box;
+}
+.af-stable:-webkit-autofill,
+.af-stable:-webkit-autofill:hover,
+.af-stable:-webkit-autofill:focus {
+  box-shadow: 0 0 0 1000px #e6f2ff inset;
+  -webkit-box-shadow: 0 0 0 1000px #e6f2ff inset;
+  -webkit-text-fill-color: #212529;
+  transition: background-color 99999s ease 0s, color 0s ease 0s;
+}
+.af-stable::placeholder { color: #6c757d; opacity: .9; }

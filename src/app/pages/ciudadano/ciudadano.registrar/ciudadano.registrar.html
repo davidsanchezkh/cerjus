@@ -1,0 +1,122 @@
+<!-- ciudadano.registrar.html -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar ciudadano</h5>
+
+          <!-- Formulario reactivo -->
+          <form [formGroup]="form" novalidate>
+
+            <!-- Fila 1: Nombres y Apellidos / DNI -->
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-semibold">Nombres</label>
+                <input type="text" class="form-control" formControlName="nombres" placeholder="Nombres">
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-semibold">Apellido Paterno</label>
+                <input type="text" class="form-control" formControlName="apellidoPaterno" placeholder="Apellido Paterno">
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-semibold">Apellido Materno</label>
+                <input type="text" class="form-control" formControlName="apellidoMaterno" placeholder="Apellido Materno">
+              </div>
+              <div class="col-12 col-md-3">
+                <label class="form-label fw-semibold">DNI</label>
+                <input type="text" maxlength="11" class="form-control text-uppercase" formControlName="dni" placeholder="DNI">
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Fila 2: Domicilio -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Domicilio</label>
+              <input type="text" class="form-control" formControlName="domicilio" placeholder="Dirección completa">
+            </div>
+
+            <!-- Fila 3: Ocupación / Fecha de nacimiento / Hijos -->
+            <div class="row g-3">
+              <div class="col-12 col-md-6 col-lg-5">
+                <label class="form-label fw-semibold">Ocupación</label>
+                <input type="text" class="form-control" formControlName="ocupacion" placeholder="Ocupación">
+              </div>
+              <div class="col-12 col-md-6 col-lg-4">
+                <label class="form-label fw-semibold">Fecha de nacimiento</label>
+                <input type="date" class="form-control" formControlName="fechaNacimiento">
+              </div>
+              <div class="col-12 col-md-6 col-lg-3">
+                <label class="form-label fw-semibold">Hijos</label>
+                <input type="number" min="0" class="form-control" formControlName="hijos" placeholder="0">
+              </div>
+            </div>
+
+            <!-- Fila 4: Número de contacto / Correo electrónico -->
+            <div class="row g-3 mt-0 mt-md-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Número de contacto</label>
+                <input type="tel" class="form-control" formControlName="telefono" placeholder="9XXXXXXXX">
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Correo electrónico</label>
+                <input type="email" class="form-control" formControlName="correoE" placeholder="correo@ejemplo.com">
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Fila 5: ¿Cómo supo del consultorio? -->
+            <div class="mb-2">
+              <div class="form-label fw-semibold mb-2">¿Cómo supo del consultorio?</div>
+              <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="supo" value="AMIGO" id="supoAmigo">
+                    <label class="form-check-label" for="supoAmigo">Amigo</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="supo" value="VECINO" id="supoVecino">
+                    <label class="form-check-label" for="supoVecino">Vecino</label>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" formControlName="supo" value="VOLANTE" id="supoVolante">
+                    <label class="form-check-label" for="supoVolante">Volante</label>
+                  </div>
+                </div>
+                <div class="col-12 col-md">
+                  <div class="input-group">
+                    <div class="input-group-text">
+                      <input class="form-check-input mt-0" type="radio" formControlName="supo" value="OTROS" id="supoOtros">
+                    </div>
+                    <input type="text" class="form-control" formControlName="supoOtrosDetalle" placeholder="Otros: especifique">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning"
+                      (click)="onBack()">
+                Regresar
+              </button>
+              <button type="button" class="btn btn-success"
+                      (click)="onSubmit()"
+                      >
+                Registrar
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

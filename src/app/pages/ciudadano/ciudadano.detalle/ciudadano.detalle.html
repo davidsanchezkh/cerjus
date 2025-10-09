@@ -1,0 +1,171 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="open = !open"
+          role="button"
+          [attr.aria-expanded]="open">
+          <!-- Grupo izquierda: texto + botón -->
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">Información del ciudadano</span>
+            <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
+              Editar
+            </button>
+          </div>
+          <span class="caret">{{ open ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Cuerpo (colapsable) -->
+        <form class="card-body selectable-fix" [hidden]="!open" [formGroup]="form" id="form1" name="form1">
+
+          <!-- Sección: Identificación -->
+          <div class="row g-3">
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="cdf1campo1">Nombres</label>
+              <input type="text"
+                name="cdf1campo1" id="cdf1campo1"
+                formControlName="nombres"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+              
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="cdf1campo2">Apellido Paterno</label>
+              <input type="text"
+                name="cdf1campo2" id="cdf1campo2"
+                formControlName="apellidoPaterno"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="cdf1campo3">Apellido Materno</label>
+              <input type="text"
+                name="cdf1campo3" id="cdf1campo3"
+                formControlName="apellidoMaterno"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="cdf1campo4">DNI</label>
+              <input type="text"
+                name="cdf1campo4" id="cdf1campo4"
+                formControlName="dni"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem; "></div>
+
+          <!-- Sección: Domicilio -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="cdf1campo5">Dirección</label>
+              <input type="text"
+                name="cdf1campo5" id="cdf1campo5"
+                formControlName="domicilio"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem; "></div>
+
+          <!-- Sección: Datos complementarios -->
+          <div class="row g-3">
+            <div class="col-12 col-md-5">
+              <label class="form-label" for="cdf1campo6">Ocupación</label>
+              <input type="text"
+                name="cdf1campo6" id="cdf1campo6"
+                formControlName="ocupacion"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="cdf1campo7">Fecha de nacimiento</label>
+              <input type="date"
+                name="cdf1campo7" id="cdf1campo7"
+                formControlName="fechaNacimiento"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="cdf1campo8">Hijos</label>
+              <input type="number"
+                name="cdf1campo8" id="cdf1campo8"
+                formControlName="hijos"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-0 mt-md-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="cdf1campo9">Número de contacto</label>
+              <input type="tel"
+                name="cdf1campo9" id="cdf1campo9"
+                formControlName="telefono"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="cdf1campo10">Correo electrónico</label>
+              <input type="email"
+                name="cdf1campo10" id="cdf1campo10"
+                formControlName="correoE"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem; "></div>
+
+          <!-- Sección: ¿Cómo supo del consultorio? -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="cdf1campo11">¿Cómo supo del consultorio?</label>
+              <input type="text"
+                name="cdf1campo11" id="cdf1campo11"
+                formControlName="conocio"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+          <div style="height: 1rem; "></div>
+            <!-- Botones -->
+          <div class="d-flex justify-content-between mt-4" *ngIf="isEditing">
+            <button type="button" name="btn1" id="cdf1btn1" class="btn btn-warning"(click)=" onCancel() ">
+              Cancelar
+            </button>
+            <button type="button" name="btn2" id="cdf1btn2" class="btn btn-success" (click)=" onSave()">
+              Guardar
+            </button>
+          </div>
+        </form>   
+      </div>
+    </div>
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="open2 = !open2"
+          role="button"
+          [attr.aria-expanded]="open2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">Consultas</span>
+            <button type="button" class="btn btn-secondary"(click)="gotoConsulta();$event.stopPropagation()">Nueva Consulta</button>
+          </div>
+          <span class="caret">{{ open2 ? "▴" : "▾" }}</span>
+        </div>
+        
+        <app-consulta-lista-ciudadano  [idciudadano]="idciudadano" [hidden]="!open2"/>
+          
+      </div> 
+    </div>
+  </div>
+</div>

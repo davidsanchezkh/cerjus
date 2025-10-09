@@ -1,0 +1,51 @@
+/* Mantiene coherencia visual con inputs, pero en modo lectura */
+
+.value-box-noedit {
+  display: block;
+  width: 100%;
+  padding: .475rem .75rem;
+  background-color: #f8f9fa;   /* gris claro tipo form-control readonly */
+  border: 1px solid #dee2e6;
+  border-radius: .375rem;
+  min-height: calc(1.5em + .95rem + 2px);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: default;
+  pointer-events: none;
+  user-select: none; 
+} 
+.value-box-edit {
+  display: block;
+  width: 100%;
+  padding: .475rem .75rem;
+  background-color: #fff;     /* blanco como input normal */
+  border: 1px solid #ced4da;  /* borde típico de bootstrap */
+  border-radius: .375rem;
+  min-height: calc(1.5em + .95rem + 2px);
+  line-height: 1.5;
+}
+
+/* Encabezado clicable; evita selección accidental de texto */
+.card-header {
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-title {
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: .25rem;
+}
+
+/* Flecha simple (si no usa Bootstrap Icons) */
+.caret {
+  font-size: 1rem;
+}
+
+/* Opcional: si desea impedir selección en todo el panel */
+.selectable-fix {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}

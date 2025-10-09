@@ -1,0 +1,229 @@
+/* =========================
+   Estilos ordenados A–Z
+   ========================= */
+
+.card--flat {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.estado-vacio {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 345px;
+}
+
+.fullheight {
+  align-items: center;
+  color: #6c757d;
+  display: flex;
+  justify-content: center;
+  min-height: var(--list-min);
+  text-align: center;
+}
+
+html, body {
+  scrollbar-gutter: stable both-edges; /* evita saltos de scroll */
+}
+
+.is-loading .table-hover tbody tr:hover {
+  background-color: inherit;
+}
+
+.lista-wrap {
+  display: flow-root; /* evita margin-collapsing en primer/último hijo */
+  position: relative;
+}
+
+/* Overlay */
+.loading-overlay {
+  backdrop-filter: blur(1px);
+  background: rgba(255, 255, 255, .6);
+  font-weight: 600;
+  inset: 0;
+  position: absolute;
+}
+
+/* Paginación */
+.pager-wrap {
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  min-height: 2rem;        /* altura estable del bloque */
+  padding: 0 1rem .5rem;     /* padding superior/laterales */
+}
+
+.pager-wrap .num-range,
+.pager-wrap .total-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums; /* dígitos de ancho fijo */
+  min-width: 9ch;                     /* reserve según su máximo esperado */
+  text-align: right;
+  transition: opacity .15s ease;      /* crossfade leve en cambios */
+}
+
+.pager-wrap.is-loading .num-range,
+.pager-wrap.is-loading .total-num {
+  opacity: .75;
+}
+
+.pager-wrap.invisible {
+  min-height: 40px;
+  visibility: hidden;
+}
+
+.placeholder {
+  background: #e9ecef;
+  border-radius: .25rem;
+  display: inline-block;
+  height: .9rem;
+}
+
+.prewrap {
+  white-space: pre-wrap;
+}
+
+/* ——— ÍTEM: variables para igualar ALTURA del cuerpo (skeleton vs textarea) ——— */
+
+.seguimiento-card {
+  /* Variables del textarea (ajuste si su tema cambia tamaños) */
+  --ta-fs: 1rem;       /* font-size del textarea */
+  --ta-lh: 1.5;        /* line-height (factor) */
+  --ta-rows: 2;        /* filas (coincide con rows="…") */
+  --ta-py: .375rem;    /* padding-top/bottom del textarea (Bootstrap) */
+  --ta-bd: 2px;        /* borde vertical total (1px arriba + 1px abajo) */
+
+  /* Altura mínima del cuerpo (textarea o skeleton-area) */
+  --ta-line: calc(var(--ta-fs) * var(--ta-lh));
+  --body-min: calc(var(--ta-rows) * var(--ta-line) + (2 * var(--ta-py)) + var(--ta-bd));
+
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  display: block;     /* bloque: el contenido cae siempre debajo del header */
+  margin: 0 !important;
+  min-height: var(--row-min, 140px);
+  padding: .75rem 1rem;
+}
+
+/* ——— Header en GRID: ID | ACCIONES | FECHA (ancho reservado) ——— */
+
+.seguimiento-card .cabecera {
+  align-items: center;
+  column-gap: .75rem;
+  display: grid;
+  grid-template-columns: 1fr auto var(--fecha-minch, 28ch); /* ancho fijo fecha */
+  padding: .5rem 0 .25rem;
+}
+
+.seguimiento-card .cabecera .acciones {
+  align-items: center;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+  justify-self: end; /* pegado a la derecha de su columna */
+}
+
+.seguimiento-card .cabecera .fecha {
+  justify-self: end; /* pegado a la derecha de su columna */
+  white-space: nowrap;
+}
+
+.seguimiento-card .cabecera .fecha .fecha-box {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  min-width: 100%; /* ocupa toda la columna reservada */
+  text-align: right;
+}
+
+.seguimiento-card .cabecera .fecha .fecha-box.placeholder {
+  background: #e9ecef;
+  border-radius: .25rem;
+  display: inline-block;
+  height: .9rem;
+}
+
+.seguimiento-card .cabecera .id {
+  font-weight: 600;
+}
+
+/* ——— Cuerpo: MISMA ALTURA para textarea y skeleton-area ——— */
+
+.seguimiento-card .contenido {
+  padding: 0;               /* la altura la controla el textarea/skeleton-area */
+  width: 100%;
+  min-height: var(--body-min);
+}
+
+/* Textarea real: obligamos a respetar la altura calculada */
+.seguimiento-card .contenido .form-control {
+  font-size: var(--ta-fs);
+  line-height: var(--ta-lh);
+  min-height: var(--body-min);
+  padding-bottom: var(--ta-py);
+  padding-top: var(--ta-py);
+  resize: vertical;         /* opcional: permitir crecer manualmente */
+}
+
+/* Skeleton-area con altura idéntica al textarea */
+.seguimiento-card .contenido .skeleton-area {
+  box-sizing: border-box;       /* igual que el textarea */
+  height: var(--body-min);      /* ⬅️ misma altura */
+  overflow: hidden;             /* líneas no deben “empujar” */
+  padding: var(--ta-py) 0;      /* emula padding vertical del textarea */
+}
+
+/* Líneas del skeleton */
+.skeleton-line {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #f0f3f5 25%, #e6eaed 37%, #f0f3f5 63%);
+  background-size: 400% 100%;
+  border-radius: .25rem;
+  height: .9rem;
+}
+
+.skeleton-line.w-75 { width: 75%; }
+.skeleton-card { opacity: .95; }
+
+/* En modo skeleton: altura FIJA del ítem para evitar empujes del conjunto */
+.skeleton-mode .seguimiento-card {
+  height: var(--row-min, 140px);
+  min-height: var(--row-min, 140px);
+}
+
+/* ——— Pila/Separación ——— */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--row-gap, 8px);
+}
+
+.stack > .seguimiento-card + .seguimiento-card {
+  border-top: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+/* ——— Tabla (si convive) ——— */
+
+.tabla-wrap {
+  contain: paint;
+  display: flow-root;
+  position: relative;
+}
+
+table { table-layout: fixed; width: 100%; }
+
+td, th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================
+   Animaciones
+   ========================= */
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}

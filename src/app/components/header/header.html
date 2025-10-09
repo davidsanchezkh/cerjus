@@ -1,0 +1,38 @@
+<nav class="navbar navbar-expand-lg navbar-dark color_azul" style="user-select: none;">
+  <div class="container-fluid header-bar">
+    <!-- SLOT FIJO PARA ATRÁS (evita saltos) -->
+    <div class="back-slot">
+      @if (backHref) {
+        <button type="button"
+                class="btn btn-back"
+                (click)="goBack()"
+                aria-label="Volver">
+          ⬅️
+        </button>
+      } @else {
+        <!-- Placeholder idéntico en tamaño -->
+        <span class="btn-back placeholder" aria-hidden="true">⬅️</span>
+      }
+    </div>
+
+    <!-- SLOT TÍTULO (ancho/altura reservado) -->
+    <div class="navbar-brand title-slot">
+      <span class="title-text">{{ title || ' ' }}</span>
+    </div>
+
+    <!-- Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Menú -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link text-light" href="#" (click)="onLogout(); $event.preventDefault()">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,34 @@
+<!-- ciudadano.registrar.html -->
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar Seguimiento</h5>
+
+          <!-- Formulario reactivo -->
+          <form [formGroup]="form" novalidate>
+            <div class="mb-3">
+              <label class="form-label fw-semibold"> Cuerpo del seguimiento </label>
+              <textarea class="form-control" formControlName="cuerposeguimiento" rows="4"></textarea>
+            </div>
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning"
+                      (click)="onBack()">
+                Regresar
+              </button>
+              <button type="button" class="btn btn-success"
+                      (click)="onSubmit()"
+                      >
+                Registrar
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

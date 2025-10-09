@@ -1,0 +1,30 @@
+.color_azul{
+    background-color: #015675; 
+}
+.color_resaltado{
+    background-color:#01BAFE;
+}
+/* Resalta la opción activa */
+.nav-link.active,
+.nav-link.active:focus,
+.nav-link.active:hover {
+  background-color: rgba(255,255,255, .15);
+  color: #fff;
+}
+
+/* Suaviza hover aunque no esté activa */
+.nav-link.text-white:hover { 
+  background-color: rgba(255,255,255, .08);
+}
+
+/* Mantener tipografía legible */
+.nav-link { border-radius: .375rem; }
+
+
+.nav-pills .nav-link {
+  padding: 0.75rem 1rem; /* más espacio interno */
+}
+
+.nav-pills .nav-item + .nav-item {
+  margin-top: 0.75rem; /* espacio entre items */
+}

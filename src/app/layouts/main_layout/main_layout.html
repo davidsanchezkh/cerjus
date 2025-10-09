@@ -1,0 +1,14 @@
+<div class="d-flex" style="height: 100vh;">
+  <div>
+    <app-sidebar [userLevel]="userLevel" [loggedIn]="loggedIn"></app-sidebar>
+  </div>
+
+  <div class="flex-grow-1 d-flex flex-column">
+    <app-header></app-header>
+
+    <!-- Contenedor que scrollea sin achicar el contenido -->
+    <div #scrollContainer class="scroll-container flex-grow-1 p-3">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>

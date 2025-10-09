@@ -1,0 +1,129 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <!-- PANEL 1: Información de la consulta -->
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="open = !open"
+          role="button"
+          [attr.aria-expanded]="open">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">Información de la consulta</span>
+            <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
+              Editar
+            </button>
+          </div>
+          <span class="caret">{{ open ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Cuerpo (colapsable, NO destructivo) -->
+        <form class="card-body selectable-fix"
+              [formGroup]="form"
+              id="form1"
+              name="form1"
+              [hidden]="!open">
+
+          <!-- Sección: Datos principales -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Resumen</label>
+              <input type="text"
+                     formControlName="resumen"
+                     [class.value-box-edit]="isEditing"
+                     [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Sección: Hechos -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Hechos</label>
+              <textarea formControlName="hechos"
+                        rows="4"
+                        [class.value-box-edit]="isEditing"
+                        [class.value-box-noedit]="!isEditing"></textarea>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Sección: Materia -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Materia</label>
+              <input type="text"
+                     formControlName="materia"
+                     [class.value-box-edit]="isEditing"
+                     [class.value-box-noedit]="!isEditing"/>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Estado</label>
+              <input type="number"
+                     formControlName="estado"
+                     [class.value-box-edit]="isEditing"
+                     [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Sección: Absolución -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Absolución</label>
+              <textarea formControlName="absolucion"
+                        rows="3"
+                        [class.value-box-edit]="isEditing"
+                        [class.value-box-noedit]="!isEditing"></textarea>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Botones -->
+          @if (isEditing) {
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning" (click)="onCancel()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-success" (click)="onSave()">
+                Guardar
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+
+    <!-- PANEL 2: Seguimiento -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="open2 = !open2"
+          role="button"
+          [attr.aria-expanded]="open2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">Seguimiento</span>
+            <button type="button" class="btn btn-secondary"
+                    (click)="gotoSeguimiento(); $event.stopPropagation()">Nuevo Seguimiento</button>
+          </div>
+          <span class="caret">{{ open2 ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Contenido (persistente, NO destructivo) -->
+        <div class="card-body p-0 no-fouc" [hidden]="!open2">
+          <!-- El child se instancia desde el inicio y carga con el @Input -->
+          <app-seguimiento-lista-consulta [idconsulta]="idconsulta"></app-seguimiento-lista-consulta>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
