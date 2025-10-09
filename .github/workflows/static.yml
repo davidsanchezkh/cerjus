@@ -2,7 +2,7 @@ name: Deploy Angular to GitHub Pages
 
 on:
   push:
-    branches: ["master"]
+    branches: ["master"]     # usas master
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deploy_pages.outputs.page_url }}   # <- actualizado
     runs-on: ubuntu-latest
 
     steps:
@@ -45,7 +45,6 @@ jobs:
         id: locate
         shell: bash
         run: |
-          # 1) Intento leyendo angular.json (architect o targets)
           OUT=$(node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('./angular.json','utf8'));
             const p=a.defaultProject || Object.keys(a.projects||{})[0];
             const proj=(a.projects||{})[p]||{};
@@ -53,7 +52,6 @@ jobs:
             const opt=(b.options||{});
             process.stdout.write(opt.outputPath||'');")
 
-          # 2) Si no hay OUT, buscamos index.html dentro de dist/**
           if [ -z "$OUT" ]; then
             CANDIDATE=$(find dist -type f -name index.html -print -quit 2>/dev/null || true)
             if [ -n "$CANDIDATE" ]; then
@@ -61,7 +59,6 @@ jobs:
             fi
           fi
 
-          # 3) Ajuste por estructuras con "browser"
           if [ -n "$OUT" ] && [ -f "$OUT/index.html" ]; then
             PUBLISH_DIR="$OUT"
           elif [ -n "$OUT" ] && [ -f "$OUT/browser/index.html" ]; then
@@ -86,8 +83,5 @@ jobs:
           path: ${{ env.PUBLISH_DIR }}
 
       - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - name: Deploy to GitHub Pages
-        id: deployment
+        id: deploy_pages                     # <- renombrado (antes era "deployment")
         uses: actions/deploy-pages@v4
