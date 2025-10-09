@@ -2,7 +2,7 @@ name: Deploy Angular to GitHub Pages
 
 on:
   push:
-    branches: ["master"]          # usa "master" si tu repo es master
+    branches: ["master"]     # <- usas master
   workflow_dispatch:
 
 permissions:
@@ -23,6 +23,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,22 +37,39 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # Compila en dist/ (forzamos output-path para no depender del angular.json)
+      # Compila (sin forzar outputPath) y deja base-href para Project Pages
       - name: Build Angular (production)
-        run: |
-          npm run build -- --configuration production --output-path dist --base-href "/${REPO_NAME}/"
+        run: npm run build -- --configuration production --base-href "/${REPO_NAME}/"
 
-      # Reescritura SPA: 404.html -> index.html
+      # Detecta automáticamente dónde quedó index.html (Angular 15-18)
+      - name: Locate publish directory
+        id: locate
+        shell: bash
+        run: |
+          OUT=$(node -e "const a=require('./angular.json'); const p=Object.keys(a.projects)[0]; console.log(a.projects[p].architect.build.options.outputPath)")
+          # Posibles ubicaciones del index
+          if [ -f \"$OUT/index.html\" ]; then
+            PUBLISH_DIR=\"$OUT\"
+          elif [ -f \"$OUT/browser/index.html\" ]; then
+            PUBLISH_DIR=\"$OUT/browser\"
+          else
+            echo \"No se encontró index.html en $OUT ni en $OUT/browser\"
+            exit 1
+          fi
+          echo \"PUBLISH_DIR=$PUBLISH_DIR\" >> $GITHUB_ENV
+          echo \"Publish dir: $PUBLISH_DIR\"
+
+      # 404 para SPA routing
       - name: Add SPA 404.html
-        run: cp dist/index.html dist/404.html
+        run: cp "$PUBLISH_DIR/index.html" "$PUBLISH_DIR/404.html"
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload artifact (dist)
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: ${{ env.PUBLISH_DIR }}
 
       - name: Deploy to GitHub Pages
         id: deployment
