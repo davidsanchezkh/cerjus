@@ -2,7 +2,7 @@ name: Deploy Angular to GitHub Pages
 
 on:
   push:
-    branches: ["master"]     # <- usas master
+    branches: ["master"]
   workflow_dispatch:
 
 permissions:
@@ -37,29 +37,43 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      # Compila (sin forzar outputPath) y deja base-href para Project Pages
-      - name: Build Angular (production)
-        run: npm run build -- --configuration production --base-href "/${REPO_NAME}/"
+      - name: Build Angular (prod)
+        run: |
+          npm run build -- --configuration production --base-href "/${REPO_NAME}/"
 
-      # Detecta automáticamente dónde quedó index.html (Angular 15-18)
-      - name: Locate publish directory
+      - name: Locate publish directory (robusto)
         id: locate
         shell: bash
         run: |
-          OUT=$(node -e "const a=require('./angular.json'); const p=Object.keys(a.projects)[0]; console.log(a.projects[p].architect.build.options.outputPath)")
-          # Posibles ubicaciones del index
-          if [ -f \"$OUT/index.html\" ]; then
-            PUBLISH_DIR=\"$OUT\"
-          elif [ -f \"$OUT/browser/index.html\" ]; then
-            PUBLISH_DIR=\"$OUT/browser\"
+          # 1) Intento leyendo angular.json (architect o targets)
+          OUT=$(node -e "const fs=require('fs');const a=JSON.parse(fs.readFileSync('./angular.json','utf8'));
+            const p=a.defaultProject || Object.keys(a.projects||{})[0];
+            const proj=(a.projects||{})[p]||{};
+            const b=(proj.architect&&proj.architect.build)||(proj.targets&&proj.targets.build)||{};
+            const opt=(b.options||{});
+            process.stdout.write(opt.outputPath||'');")
+
+          # 2) Si no hay OUT, buscamos index.html dentro de dist/**
+          if [ -z "$OUT" ]; then
+            CANDIDATE=$(find dist -type f -name index.html -print -quit 2>/dev/null || true)
+            if [ -n "$CANDIDATE" ]; then
+              OUT="$(dirname "$CANDIDATE")"
+            fi
+          fi
+
+          # 3) Ajuste por estructuras con "browser"
+          if [ -n "$OUT" ] && [ -f "$OUT/index.html" ]; then
+            PUBLISH_DIR="$OUT"
+          elif [ -n "$OUT" ] && [ -f "$OUT/browser/index.html" ]; then
+            PUBLISH_DIR="$OUT/browser"
           else
-            echo \"No se encontró index.html en $OUT ni en $OUT/browser\"
+            echo "No se encontró index.html en $OUT ni en $OUT/browser ni en dist/**"
             exit 1
           fi
-          echo \"PUBLISH_DIR=$PUBLISH_DIR\" >> $GITHUB_ENV
-          echo \"Publish dir: $PUBLISH_DIR\"
 
-      # 404 para SPA routing
+          echo "PUBLISH_DIR=$PUBLISH_DIR" >> $GITHUB_ENV
+          echo "Publish dir: $PUBLISH_DIR"
+
       - name: Add SPA 404.html
         run: cp "$PUBLISH_DIR/index.html" "$PUBLISH_DIR/404.html"
 
@@ -71,6 +85,9 @@ jobs:
         with:
           path: ${{ env.PUBLISH_DIR }}
 
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
