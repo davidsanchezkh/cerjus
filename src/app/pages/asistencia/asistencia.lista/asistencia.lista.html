@@ -1,10 +1,10 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <button type="button"
-          (click)="marcarEntrada()"
+<div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+  <button type="button" class="btn btn-warning"
+          (click)="marcarEntrada()" 
           [disabled]="loading || marcando">
     {{ marcando ? 'Marcando…' : 'Marcar entrada' }}
   </button>
-   <button type="button"
+   <button type="button" class="btn btn-success"
           (click)="marcarSalida()"
           [disabled]="loading || marcando">
     {{ marcando ? 'Marcando…' : 'Marcar salida' }}
