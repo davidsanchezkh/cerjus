@@ -25,14 +25,34 @@
                   [class.hidden]="logoMissing"
                   loading="eager"
                   decoding="sync"
-                  src="./assets/img/bsb-logo-light.svg"
-                  width="245" height="80"
+                  src="assets/imagenes/cerjuslogo.jpg"
                   alt="Logo"
                   (load)="onLogoLoad()"
                   (error)="onLogoError()"
                 />
               </div>
+              <div class="abagado-box mx-auto">
+                <!-- Fallback mientras no carga o si falla -->
+                <div class="logo-fallback" [class.hidden]="logoLoaded && !logoMissing" aria-hidden="true">
+                  <svg viewBox="0 0 100 30" role="img" aria-label="Logo">
+                    <rect x="0" y="0" width="100" height="30" rx="4" ry="4"></rect>
+                    <text x="50" y="20" text-anchor="middle" font-size="12">Abogado</text>
+                  </svg>
+                </div>
 
+                <!-- Imagen real -->
+                <img
+                  class="logo-img"
+                  [class.loaded]="logoLoaded && !logoMissing"
+                  [class.hidden]="logoMissing"
+                  loading="eager"
+                  decoding="sync"
+                  src="assets/imagenes/abogado.jpg"
+                  alt="Logo"
+                  (load)="onLogoLoad()"
+                  (error)="onLogoError()"
+                />
+              </div>
               <hr class="border-primary-subtle mb-4">
               <h2 class="h1 mb-4">Bienvenido a CERJUS</h2>
               <p class="lead m-0">Por favor ingrese su correo y contraseña</p>

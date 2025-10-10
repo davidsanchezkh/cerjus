@@ -5,15 +5,15 @@
 .btn-login:active { box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
 
 /* ====== LOGO BOX sin flash ====== */
-.logo-box { width: 245px; height: 80px; position: relative; margin-bottom: 1rem; }
+.logo-box { width: 328px; height: 80px; position:relative; margin:0 auto 1rem;overflow:hidden; }
 .logo-box .hidden { display: none !important; }
 .logo-fallback, .logo-img { position: absolute; inset: 0; display: block; }
 .logo-fallback { background: rgba(255,255,255,.12); border-radius: .25rem; display: grid; place-items: center; }
 .logo-fallback svg { width: 60%; height: 60%; fill: rgba(255,255,255,.5); }
 .logo-fallback text { fill: rgba(255,255,255,.9); font-weight: 600; }
-.logo-img { object-fit: contain; width: 245px; height: 80px; opacity: 0; transition: opacity .18s ease; }
+.logo-img {position:absolute; inset:0;width:100%; height:100%;object-fit:contain;opacity:0; transition:opacity .18s ease;}
 .logo-img.loaded { opacity: 1; }
-
+.abagado-box { width: 328px; height: 218.67px; position:relative; margin:0 auto 1rem;overflow:hidden; }
 /* ====== Skeleton SOLO encima del campo (no del form) ====== */
 .input-shell { position: relative; }
 .sk-input-overlay {
