@@ -49,11 +49,11 @@
         } @else {
           <!-- FILAS REALES -->
           @if (items.length > 0) {
-            @for (item of items;track item; let i = $index) {
+             @for (c of items; track c.idmarca) {
               <tr>
-                <td style="width: 8rem;">{{ i + 1}}</td>
-                <td >{{ item.tipo }}</td>
-                <td>{{ item.fecha_formato }}</td>
+                <td style="width: 8rem;">{{ c.idmarca }}</td>
+                <td >{{ c.tipo }}</td>
+                <td>{{ c.fecha_formato }}</td>
               </tr>
             }
           }
