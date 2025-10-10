@@ -111,7 +111,7 @@ export class AsistenciaLista implements OnInit {
     const last = this.lastPage;
     if (last && page > last) return;
     this.page = page;
-    //this.load();
+    this.load();
   }
 
   /* Carga con anti-flicker */
