@@ -253,7 +253,37 @@ export class AsistenciaLista implements OnInit {
   get lastPageCalc(): number {
     return this.lastPage; // alias si lo prefiere en plantillas
   }
+  
+  marcando = false;
+  marcarEntrada(): void {
+    if (this.marcando) return;
+    this.marcando = true;
+    this.service.marcarEntrada().subscribe({
+      next: () => {
+        this.marcando = false;
+        this.load(); // refresca la tabla
+      },
+      error: () => {
+        this.marcando = false;
+        alert('No se pudo marcar la entrada.');
+      }
+    });
+  }
 
+  marcarSalida(): void {
+    if (this.marcando) return;
+    this.marcando = true;
+    this.service.marcarSalida().subscribe({
+      next: () => {
+        this.marcando = false;
+        this.load(); // refresca la tabla
+      },
+      error: () => {
+        this.marcando = false;
+        alert('No se pudo marcar la salida.');
+      }
+    });
+  }
   /*trackById(_index: number, item: VMCiudadanoListaSimple) {
     return item.id;
   }*/

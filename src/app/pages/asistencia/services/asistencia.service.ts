@@ -23,10 +23,16 @@ export class AsistenciaService {
     
     const dto:DTOAsistenciaListaOptions=MapAsistenciaListaOpciones(opts);
     const params = toHttpParams(dto);
-    
+
     return this.http
     .get<ApiAsistenciaPageSimple>(this.base, { params })
     .pipe(map(apiPage=>MapPageToVM<ApiAsistenciaListaSimple,VMAsistenciaListaSimple>(apiPage,MapAsistenciaListaItemVM)))
     
+  }
+  marcarSalida(): Observable<void> {
+    return this.http.post<void>(`${this.base}/salida`, {});
+  }
+  marcarEntrada(): Observable<void> {
+    return this.http.post<void>(`${this.base}/entrada`, {});
   }
 }

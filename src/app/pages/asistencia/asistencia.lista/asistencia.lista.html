@@ -1,5 +1,14 @@
 <div class="d-flex align-items-center justify-content-between mb-3">
-  <a class="btn btn-primary" routerLink="/ciudadano/registrar">Registrar ciudadano</a>
+  <button type="button"
+          (click)="marcarEntrada()"
+          [disabled]="loading || marcando">
+    {{ marcando ? 'Marcando…' : 'Marcar entrada' }}
+  </button>
+   <button type="button"
+          (click)="marcarSalida()"
+          [disabled]="loading || marcando">
+    {{ marcando ? 'Marcando…' : 'Marcar salida' }}
+  </button>
 </div>
 
 <div [formGroup]="form" class="card card--flat">
