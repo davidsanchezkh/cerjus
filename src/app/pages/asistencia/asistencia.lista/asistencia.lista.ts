@@ -8,7 +8,7 @@ import { VMAsistenciaListaSimple } from '../models/asistencia.vm';
 
 @Component({
   selector: 'app-asistencia-lista',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './asistencia.lista.html',
   styleUrl: './asistencia.lista.css'
 })

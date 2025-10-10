@@ -5,8 +5,20 @@ import {DTOAsistenciaListaOptions} from '../models/asistencia.dto';
 
 //traductor entre API ↔ VM ↔ DTO.Asistencia
 export function MapAsistenciaListaItemVM(a: ApiAsistenciaListaSimple):VMAsistenciaListaSimple {
-  return{
-    tipo: a.ma_tipo,
+  let tipo: string;
+  switch (a.ma_tipo) {
+    case 1:
+      tipo = 'Entrada';
+      break;
+    case 2:
+      tipo = 'Salida';
+      break;
+    default:
+      tipo = 'Error: tipo desconocido';
+  }
+
+  return {
+    tipo,
     fecha_formato: formatFechaPeru(new Date(a.ma_fecha)),
   };
 }
@@ -39,15 +51,23 @@ export function MapPageToVM<TIn, TOut>(
 function formatFechaPeru(fecha?: Date): string {
   if (!fecha) return '';
 
-  const opciones: Intl.DateTimeFormatOptions = {
-    hour: '2-digit',
-    minute: '2-digit',
+  const opcionesFecha: Intl.DateTimeFormatOptions = {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    hour12: false,           
-    timeZone: 'America/Lima'  
+    timeZone: 'America/Lima'
   };
-  
-  return fecha.toLocaleString('es-PE', opciones).replace(',', '');
+
+  const opcionesHora: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit', // 👈 ahora muestra los segundos
+    hour12: false,
+    timeZone: 'America/Lima'
+  };
+
+  const fechaStr = fecha.toLocaleDateString('es-PE', opcionesFecha);
+  const horaStr = fecha.toLocaleTimeString('es-PE', opcionesHora);
+
+  return `${fechaStr} ${horaStr}`;
 }

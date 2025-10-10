@@ -10,7 +10,7 @@ export interface VMAsistencia{
 
     idmarca: bigint;
     idmarcaasistencia: number;
-    tipo: number;
+    tipo: string;
     fecha: Date;
     latitud: number;
     longitud: number;
