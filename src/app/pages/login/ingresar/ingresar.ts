@@ -2,16 +2,17 @@ import { Component, ElementRef, ViewChild, AfterViewInit, OnDestroy, inject } fr
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../auth/auth.service';
+import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './login.html',
-  styleUrl: './login.css'
+  imports: [CommonModule, FormsModule,RouterLink],
+  templateUrl: './ingresar.html',
+  styleUrl: './ingresar.css'
 })
-export class Login implements AfterViewInit {
+export class Ingresar implements AfterViewInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
