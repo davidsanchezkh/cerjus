@@ -18,8 +18,8 @@ export class Ingresar implements AfterViewInit {
 
   email = '';
   password = '';
-  loading = false;
-  error = '';
+  loading = false;       
+  error = ''; 
 
   inputsReady = false;
   private firstPaintAt = 0;
@@ -35,7 +35,6 @@ export class Ingresar implements AfterViewInit {
     this.firstPaintAt = performance.now();
     this.inputsReady = false;
 
-    // Oculta skeleton tras mínimo + primer indicio de valor/tecleo
     const tryReveal = (force = false) => {
       if (this.inputsReady) return;
       const elapsed = performance.now() - this.firstPaintAt;
@@ -45,7 +44,6 @@ export class Ingresar implements AfterViewInit {
       if (minReached && (force || eHas || pHas)) this.inputsReady = true;
     };
 
-    // Failsafes y eventos (autofill suele disparar input)
     setTimeout(() => tryReveal(true), this.minSkeletonMs);
     setTimeout(() => tryReveal(true), 50);
     setTimeout(() => tryReveal(true), 250);
@@ -54,14 +52,8 @@ export class Ingresar implements AfterViewInit {
     this.passEl.nativeElement.addEventListener('input', () => tryReveal(true), { passive: true });
   }
 
-  onLogoLoad() {
-    this.logoLoaded = true;
-    this.logoMissing = false;
-  }
-  onLogoError() {
-    this.logoLoaded = false;
-    this.logoMissing = true;
-  }
+  onLogoLoad() { this.logoLoaded = true; this.logoMissing = false; }
+  onLogoError() { this.logoLoaded = false; this.logoMissing = true; }
 
   onLogin() {
     if (!this.email || !this.password) {
@@ -78,7 +70,11 @@ export class Ingresar implements AfterViewInit {
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message || 'Credenciales inválidas.';
+
+        if (err?.status === 401 || err?.status === 400) {
+          this.error = err?.error?.message || 'Credenciales inválidas.';
+          return;
+        }
       }
     });
   }

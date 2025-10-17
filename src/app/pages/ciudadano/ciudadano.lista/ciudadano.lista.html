@@ -33,28 +33,16 @@
       </thead>
 
       <tbody>
-        <!-- SKELETON filas (primera carga o carga sin datos previos) -->
-        @if (firstLoad || (loading && items.length === 0)) {
+        <!-- SKELETON filas SOLO en primera carga -->
+        @if (firstLoad) {
           @for (_ of skeletonRows; track $index) {
             <tr class="tbody-skeleton">
-              <td style="width: 8rem;">
-                <div class="sk-wrap"><div class="sk-cell sk-id"></div></div>
-              </td>
-              <td style="width: 10rem;">
-                <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
-              </td>
-              <td>
-                <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
-              </td>
-              <td>
-                <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
-              </td>
-              <td>
-                <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
-              </td>
-              <td style="width: 10rem;">
-                <div class="sk-wrap"><div class="sk-cell sk-btn"></div></div>
-              </td>
+              <td style="width: 8rem;"><div class="sk-wrap"><div class="sk-cell sk-id"></div></div></td>
+              <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+              <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+              <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+              <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+              <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-btn"></div></div></td>
             </tr>
           }
         } @else {
@@ -78,7 +66,7 @@
     </table>
 
     <!-- OVERLAY: estado vacío (con debounce, estable) -->
-    @if (showEmpty) {
+    @if (showEmpty && !loading) {
       <div class="empty-overlay">
         <div class="text-center text-muted estado-vacio fullheight">
           No se encontraron resultados.

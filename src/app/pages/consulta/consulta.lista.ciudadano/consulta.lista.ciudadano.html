@@ -1,7 +1,7 @@
 <div [formGroup]="form" class="card card--flat">
   <div class="card-body p-0 tabla-wrap"
        [class.is-loading]="loading"
-       [class.skeleton-mode]="firstLoad || (loading && items.length === 0)"
+       [class.skeleton-mode]="firstLoad"
        [style.minHeight.px]="listMinHeight"
        [style.--thead-h.px]="headerBlockPx"
        style="position: relative;">
@@ -27,8 +27,8 @@
       </thead>
 
       <tbody>
-        <!-- SKELETON -->
-        @if (firstLoad || (loading && items.length === 0)) {
+        <!-- SKELETON SOLO EN PRIMERA CARGA -->
+        @if (firstLoad) {
           @for (_ of skeletonRows; track $index) {
             <tr class="tbody-skeleton">
               <td style="width: 4rem;"><div class="sk-wrap"><div class="sk-cell sk-id"></div></div></td>
@@ -56,8 +56,8 @@
       </tbody>
     </table>
 
-    <!-- OVERLAY vacío (ahora dependemos de showEmpty con debounce) -->
-    @if (showEmpty) {
+    <!-- VACÍO SOLO CUANDO NO ESTÁ CARGANDO -->
+    @if (showEmpty && !loading) {
       <div class="empty-overlay">
         <div class="text-center text-muted estado-vacio fullheight">
           No se encontraron resultados.
@@ -65,7 +65,7 @@
       </div>
     }
 
-    <!-- OVERLAY de carga sólo cuando ya hay datos previos -->
+    <!-- OVERLAY de carga sólo cuando ya había datos previos -->
     @if (showOverlay && items.length > 0) {
       <div class="loading-overlay d-flex align-items-center justify-content-center">
         Cargando…
@@ -82,9 +82,7 @@
     Página {{ shownPage }} de {{ shownLastPage }} —
     Mostrando
     <span class="num-range">
-      @if (shownFrom > 0) {
-        {{ shownFrom }}&ndash;{{ shownTo }}
-      } @else { 0 }
+      @if (shownFrom > 0) { {{ shownFrom }}&ndash;{{ shownTo }} } @else { 0 }
     </span>
     de <span class="total-num">{{ shownTotal }}</span>
   </div>

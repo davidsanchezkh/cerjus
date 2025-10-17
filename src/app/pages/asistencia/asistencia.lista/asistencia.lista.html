@@ -2,12 +2,12 @@
   <button type="button" class="btn btn-warning"
           (click)="marcarEntrada()" 
           [disabled]="loading || marcando">
-    {{ marcando ? 'Marcando…' : 'Marcar entrada' }}
+    Marcar entrada
   </button>
    <button type="button" class="btn btn-success"
           (click)="marcarSalida()"
           [disabled]="loading || marcando">
-    {{ marcando ? 'Marcando…' : 'Marcar salida' }}
+    Marcar salida 
   </button>
 </div>
 
@@ -49,7 +49,7 @@
         } @else {
           <!-- FILAS REALES -->
           @if (items.length > 0) {
-             @for (c of items; track c.idmarca) {
+             @for (c of items; track (c.idmarcaasistencia + '-' + c.idmarca)) {
               <tr>
                 <td style="width: 8rem;">{{ c.idmarca }}</td>
                 <td >{{ c.tipo }}</td>

@@ -1,0 +1,62 @@
+<!-- Loading overlay (no bloquea interacción) -->
+@if (loading().visible) {
+  <div class="app-loading-overlay" aria-live="polite">
+    <div class="app-loading-card">
+      <div class="spinner-border me-3" role="status" aria-hidden="true"></div>
+      <div>{{ loading().message }}</div>
+    </div>
+  </div>
+}
+
+<!-- Diálogo OK (bloqueante hasta pulsar el botón) -->
+@if (ok()) {
+  <div class="app-dialog-backdrop">
+    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="ok()?.title">
+      <div class="app-dialog-header"
+           [class.ok-success]="headerClass().success"
+           [class.ok-info]="headerClass().info"
+           [class.ok-warning]="headerClass().warning"
+           [class.ok-error]="headerClass().error">
+        <strong>{{ ok()?.title }}</strong>
+      </div>
+
+      <div class="app-dialog-body">
+        <p class="mb-0">{{ ok()?.message }}</p>
+      </div>
+
+      <div class="app-dialog-footer">
+        <button type="button" class="btn btn-primary" (click)="onOkClick()">
+          {{ ok()?.primaryText ?? 'OK' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Diálogo CONFIRM (bloqueante hasta confirmar/cancelar) -->
+@if (confirm()) {
+  <div class="app-dialog-backdrop">
+    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="confirm()?.title">
+      <div class="app-dialog-header"
+           [class.ok-success]="headerClass().success"
+           [class.ok-info]="headerClass().info"
+           [class.ok-warning]="headerClass().warning"
+           [class.ok-error]="headerClass().error">
+        <strong>{{ confirm()?.title }}</strong>
+      </div>
+
+      <div class="app-dialog-body">
+        <p class="mb-0">{{ confirm()?.message }}</p>
+      </div>
+
+      <div class="app-dialog-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="onConfirmCancel()">
+          {{ confirm()?.cancelText ?? 'Cancelar' }}
+        </button>
+        <button type="button" class="btn btn-primary" (click)="onConfirmAccept()">
+          {{ confirm()?.confirmText ?? 'Confirmar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

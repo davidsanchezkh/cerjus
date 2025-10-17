@@ -6,9 +6,7 @@
     Página {{ shownPage }} de {{ shownLastPage }} —
     Mostrando
     <span class="num-range">
-      @if (shownFrom > 0) {
-        {{ shownFrom }}&ndash;{{ shownTo }}
-      } @else { 0 }
+      @if (shownFrom > 0) { {{ shownFrom }}&ndash;{{ shownTo }} } @else { 0 }
     </span>
     de <span class="total-num">{{ shownTotal }}</span>
   </div>
@@ -27,7 +25,7 @@
 <div [formGroup]="form" class="card card--flat" [attr.aria-busy]="loading">
   <div class="card-body p-0 lista-wrap"
        [class.is-loading]="loading"
-       [class.skeleton-mode]="firstLoad || (loading && items.length === 0)"
+       [class.skeleton-mode]="firstLoad"
        [style.--list-min.px]="listMinHeight"
        [style.--row-min.px]="rowSlotPx"
        [style.--row-gap.px]="rowGapPx"
@@ -37,18 +35,14 @@
       <!-- PRIMERA CARGA: SKELETON -->
       @if (firstLoad) {
         @for (_ of skeletons; track $index) {
-          <!-- Ajuste una sola vez aquí: filas del “textarea” -->
-          <article class="seguimiento-card"
-                   style="--fecha-minch: 28ch; --ta-rows: 2;">
+          <article class="seguimiento-card" style="--fecha-minch: 28ch; --ta-rows: 2;">
             <header class="cabecera">
               <div class="id">Seguimiento #</div>
               <div class="acciones">
-                  <a class="btn btn-sm btn-outline-secondary">Editar</a> 
+                <a class="btn btn-sm btn-outline-secondary">Editar</a>
               </div>
               <span class="fecha"><span class="fecha-box placeholder"></span></span>
             </header>
-
-            <!-- BLOQUE SKELETON CON ALTURA IGUAL AL TEXTAREA REAL -->
             <div class="contenido">
               <div class="skeleton-area">
                 <div class="skeleton-line mb-2"></div>
@@ -59,71 +53,41 @@
           </article>
         }
       } @else {
-
-        <!-- CARGAS POSTERIORES: SKELETON si no hay datos previos -->
-        @if (loading && items.length === 0) {
-          @for (_ of skeletons; track $index) {
-            <article class="seguimiento-card"
-                     style="--fecha-minch: 28ch; --ta-rows: 2;">
-              <header class="cabecera">
-                <div class="id">Seguimiento #</div>
-                <div class="acciones">
-                  <a class="btn btn-sm btn-outline-secondary">Editar</a>
-                </div>
-                <span class="fecha"><span class="fecha-box placeholder"></span></span>
-              </header>
-
-              <div class="contenido">
-                <div class="skeleton-area">
-                  <div class="skeleton-line mb-2"></div>
-                  <div class="skeleton-line mb-2"></div>
-                  <div class="skeleton-line w-75"></div>
-                </div>
-              </div>
-            </article>
-          }
-        } @else {
-
-          <!-- LISTA REAL -->
-          @if (items.length > 0 && rows.length === items.length) {
-            <div formArrayName="rows" class="stack">
-              @for (c of items; track c.id; let i = $index) {
-                <article class="seguimiento-card"
-                         style="--fecha-minch: 28ch; --ta-rows: 2;"
-                         [formGroupName]="i">
-                  <header class="cabecera">
-                    <div class="id">Seguimiento #{{ c.id }}</div>
-                    <div class="acciones">
-                      <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/seguimiento/editar', c.id]">Editar</a>
-                    </div>
-                    <time class="fecha text-muted"><span class="fecha-box">{{ c.fecha_formato }}</span></time>
-                  </header>
-
-                  <!-- TEXTAREA REAL; MISMA ALTURA QUE EL SKELETON-AREA -->
-                  <div class="contenido">
-                    <textarea formControlName="cuerposeguimiento"
-                              class="form-control"
-                              rows="2"
-                              placeholder="Escriba el seguimiento…"
-                              (change)="onRowChange(i)"></textarea>
+        <!-- LISTA REAL -->
+        @if (items.length > 0 && rows.length === items.length) {
+          <div formArrayName="rows" class="stack">
+            @for (c of items; track c.id; let i = $index) {
+              <article class="seguimiento-card" style="--fecha-minch: 28ch; --ta-rows: 2;" [formGroupName]="i">
+                <header class="cabecera">
+                  <div class="id">Seguimiento #{{ c.id }}</div>
+                  <div class="acciones">
+                    <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/seguimiento/editar', c.id]">Editar</a>
                   </div>
-                </article>
-              }
-            </div>
-          }
+                  <time class="fecha text-muted"><span class="fecha-box">{{ c.fecha_formato }}</span></time>
+                </header>
+                <div class="contenido">
+                  <textarea formControlName="cuerposeguimiento"
+                            class="form-control"
+                            rows="2"
+                            placeholder="Escriba el seguimiento…"
+                            (change)="onRowChange(i)"></textarea>
+                </div>
+              </article>
+            }
+          </div>
+        }
 
-          <!-- VACÍO estable -->
-          @if (!loading && showEmpty) {
-            <div class="text-center text-muted estado-vacio fullheight">
-              No se encontraron resultados.
-            </div>
-          }
+        <!-- VACÍO estable (solo cuando NO está cargando) -->
+        @if (showEmpty && !loading) {
+          <div class="text-center text-muted estado-vacio fullheight">
+            No se encontraron resultados.
+          </div>
         }
       }
     </div>
 
-    <!-- OVERLAY: sólo cargas posteriores -->
-    @if (showOverlay) {
+    <!-- OVERLAY: cargas posteriores (opcional mostrar solo si había datos previos) -->
+    @if (showOverlay  && items.length > 0 ) {
       <div class="loading-overlay d-flex align-items-center justify-content-center">
         Cargando…
       </div>

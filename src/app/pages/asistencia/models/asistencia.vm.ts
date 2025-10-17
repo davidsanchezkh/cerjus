@@ -21,7 +21,7 @@ export interface VMAsistencia{
 export type VMAsistenciaListaCompleta = VMAsistencia;
 
 export type VMAsistenciaListaSimple = Pick<VMAsistenciaListaCompleta, 
-  'idmarca'|'tipo'
+  'idmarcaasistencia'|'idmarca'|'tipo'
 >&Partial<{
   fecha_formato: string;
 }>;

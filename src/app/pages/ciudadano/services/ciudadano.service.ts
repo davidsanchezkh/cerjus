@@ -38,7 +38,6 @@ export class CiudadanoService {
   }
 
   getById(id: number): Observable<VMCiudadanoDetalleSimple> {
-    console.log("getById");
     return this.http
       .get<ApiCiudadanoDetalleSimple>(`${this.base}/${id}`)
       .pipe(map(apiItem => MapCiudadanoDetalleListaSimple(apiItem)));// mapper que convierte Api → VM

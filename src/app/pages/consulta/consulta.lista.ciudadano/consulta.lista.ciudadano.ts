@@ -8,6 +8,7 @@ import { VMConsultaListaSimple } from '../models/consulta.vm';
 
 @Component({
   selector: 'app-consulta-lista-ciudadano',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './consulta.lista.ciudadano.html',
   styleUrl: './consulta.lista.ciudadano.css'
@@ -18,7 +19,7 @@ export class ConsultaListaCiudadano implements OnInit {
      ========================= */
   @Input() set idciudadano(value: number | undefined) {
     this._idciudadano = value;
-    if (value != null) this.load();
+    if (value != null) this.load(); // dispara carga inicial cuando llega el id
   }
   private _idciudadano?: number;
 
@@ -34,12 +35,12 @@ export class ConsultaListaCiudadano implements OnInit {
   form = this.fb.group({
     id: [null],
     resumen: [''],
-    fecha: [''],
-    estado: [''],
+    fecha: [''],  // string yyyy-MM-dd
+    estado: [''], // string/number libre
   });
 
   /* =========================
-     Estado de datos / UI
+     Estado de datos / UI visibles
      ========================= */
   items: VMConsultaListaSimple[] = [];
   total = 0;
@@ -49,9 +50,9 @@ export class ConsultaListaCiudadano implements OnInit {
   loading = false;
   showOverlay = false;
 
-  // Anti-flicker / sincronización
-  firstLoad = true;
-  showEmpty = false;
+  // Anti-flicker
+  firstLoad = true;   // skeleton solo en 1ª carga
+  showEmpty = false;  // solo cuando !loading
 
   // Paginación “mostrada” (desacoplada)
   shownFrom = 0;
@@ -60,33 +61,31 @@ export class ConsultaListaCiudadano implements OnInit {
   shownLastPage = 1;
   shownTotal = 0;
 
-  // Paginación pendiente (se promueve al final del ciclo anti-flicker)
+  // Pendientes (se promueven al finalizar cada carga)
+  private pendItems: VMConsultaListaSimple[] = [];
+  private pendTotal = 0;
   private pendFrom = 0;
   private pendTo = 0;
   private pendPage = 1;
   private pendLastPage = 1;
-  private pendTotal = 0;
 
   /* =========================
      Timers / medidas
      ========================= */
   private reqSeq = 0;
   private overlayTimer: any;
-  private emptyTimer: any;
   private overlayShownAt = 0;
   private firstPaintStart = 0;
 
-  private readonly overlayDelay = 180;   // ms antes de mostrar overlay (cargas posteriores)
-  private readonly minOverlayMs = 220;   // ms mínimos visible si llegó a mostrarse
-  private readonly emptyDelay = 220;     // ms de debounce para estado vacío (no 1ª carga)
-  private readonly firstSkeletonMinMs = 200; // ms mínimos de skeleton en 1ª carga
+  private readonly overlayDelay = 180;        // ms antes de mostrar overlay (cargas posteriores)
+  private readonly minOverlayMs = 220;        // ms mínimos visible si se mostró overlay
+  private readonly firstSkeletonMinMs = 200;  // ms mínimos de skeleton en 1ª carga
 
   /* =========================
      Layout helpers
      ========================= */
-  headerBlockPx = 96; // alto estimado de thead + fila de filtros (ajústelo si cambia)
+  headerBlockPx = 96; // alto estimado de thead + fila de filtros
   get listMinHeight(): number {
-    // 96px (head+filtros) + N * 48px aprox (fila), mantenga su fórmula si prefiere
     return this.headerBlockPx + this.pageSize * 48;
   }
   get skeletonRows(): number[] {
@@ -100,6 +99,7 @@ export class ConsultaListaCiudadano implements OnInit {
      Ciclo de vida
      ========================= */
   ngOnInit(): void {
+    // Si el id llega después por @Input, load() ya lo dispara el setter
     // Refiltrado con debounce y comparación estructural
     this.form.valueChanges
       .pipe(
@@ -135,17 +135,21 @@ export class ConsultaListaCiudadano implements OnInit {
   }
 
   /* =========================
-     Carga con anti-flicker
+     Carga con anti-flicker (sin parpadeos)
      ========================= */
   private cancelTimers(): void {
     clearTimeout(this.overlayTimer);
-    clearTimeout(this.emptyTimer);
   }
 
   load(): void {
+    if (this._idciudadano == null) return; // aún no hay contexto
+
     this.loading = true;
     this.cancelTimers();
     const myReq = ++this.reqSeq;
+
+    // Oculta "vacío" al iniciar nueva búsqueda, no toques items para no parpadear
+    this.showEmpty = false;
 
     // 1ª carga: NO overlay; posteriores: overlay diferido
     if (!this.firstLoad) {
@@ -158,7 +162,6 @@ export class ConsultaListaCiudadano implements OnInit {
     } else {
       this.firstPaintStart = performance.now();
       this.showOverlay = false;
-      this.showEmpty = false;
     }
 
     const v = this.form.value;
@@ -169,71 +172,39 @@ export class ConsultaListaCiudadano implements OnInit {
       idciudadano: this._idciudadano,
       resumen: v.resumen || undefined,
       fecha: v.fecha ? new Date(v.fecha) : undefined,
-      estado: Number(v.estado) || undefined,
+      estado: v.estado ? Number(v.estado) : undefined,
     })
     .subscribe({
       next: (res) => {
-        if (myReq !== this.reqSeq) return;
+        if (myReq !== this.reqSeq) return; // respuesta vieja → ignorar
 
         const incoming = res.items ?? [];
-        this.total = res.total ?? incoming.length;
+        const total = res.total ?? incoming.length;
 
-        // Reemplazo en sitio para reusar nodos <tr>
-        if (this.items.length) {
-          this.items.splice(0, this.items.length, ...incoming);
-        } else {
-          this.items = incoming;
-        }
-        
-        // Calcular paginación PENDIENTE (no mostrada aún)
+        // No tocar items ahora. Calcula pendientes.
         const from = incoming.length > 0 ? (this.page - 1) * this.pageSize + 1 : 0;
         const to = (this.page - 1) * this.pageSize + incoming.length;
-        const last = this.pageSize ? Math.max(1, Math.ceil(this.total / this.pageSize)) : 1;
+        const last = this.pageSize ? Math.max(1, Math.ceil(total / this.pageSize)) : 1;
 
+        this.pendItems = incoming;
+        this.pendTotal = total;
         this.pendFrom = from;
         this.pendTo = to;
         this.pendPage = this.page;
         this.pendLastPage = last;
-        this.pendTotal = this.total;
-
-        // “Vacío” con debounce SOLO después de 1ª carga
-        clearTimeout(this.emptyTimer);
-        if (!this.firstLoad) {
-          if (incoming.length === 0) {
-            this.emptyTimer = setTimeout(() => {
-              if (this.reqSeq === myReq && this.items.length === 0) {
-                this.showEmpty = true;
-              }
-            }, this.emptyDelay);
-          } else {
-            this.showEmpty = false;
-          }
-        }
 
         this.finishLoadingWithOverlayMin();
       },
-      error: (err) => {
+      error: () => {
         if (myReq !== this.reqSeq) return;
-        console.error('Error al cargar la lista:', err);
 
-        this.items = [];
-        this.total = 0;
-
-        clearTimeout(this.emptyTimer);
-        if (!this.firstLoad) {
-          this.emptyTimer = setTimeout(() => {
-            if (this.reqSeq === myReq && this.items.length === 0) {
-              this.showEmpty = true;
-            }
-          }, this.emptyDelay);
-        }
-
-        // Paginación “pendiente” coherente con error
-        this.pendFrom = 0;
-        this.pendTo = 0;
-        this.pendPage = this.page;
-        this.pendLastPage = this.lastPage;
-        this.pendTotal = 0;
+        // En error, conserva la pantalla tal cual (sin vaciar)
+        this.pendItems = this.items;
+        this.pendTotal = this.total;
+        this.pendFrom = this.shownFrom;
+        this.pendTo = this.shownTo;
+        this.pendPage = this.shownPage || this.page;
+        this.pendLastPage = this.shownLastPage || this.lastPage;
 
         this.finishLoadingWithOverlayMin();
       }
@@ -253,26 +224,35 @@ export class ConsultaListaCiudadano implements OnInit {
         this.showOverlay = false;
       }
 
-      // Promover contadores “pendientes” a “mostrados”
+      // Promover pendientes a mostrados (un único momento)
+      this.items = this.pendItems;
+      this.total = this.pendTotal;
       this.shownFrom = this.pendFrom;
       this.shownTo = this.pendTo;
       this.shownPage = this.pendPage;
       this.shownLastPage = this.pendLastPage;
       this.shownTotal = this.pendTotal;
 
-      // Cerrar primera carga (después del skeleton mínimo)
+      // "Vacío" solo al finalizar la carga
+      this.showEmpty = this.items.length === 0;
+
+      // Cerrar 1ª carga (respetando mínimo de skeleton)
       if (this.firstLoad) {
         this.firstLoad = false;
-        if (this.items.length === 0) this.showEmpty = true;
       }
     };
 
     if (this.firstLoad) {
       const elapsed = performance.now() - this.firstPaintStart;
       const remain = Math.max(0, this.firstSkeletonMinMs - elapsed);
-      setTimeout(complete, remain);   
+      setTimeout(complete, remain);
     } else {
-      complete();            
+      complete();
     }
+  }
+
+  /* Utilidades */
+  trackById(_index: number, item: VMConsultaListaSimple) {
+    return item.id;
   }
 }

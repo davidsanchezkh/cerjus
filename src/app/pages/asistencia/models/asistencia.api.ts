@@ -20,7 +20,7 @@ export interface ApiAsistencia {
 export type ApiAsistenciaListaCompleta = ApiAsistencia
 
 export type ApiAsistenciaListaSimple = Pick<ApiAsistenciaListaCompleta,
- 'ma_ID'|'ma_tipo' | 'ma_fecha'
+ 'ma_as_ID'|'ma_ID'|'ma_tipo' | 'ma_fecha'
 >
 export type ApiAsistenciaDetalleCompleta = ApiAsistencia
 

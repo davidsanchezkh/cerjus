@@ -18,12 +18,11 @@ export class LoginService {
   private readonly base = `${this.apiUrl}/usuario`;
 
 
-  async create(vm: VMLoginCreate): Promise<void> {
+  async create(vm: VMLoginCreate): Promise<number> {
     const dto: DTOLoginCreate = MapLoginCreate(vm);
-
-    await firstValueFrom(this.http.post(this.base, dto));
-
-    this.router.navigate(['/login']);
+    // devuelve ID creado (ajusta según respuesta real de tu API)
+    const res = await firstValueFrom(this.http.post<{id:number}>(this.base, dto));
+    return res.id;
   }
 
 }

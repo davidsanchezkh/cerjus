@@ -18,6 +18,7 @@ export function MapAsistenciaListaItemVM(a: ApiAsistenciaListaSimple):VMAsistenc
   }
 
   return {
+    idmarcaasistencia:a.ma_as_ID,
     idmarca:a.ma_ID,
     tipo,
     fecha_formato: formatFechaPeru(new Date(a.ma_fecha)),

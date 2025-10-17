@@ -1,7 +1,7 @@
 import { Routes,UrlMatcher,UrlSegment } from '@angular/router';
 import { loginGuardMactch } from '@app/guard/guard.login';
-import { Ingresar } from './ingresar/ingresar';
-import { Registar } from './registrar/registar';
+import { Ingresar } from './login.ingresar/ingresar';
+import { Registar } from './login.registrar/registar';
 import { PaginaNoEncontradaComponent } from '../../components/paginanoencontrada/pagina';
 
 export const numericIdMatcher: UrlMatcher = (segments: UrlSegment[]) =>

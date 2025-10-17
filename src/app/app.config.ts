@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http'
 import { routes } from './app.routes';
 import { API_URL } from './app.token'
 import { jwtInterceptor } from './interceptor/interceptor.auth';
+import { loadingAndErrorsInterceptor } from './interceptor/loadinganderrors';
 
 const isProd =
   typeof window !== 'undefined' &&
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([jwtInterceptor])),
+    provideHttpClient(withInterceptors([jwtInterceptor,loadingAndErrorsInterceptor])),
     { provide: API_URL, useValue: apiBase }
   ]
 };

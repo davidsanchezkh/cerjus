@@ -26,7 +26,7 @@ export class CiudadanoLista implements OnInit {
     nombres: [''],
   });
 
-  /* Estado de datos / UI */
+  /* Estado de datos / UI visibles */
   items: VMCiudadanoListaSimple[] = [];
   total = 0;
   page = 1;
@@ -36,8 +36,8 @@ export class CiudadanoLista implements OnInit {
   showOverlay = false;
 
   // Anti-flicker
-  firstLoad = true;
-  showEmpty = false;
+  firstLoad = true;     // skeleton solo en primera carga
+  showEmpty = false;    // "No se encontraron resultados" solo cuando !loading
 
   // Paginación “mostrada” (desacoplada)
   shownFrom = 0;
@@ -46,23 +46,23 @@ export class CiudadanoLista implements OnInit {
   shownLastPage = 1;
   shownTotal = 0;
 
-  // Paginación PENDIENTE (se promueve al final del ciclo anti-flicker)
+  // PENDIENTES (se promueven al final de cada carga)
+  private pendItems: VMCiudadanoListaSimple[] = [];
+  private pendTotal = 0;
   private pendFrom = 0;
   private pendTo = 0;
   private pendPage = 1;
   private pendLastPage = 1;
-  private pendTotal = 0;
 
   /* Timers / medidas */
   private reqSeq = 0;
   private overlayTimer: any;
-  private emptyTimer: any;
+  private emptyTimer: any;           // ya no lo usaremos, pero lo mantenemos por si lo necesitas
   private overlayShownAt = 0;
   private firstPaintStart = 0;
 
   private readonly overlayDelay = 180;        // ms antes de mostrar overlay (cargas posteriores)
   private readonly minOverlayMs = 220;        // ms mínimos visible si se mostró overlay
-  private readonly emptyDelay = 220;          // ms de debounce para “vacío” (no en 1ª carga)
   private readonly firstSkeletonMinMs = 200;  // ms mínimos de skeleton en 1ª carga
 
   /* Layout helpers (alineado con CSS) */
@@ -129,6 +129,9 @@ export class CiudadanoLista implements OnInit {
     this.cancelTimers();
     const myReq = ++this.reqSeq;
 
+    // Ocultar estado vacío al iniciar nueva búsqueda
+    this.showEmpty = false;
+
     // 1ª carga: sin overlay; posteriores: overlay diferido
     if (!this.firstLoad) {
       this.overlayTimer = setTimeout(() => {
@@ -140,7 +143,6 @@ export class CiudadanoLista implements OnInit {
     } else {
       this.firstPaintStart = performance.now();
       this.showOverlay = false;
-      this.showEmpty = false;
     }
 
     const v = this.form.value;
@@ -155,67 +157,36 @@ export class CiudadanoLista implements OnInit {
     })
     .subscribe({
       next: (res) => {
-        if (myReq !== this.reqSeq) return;
+        if (myReq !== this.reqSeq) return; // respuesta vieja → ignorar
 
         const incoming = res.items ?? [];
-        this.total = res.total ?? incoming.length;
+        const total = res.total ?? incoming.length;
 
-        // Reemplazo en sitio para reutilizar nodos <tr>
-        if (this.items.length) {
-          this.items.splice(0, this.items.length, ...incoming);
-        } else {
-          this.items = incoming;
-        }
-
-        // Calcular paginación PENDIENTE (no mostrada aún)
+        // NO tocar this.items aquí. Solo calcular pendientes.
         const from = incoming.length > 0 ? (this.page - 1) * this.pageSize + 1 : 0;
         const to = (this.page - 1) * this.pageSize + incoming.length;
-        const last = this.pageSize ? Math.max(1, Math.ceil(this.total / this.pageSize)) : 1;
+        const last = this.pageSize ? Math.max(1, Math.ceil(total / this.pageSize)) : 1;
 
+        this.pendItems = incoming;
+        this.pendTotal = total;
         this.pendFrom = from;
         this.pendTo = to;
         this.pendPage = this.page;
         this.pendLastPage = last;
-        this.pendTotal = this.total;
-
-        // “Vacío” con debounce SOLO después de 1ª carga
-        clearTimeout(this.emptyTimer);
-        if (!this.firstLoad) {
-          if (incoming.length === 0) {
-            this.emptyTimer = setTimeout(() => {
-              if (this.reqSeq === myReq && this.items.length === 0) {
-                this.showEmpty = true;
-              }
-            }, this.emptyDelay);
-          } else {
-            this.showEmpty = false;
-          }
-        }
 
         this.finishLoadingWithOverlayMin();
       },
       error: () => {
         if (myReq !== this.reqSeq) return;
 
-        // Reset coherente
-        this.items = [];
-        this.total = 0;
-
-        clearTimeout(this.emptyTimer);
-        if (!this.firstLoad) {
-          this.emptyTimer = setTimeout(() => {
-            if (this.reqSeq === myReq && this.items.length === 0) {
-              this.showEmpty = true;
-            }
-          }, this.emptyDelay);
-        }
-
-        // Paginación pendiente coherente al error
-        this.pendFrom = 0;
-        this.pendTo = 0;
-        this.pendPage = this.page;
-        this.pendLastPage = this.lastPage;
-        this.pendTotal = 0;
+        // En error no vaciamos items (evita destello).
+        // Dejamos pend* con lo ya mostrado:
+        this.pendItems = this.items;
+        this.pendTotal = this.total;
+        this.pendFrom = this.shownFrom;
+        this.pendTo = this.shownTo;
+        this.pendPage = this.shownPage || this.page;
+        this.pendLastPage = this.shownLastPage || this.lastPage;
 
         this.finishLoadingWithOverlayMin();
       }
@@ -235,17 +206,21 @@ export class CiudadanoLista implements OnInit {
         this.showOverlay = false;
       }
 
-      // Promover contadores “pendientes” a “mostrados”
+      // Promover pendientes a “mostrados” (un solo momento)
+      this.items = this.pendItems;
+      this.total = this.pendTotal;
       this.shownFrom = this.pendFrom;
       this.shownTo = this.pendTo;
       this.shownPage = this.pendPage;
       this.shownLastPage = this.pendLastPage;
       this.shownTotal = this.pendTotal;
 
+      // Decidir "vacío" SOLO ahora (y nunca durante la carga)
+      this.showEmpty = this.items.length === 0;
+
       // Cerrar primera carga respetando el mínimo de skeleton
       if (this.firstLoad) {
         this.firstLoad = false;
-        if (this.items.length === 0) this.showEmpty = true;
       }
     };
 

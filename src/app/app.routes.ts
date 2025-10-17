@@ -2,7 +2,7 @@
 import { Routes } from '@angular/router';
 
 import { Main_layout } from './layouts/main_layout/main_layout';
-import { Auth_layout } from './layouts/auth_layout/auth_layout';
+import { Simple_layout } from './layouts/simple_layout/simple_layout';
 
 import { ciudadanoRoutes } from './pages/ciudadano/ciudadano.routes';
 import { consultaRoutes } from './pages/consulta/consulta.routes';
@@ -13,7 +13,7 @@ import { PaginaNoEncontradaComponent } from './components/paginanoencontrada/pag
 
 
 export const routes: Routes = [
-    {path:'', component: Auth_layout,
+    {path:'', component: Simple_layout,
         children:[
             {path:'', redirectTo:'login', pathMatch:'full', },
             ...loginRoutes,

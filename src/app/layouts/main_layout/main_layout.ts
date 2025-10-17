@@ -4,13 +4,13 @@ import { CommonModule } from '@angular/common';
 import { Sidebar } from '../../components/sidebar/sidebar';
 import { Header } from '@/app/components/header/header';
 import { RouterOutlet } from '@angular/router';
-
+import { NotificacionestVer } from '@/app/components/notificaciones/notificaciones.ver/notificaciones.ver';
 import { AuthStore } from '@/app/auth/auth.store';;
 
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, Sidebar, Header, RouterOutlet],
+  imports: [CommonModule, Sidebar, Header, RouterOutlet,NotificacionestVer],
   templateUrl: './main_layout.html',
   styleUrl:'./main_layout.css'
 })
