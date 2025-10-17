@@ -40,7 +40,7 @@ export class CiudadanoService {
   getById(id: number): Observable<VMCiudadanoDetalleSimple> {
     return this.http
       .get<ApiCiudadanoDetalleSimple>(`${this.base}/${id}`)
-      .pipe(map(apiItem => MapCiudadanoDetalleListaSimple(apiItem)));// mapper que convierte Api → VM
+      .pipe(map(apiItem => MapCiudadanoDetalleListaSimple(apiItem)));
   }
   async update(id: number, changes: Partial<VMCiudadanoUpdate>): Promise<number> {
     const dto: DTOCiudadanoUpdate = MapCiudadanoUpdateParcial(id, changes);

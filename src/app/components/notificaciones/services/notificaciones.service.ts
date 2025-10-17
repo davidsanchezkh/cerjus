@@ -13,7 +13,7 @@ export class NotificacionesService {
   readonly loading = signal<LoadingState>({ visible: false, message: 'Procesando…' });
 
   // ajustes (puedes moverlos a InjectionToken si quieres configurarlo global)
-  private debounceMs = 400;      // evita parpadeo
+  private debounceMs = 1000;      // evita parpadeo
   private longMs = 2000;         // mensaje “despertando servidor…”
   private deadmanMs = 30000;     // corta spinners eternos
 
