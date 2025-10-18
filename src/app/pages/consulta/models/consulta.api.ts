@@ -21,6 +21,7 @@ export type ApiConsultaListaCompleta = ApiConsulta
 export type ApiConsultaListaSimple = Pick<ApiConsultaListaCompleta,
  'co_ID' | 'co_resumen'|'co_fecha' | 'co_estado'
 >
+
 export type ApiConsultaDetalleCompleta = ApiConsulta
 
 export type ApiConsultaDetalleSimple= Pick<ApiConsultaDetalleCompleta,

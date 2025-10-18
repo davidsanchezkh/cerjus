@@ -1,4 +1,5 @@
 //lo que se envia al backend
+import { EstadoConsulta } from './consulta.dominio';
 export interface DTOConsulta{
   co_ID: number;
   co_ci_ID: number;
@@ -23,8 +24,9 @@ export type DTOConsultaSoftDelete= Pick<DTOConsulta,
   'co_ID'
 >
 export type DTOConsultaListaOptions =Partial<Pick<DTOConsulta, 
-  'co_ID' | 'co_resumen' |'co_fecha'| 'co_estado'|'co_ci_ID' >> 
+  'co_ID' | 'co_resumen' |'co_fecha'|'co_ci_ID' >> 
   & {
+    co_estado?: EstadoConsulta;
     page?: number;
     pageSize?: number;
     sort?: string;

@@ -18,10 +18,17 @@
 
         <!-- Filtros -->
         <tr class="filters-row" style="user-select: none;">
-          <th><input class="form-control form-control-sm" formControlName="id" placeholder="ID"></th>
+          <th><input class="form-control form-control-sm no-spinner" formControlName="id" placeholder="ID" type="number" min="0" step="1" (wheel)="$event.preventDefault()" ></th>
           <th><input class="form-control form-control-sm" formControlName="resumen" placeholder="Resumen"></th>
           <th><input type="date" class="form-control form-control-sm" formControlName="fecha" placeholder="Fecha"></th>
-          <th><input class="form-control form-control-sm" formControlName="estado" placeholder="Estado"></th>
+          <th>
+            <select class="form-select form-select-sm" formControlName="estado">
+              <option value="">Todos</option>
+              @for (opt of estadoOpciones; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </th>
           <th><button type="button" class="btn btn-sm btn-outline-secondary" (click)="clear()">Limpiar</button></th>
         </tr>
       </thead>
@@ -45,7 +52,7 @@
                 <td style="width: 4rem;">{{ c.id }}</td>
                 <td>{{ c.resumen }}</td>
                 <td style="width: 9rem;">{{ c.fecha_formato }}</td>
-                <td style="width: 7rem;">{{ c.estado }}</td>
+                <td style="width: 7rem;">{{ c.estadotexto }}</td>
                 <td style="width: 7rem;">
                   <a class="btn btn-sm btn-outline-primary" [routerLink]="['/consulta', c.id]">Ver</a>
                 </td>

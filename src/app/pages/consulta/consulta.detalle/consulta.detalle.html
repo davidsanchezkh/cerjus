@@ -21,19 +21,20 @@
 
         <!-- Cuerpo (colapsable, NO destructivo) -->
         <form class="card-body selectable-fix"
-              [formGroup]="form"
-              id="form1"
-              name="form1"
-              [hidden]="!open">
+          [formGroup]="form"
+          id="form1"
+          name="form1"
+          [hidden]="!open">
 
           <!-- Sección: Datos principales -->
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Resumen</label>
               <input type="text"
-                     formControlName="resumen"
-                     [class.value-box-edit]="isEditing"
-                     [class.value-box-noedit]="!isEditing"/>
+                formControlName="resumen"
+                maxlength="200"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
             </div>
           </div>
 
@@ -44,9 +45,10 @@
             <div class="col-12">
               <label class="form-label">Hechos</label>
               <textarea formControlName="hechos"
-                        rows="4"
-                        [class.value-box-edit]="isEditing"
-                        [class.value-box-noedit]="!isEditing"></textarea>
+                rows="4"
+                maxlength="600"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"></textarea>
             </div>
           </div>
 
@@ -57,17 +59,20 @@
             <div class="col-12 col-md-6">
               <label class="form-label">Materia</label>
               <input type="text"
-                     formControlName="materia"
-                     [class.value-box-edit]="isEditing"
-                     [class.value-box-noedit]="!isEditing"/>
+                formControlName="materia"
+                [class.value-box-edit]="isEditing"  
+                [class.value-box-noedit]="!isEditing"/>
             </div>
 
             <div class="col-12 col-md-6">
               <label class="form-label">Estado</label>
-              <input type="number"
-                     formControlName="estado"
-                     [class.value-box-edit]="isEditing"
-                     [class.value-box-noedit]="!isEditing"/>
+              <select formControlName="estado" 
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing">
+                @for (opt of estadoOpciones; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
             </div>
           </div>
 
@@ -78,9 +83,10 @@
             <div class="col-12">
               <label class="form-label">Absolución</label>
               <textarea formControlName="absolucion"
-                        rows="3"
-                        [class.value-box-edit]="isEditing"
-                        [class.value-box-noedit]="!isEditing"></textarea>
+                rows="3"
+                maxlength="600"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"></textarea>
             </div>
           </div>
 

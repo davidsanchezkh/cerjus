@@ -169,3 +169,11 @@ html, body { scrollbar-gutter: stable both-edges; }
 .prewrap {
   white-space: pre-wrap;
 }
+
+/* Quitar flechas en Chrome/Safari/Edge (Blink/WebKit) */
+input[type="number"].no-spinner::-webkit-outer-spin-button,
+input[type="number"].no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+

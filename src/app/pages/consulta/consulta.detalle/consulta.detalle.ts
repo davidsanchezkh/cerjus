@@ -1,136 +1,171 @@
-import { Component, OnInit,inject,Input } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder,Validators,AbstractControl,ValidationErrors } from '@angular/forms';
-import {VMConsultaDetalleSimple,VMConsultaUpdate,VMConsultaUpdateForm} from '../models/consulta.vm'
-import { ActivatedRoute,Router  } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder,FormControl } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { VMConsultaDetalleSimple, VMConsultaUpdate, VMConsultaUpdateForm } from '../models/consulta.vm';
 import { ConsultaService } from '../services/consulta.service';
-import { FormControl } from '@angular/forms';
-import {MapDetalleToUpdate} from '../mappers/consulta.mapper';
+import { MapDetalleToUpdate } from '../mappers/consulta.mapper';
 import { SeguimientoListaConsulta } from '../../seguimiento/seguimiento.lista.consulta/seguimiento.lista.consulta';
+import { ESTADO_CONSULTA_OPCIONES, EstadoConsulta } from '../models/consulta.dominio';
+// Notificaciones centralizadas
+import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 
 @Component({
   selector: 'app-consulta-detalle',
-  imports: [CommonModule,ReactiveFormsModule,SeguimientoListaConsulta],
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, SeguimientoListaConsulta],
   templateUrl: './consulta.detalle.html',
   styleUrl: './consulta.detalle.css'
-})export class ConsultaDetalle implements OnInit{
-
-  idconsulta!: number;
-
-  constructor(private router: Router) {}
+})
+export class ConsultaDetalle implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private service = inject(ConsultaService);
   private fb = inject(FormBuilder);
-  isEditing=false;
-  // controla el colapso del panel
+  private notify = inject(NotificacionesService);
+
+  idconsulta!: number;
+  isEditing = false;
+
+  // (si usas paneles colapsables en la UI)
   open = false;
   open2 = true;
-  originalData!: VMConsultaUpdate;
-  //primera carga
 
+  originalData!: VMConsultaUpdate;
+  
+  estadoOpciones = ESTADO_CONSULTA_OPCIONES;
   form = this.fb.group<ControlsOf<VMConsultaUpdateForm>>({
-    resumen: new FormControl('', { nonNullable: true }),
-    hechos: new FormControl('', { nonNullable: true }),
-    materia: new FormControl('', { nonNullable: true }),
+    resumen:    new FormControl('', { nonNullable: true }),
+    hechos:     new FormControl('', { nonNullable: true }),
+    materia:    new FormControl('', { nonNullable: true }),
     absolucion: new FormControl('', { nonNullable: true }),
-    estado: new FormControl(0, { nonNullable: true }),
+    estado:     new FormControl(0,  { nonNullable: true }),
   });
 
   ngOnInit(): void {
-    
     this.form.disable();
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (id) {
-      this.service.getById(id).subscribe({
-        next: (data) => {
+    if (!id) return;
+
+    this.service.getById(id).subscribe({
+      next: (data: VMConsultaDetalleSimple) => {
         this.form.patchValue(data);
-        this.originalData =  MapDetalleToUpdate(data);
+        this.originalData = MapDetalleToUpdate(data);
         this.idconsulta = id;
       },
-        error: (err) => console.error('Error al cargar ciudadano:', err)
-      });
-    }
+      error: () => {
+        // El interceptor ya mostró el diálogo (404, etc.).
+        // Si quieres, podrías redirigir tras cerrar el diálogo.
+      }
+    });
   }
-  onEdit(event: Event): void {
-    event.stopPropagation();
+
+  // === Edición ===
+  onEdit(ev: Event): void {
+    ev.stopPropagation();
     this.isEditing = true;
     this.open = true;
-    this.form.enable(); 
+    this.form.enable();
   }
-  onCancel() {
+
+  async onCancel(): Promise<void> {
+    if (this.hasUnsavedChanges()) {
+      const ok = await this.notify.confirm({
+        variant: 'warning',
+        title: 'Descartar cambios',
+        message: 'Tienes cambios sin guardar. ¿Deseas descartarlos?',
+        confirmText: 'Descartar',
+        cancelText: 'Seguir editando'
+      });
+      if (!ok) return;
+    }
     this.form.reset(this.originalData);
     this.isEditing = false;
     this.form.disable();
   }
-  getChangedFields(): string[] {
-    const changes: string[] = [];
-    type FormValue = typeof this.form.value;
 
-    for (const key in this.form.value) {
-      const typedKey = key as keyof FormValue;
-      if (this.form.value[typedKey] !== this.originalData[typedKey]) {
-        changes.push(key);
-      }
-    }
-    return changes;
-  }
-  onSave() {
+  // === Guardado ===
+  async onSave(): Promise<void> {
     if (!this.form.valid) return;
+
+    // Cambios respecto a originalData
     const current = this.form.value;
     const changes: Partial<typeof current> = {};
-
     for (const key of Object.keys(current) as (keyof typeof current)[]) {
       if (current[key] !== this.originalData[key]) {
         changes[key] = current[key] as any;
       }
     }
+
     if (Object.keys(changes).length === 0) {
-      console.log("No hay cambios para guardar");
+      await this.notify.ok({
+        variant: 'info',
+        title: 'Sin cambios',
+        message: 'No hay cambios para guardar.',
+        primaryText: 'Aceptar'
+      });
       return;
     }
-    // asegurar id presente
-    const id = this.originalData.id;
-    if (id === undefined || id === null) {
-      console.error("El id es obligatorio para actualizar");
-      return;
-    }
 
-    // llamar al service pasando id por separado
-
-    this.service.update(id, changes)
-    .then((ciudadanoId: number) => {
-      console.log("Guardado con éxito, id:", ciudadanoId);
-       // normalizar mayúsculas en cambios antes de actualizar originalData
-      const normalizedChanges = Object.fromEntries(
-        Object.entries(changes).map(([k, v]) => [
-          k,
-          typeof v === "string" ? v.toUpperCase() : v
-        ])
-      );
-      // actualizar originalData (mantener id y mezclar cambios)
-      this.originalData = { ...this.originalData, ...(normalizedChanges as any) };
-      this.form.patchValue(this.originalData); // opcional: sincronizar formulario
-      this.isEditing = false;
-    })
-    .catch((err) => {
-      console.error("Error al guardar:", err);
-
-      if (err.error) {
-        console.error("Detalles backend:", err.error);
-      }
-      if (Array.isArray(err.error?.message)) {
-        err.error.message.forEach((e: any) => {
-          console.warn(`❌ ${e.property} (${e.value}) → ${JSON.stringify(e.constraints)}`);
-        });
-      }
+    // Confirmar guardado
+    const confirm = await this.notify.confirm({
+      variant: 'info',
+      title: 'Guardar cambios',
+      message: '¿Deseas guardar los cambios realizados?',
+      confirmText: 'Guardar',
+      cancelText: 'Cancelar'
     });
+    if (!confirm) return;
+
+    // Asegurar id
+    const id = this.originalData.id;
+    if (id == null) {
+      await this.notify.ok({
+        variant: 'error',
+        title: 'Operación inválida',
+        message: 'No se encontró el ID de la consulta.',
+        primaryText: 'Aceptar'
+      });
+      return;
+    }
+
+    try {
+      await this.service.update(id, changes as any);
+
+      // Actualizar original + form (sin normalización a mayúsculas; conserva el texto)
+      this.originalData = { ...this.originalData, ...(changes as any) };
+      this.form.patchValue(this.originalData);
+
+      await this.notify.ok({
+        variant: 'success',
+        title: 'Cambios guardados',
+        message: 'La información de la consulta se actualizó correctamente.',
+        primaryText: 'Aceptar'
+      });
+
+      this.isEditing = false;
+      this.form.disable();
+    } catch {
+      // El interceptor ya mostró el diálogo de error (title/message del backend).
+    }
   }
-  
-  gotoSeguimiento(){
+
+  gotoSeguimiento(): void {
     this.router.navigate(['/seguimiento/registrar', this.idconsulta]);
   }
 
+  // === Utilidad ===
+  private hasUnsavedChanges(): boolean {
+    const v = this.form.value as Record<string, unknown>;
+    const o = this.originalData as Record<string, unknown>;
+    for (const k of Object.keys(v)) {
+      if (v[k] !== o[k]) return true;
+    }
+    return false;
+  }
 }
+
 type ControlsOf<T> = {
   [K in keyof T]: FormControl<T[K]>;
 };

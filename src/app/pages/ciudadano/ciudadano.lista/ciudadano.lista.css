@@ -166,3 +166,8 @@ html, body { scrollbar-gutter: stable both-edges; }
   white-space: pre-wrap;
 }
 
+input[type="number"].no-spinner::-webkit-outer-spin-button,
+input[type="number"].no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

@@ -1,10 +1,9 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { VMLoginCreate } from '../models/login.vm';
 import { LoginService } from '../services/login.service';
-import { FormControl } from '@angular/forms';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 
 @Component({
@@ -23,18 +22,24 @@ export class Registar {
   submitting = false;
 
   form = this.fb.group<ControlsOf<VMLoginCreate>>({
-    nombres: new FormControl('', { nonNullable: true }),
-    apellidoPaterno: new FormControl('', { nonNullable: true }),
-    apellidoMaterno: new FormControl('', { nonNullable: true }),
-    dni: new FormControl('', { nonNullable: true }),
-    telefono: new FormControl('', { nonNullable: true }),
-    correoE: new FormControl('', { nonNullable: true }),
-    contrasena: new FormControl('', { nonNullable: true }),
+    nombres: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    apellidoPaterno: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    apellidoMaterno: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    dni: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    telefono: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    correoE: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    contrasena: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
   async onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Datos incompletos',
+        message: 'Revisa los campos obligatorios e inténtalo nuevamente.',
+        primaryText: 'Aceptar'
+      });
       return;
     }
     this.submitting = true;

@@ -8,19 +8,19 @@
           <h5 class="mb-4">Registrar consulta</h5>
 
           <!-- Formulario reactivo -->
-          <form [formGroup]="form" novalidate>
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
 
             <!-- Fila 1: Hechos de la consulta -->
             <div class="mb-3">
               <label class="form-label fw-semibold">Hechos de la consulta</label>
-              <textarea class="form-control" formControlName="hechos" rows="3"></textarea>
+              <textarea class="form-control" formControlName="hechos" rows="3" maxlength="600" required></textarea>
             </div>
             <!-- Fila 2: Materia de la consulta -->
             <div class="row mb-3">
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold">Materia de la consulta</label>
-                <select class="form-select" formControlName="materias">
-                  <option value="INICIAL" disabled selected>Seleccione una opción</option>
+                <select class="form-select" formControlName="materias" required>
+                  <option value="" disabled selected>Seleccione una opción</option>
                   <option value="DERECHO CIVIL">Derecho Civil</option>
                   <option value="DERECHO FAMILIAR">Derecho Familiar</option>
                   <option value="DERECHO LABORAL">Derecho Laboral</option>
@@ -33,6 +33,7 @@
               <div class="col-12 col-md-6">
                 <label class="form-label">Especifique otros</label>
                 <input 
+                  maxlength="150"
                   type="text" 
                   class="form-control" 
                   formControlName="materiaOtros" 
@@ -42,11 +43,11 @@
             <!-- Fila 3: Absolucion de la consulta -->
             <div class="mb-3">
               <label class="form-label fw-semibold"> Absolución de la consulta </label>
-              <textarea class="form-control" formControlName="absolucion" rows="3"></textarea>
+              <textarea class="form-control" formControlName="absolucion" rows="3" maxlength="600" required></textarea>
             </div>
             <!-- Fila 4: Regresa de la consulta -->
             <div class="mb-3">
-              <div class="form-label fw-semibold mb-2">¿Seguimiento?</div>
+              <div class="form-label fw-semibold mb-2">¿Regresa para seguimiento?</div>
               <div class="row g-3 align-items-center">
                 <div class="col-auto">
                   <div class="form-check">
@@ -64,7 +65,7 @@
             </div>
             <div class="mb-3">
               <label class="form-label fw-semibold"> Resumen corto </label>
-              <textarea class="form-control" formControlName="resumen" rows="1"></textarea>
+              <textarea class="form-control" formControlName="resumen" rows="1" maxlength="200"></textarea>
             </div>
             <!-- Botones -->
             <div class="d-flex justify-content-between mt-4">

@@ -8,25 +8,25 @@
           <h5 class="mb-4">Registrar ciudadano</h5>
 
           <!-- Formulario reactivo -->
-          <form [formGroup]="form" novalidate>
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
 
             <!-- Fila 1: Nombres y Apellidos / DNI -->
             <div class="row g-3 align-items-end">
               <div class="col-12 col-md-3">
                 <label class="form-label fw-semibold">Nombres</label>
-                <input type="text" class="form-control" formControlName="nombres" placeholder="Nombres">
+                <input type="text" class="form-control" formControlName="nombres" placeholder="Nombres" required>
               </div>
               <div class="col-12 col-md-3">
                 <label class="form-label fw-semibold">Apellido Paterno</label>
-                <input type="text" class="form-control" formControlName="apellidoPaterno" placeholder="Apellido Paterno">
+                <input type="text" class="form-control" formControlName="apellidoPaterno" placeholder="Apellido Paterno" required>
               </div>
               <div class="col-12 col-md-3">
                 <label class="form-label fw-semibold">Apellido Materno</label>
-                <input type="text" class="form-control" formControlName="apellidoMaterno" placeholder="Apellido Materno">
+                <input type="text" class="form-control" formControlName="apellidoMaterno" placeholder="Apellido Materno" required>
               </div>
               <div class="col-12 col-md-3">
                 <label class="form-label fw-semibold">DNI</label>
-                <input type="text" maxlength="11" class="form-control text-uppercase" formControlName="dni" placeholder="DNI">
+                <input type="text" maxlength="11" class="form-control text-uppercase" formControlName="dni" placeholder="DNI" required>
               </div>
             </div>
 
@@ -35,22 +35,22 @@
             <!-- Fila 2: Domicilio -->
             <div class="mb-3">
               <label class="form-label fw-semibold">Domicilio</label>
-              <input type="text" class="form-control" formControlName="domicilio" placeholder="Dirección completa">
+              <input type="text" class="form-control" formControlName="domicilio" placeholder="Dirección completa" required>
             </div>
 
             <!-- Fila 3: Ocupación / Fecha de nacimiento / Hijos -->
             <div class="row g-3">
               <div class="col-12 col-md-6 col-lg-5">
                 <label class="form-label fw-semibold">Ocupación</label>
-                <input type="text" class="form-control" formControlName="ocupacion" placeholder="Ocupación">
+                <input type="text" class="form-control" formControlName="ocupacion" placeholder="Ocupación" required>
               </div>
               <div class="col-12 col-md-6 col-lg-4">
                 <label class="form-label fw-semibold">Fecha de nacimiento</label>
-                <input type="date" class="form-control" formControlName="fechaNacimiento">
+                <input type="date" class="form-control" formControlName="fechaNacimiento" required>
               </div>
               <div class="col-12 col-md-6 col-lg-3">
                 <label class="form-label fw-semibold">Hijos</label>
-                <input type="number" min="0" class="form-control" formControlName="hijos" placeholder="0">
+                <input type="number" min="0" class="form-control" formControlName="hijos" placeholder="0" required>
               </div>
             </div>
 
@@ -58,7 +58,7 @@
             <div class="row g-3 mt-0 mt-md-3">
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold">Número de contacto</label>
-                <input type="tel" class="form-control" formControlName="telefono" placeholder="9XXXXXXXX">
+                <input type="tel" class="form-control" formControlName="telefono" placeholder="9XXXXXXXX" required>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold">Correo electrónico</label>
@@ -70,7 +70,7 @@
 
             <!-- Fila 5: ¿Cómo supo del consultorio? -->
             <div class="mb-2">
-              <div class="form-label fw-semibold mb-2">¿Cómo supo del consultorio?</div>
+              <div class="form-label fw-semibold mb-2" >¿Cómo supo del consultorio?</div>
               <div class="row g-3 align-items-center">
                 <div class="col-auto">
                   <div class="form-check">

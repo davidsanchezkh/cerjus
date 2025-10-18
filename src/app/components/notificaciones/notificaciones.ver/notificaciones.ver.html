@@ -8,15 +8,16 @@
   </div>
 }
 
-<!-- Diálogo OK (bloqueante hasta pulsar el botón) -->
+<!-- Diálogo OK -->
 @if (ok()) {
-  <div class="app-dialog-backdrop">
-    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="ok()?.title">
-      <div class="app-dialog-header"
-           [class.ok-success]="headerClass().success"
-           [class.ok-info]="headerClass().info"
-           [class.ok-warning]="headerClass().warning"
-           [class.ok-error]="headerClass().error">
+  <div class="app-dialog-backdrop" tabindex="-1"(keydown.capture)="handleKey($event, 'ok')">
+    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="ok()?.title"
+      tabindex="-1" (keydown.capture)="handleKey($event, 'ok')"
+    >
+      <div class="app-dialog-header" [class.ok-success]="headerClass().success"
+        [class.ok-info]="headerClass().info" [class.ok-warning]="headerClass().warning"
+        [class.ok-error]="headerClass().error"
+      >
         <strong>{{ ok()?.title }}</strong>
       </div>
 
@@ -33,15 +34,16 @@
   </div>
 }
 
-<!-- Diálogo CONFIRM (bloqueante hasta confirmar/cancelar) -->
+<!-- Diálogo CONFIRM -->
 @if (confirm()) {
-  <div class="app-dialog-backdrop">
-    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="confirm()?.title">
-      <div class="app-dialog-header"
-           [class.ok-success]="headerClass().success"
-           [class.ok-info]="headerClass().info"
-           [class.ok-warning]="headerClass().warning"
-           [class.ok-error]="headerClass().error">
+  <div class="app-dialog-backdrop" tabindex="-1" (keydown.capture)="handleKey($event, 'confirm')">
+    <div class="app-dialog" role="dialog" aria-modal="true" [attr.aria-label]="confirm()?.title"
+      tabindex="-1" (keydown.capture)="handleKey($event, 'confirm')"
+    >
+      <div class="app-dialog-header" [class.ok-success]="headerClass().success"
+        [class.ok-info]="headerClass().info" [class.ok-warning]="headerClass().warning"
+        [class.ok-error]="headerClass().error"
+      >
         <strong>{{ confirm()?.title }}</strong>
       </div>
 

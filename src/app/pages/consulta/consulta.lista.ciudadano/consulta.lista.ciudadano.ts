@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConsultaService } from '../services/consulta.service';
 import { VMConsultaListaSimple } from '../models/consulta.vm';
-
+import { ESTADO_CONSULTA_OPCIONES, EstadoConsulta } from '../models/consulta.dominio';
 @Component({
   selector: 'app-consulta-lista-ciudadano',
   standalone: true,
@@ -32,11 +32,12 @@ export class ConsultaListaCiudadano implements OnInit {
   /* =========================
      Formulario
      ========================= */
+  estadoOpciones = ESTADO_CONSULTA_OPCIONES;
   form = this.fb.group({
     id: [null],
     resumen: [''],
     fecha: [''],  // string yyyy-MM-dd
-    estado: [''], // string/number libre
+    estado: ['' as '' | EstadoConsulta], // string/number libre
   });
 
   /* =========================
@@ -165,6 +166,12 @@ export class ConsultaListaCiudadano implements OnInit {
     }
 
     const v = this.form.value;
+
+    const estado =
+      v.estado === '' || v.estado == null
+        ? undefined
+        : Number(v.estado) as EstadoConsulta;
+        
     this.service.list({
       page: this.page,
       pageSize: this.pageSize,
@@ -172,7 +179,7 @@ export class ConsultaListaCiudadano implements OnInit {
       idciudadano: this._idciudadano,
       resumen: v.resumen || undefined,
       fecha: v.fecha ? new Date(v.fecha) : undefined,
-      estado: v.estado ? Number(v.estado) : undefined,
+      estado: estado,
     })
     .subscribe({
       next: (res) => {

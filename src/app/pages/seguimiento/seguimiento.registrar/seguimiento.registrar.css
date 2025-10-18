@@ -1,0 +1,10 @@
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc3545;            /* rojo bootstrap */
+  box-shadow: none;                  /* opcional */
+}
+
+/* Cuando presionaste Guardar y marcas submitting=true */
+.was-validated .form-control.ng-invalid {
+  border-color: #dc3545;
+  box-shadow: none;
+}

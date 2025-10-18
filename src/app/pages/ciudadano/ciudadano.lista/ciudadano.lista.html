@@ -23,7 +23,7 @@
 
         <!-- Filtros -->
         <tr class="filters-row" style="user-select: none;">
-          <th><input class="form-control form-control-sm" formControlName="id" placeholder="ID"></th>
+          <th><input class="form-control form-control-sm no-spinner" formControlName="id" placeholder="ID" type="number" min="0" step="1" (wheel)="$event.preventDefault()"></th>
           <th><input class="form-control form-control-sm" formControlName="dni" placeholder="DNI"></th>
           <th><input class="form-control form-control-sm" formControlName="apellidoPaterno" placeholder="Apellido paterno"></th>
           <th><input class="form-control form-control-sm" formControlName="apellidoMaterno" placeholder="Apellido materno"></th>

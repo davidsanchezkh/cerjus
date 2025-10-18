@@ -1,10 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder,FormControl} from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CiudadanoService } from '../services/ciudadano.service';
 import { VMCiudadanoListaSimple } from '../models/ciudadano.vm';
+import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 
 @Component({
   selector: 'app-ciudadano-lista',
@@ -16,7 +17,8 @@ export class CiudadanoLista implements OnInit {
   /* Inyección */
   private fb = inject(FormBuilder);
   private service = inject(CiudadanoService);
-
+  private notify = inject(NotificacionesService);
+  
   /* Formulario de búsqueda */
   form = this.fb.group({
     id: [null],

@@ -1,4 +1,5 @@
 //como el frontend lo trata la UI
+import { EstadoConsulta } from './consulta.dominio';
 export interface VMConsulta{
   id: number;
   idciudadano: number;
@@ -9,6 +10,7 @@ export interface VMConsulta{
   absolucion: string;
   regresa:string;
   estado: number;
+  
   creadoPor: number;
   fechaCreadoPor: string;
   modificadoPor: number;
@@ -19,8 +21,11 @@ export interface VMConsulta{
 export type VMConsultaListaCompleta = VMConsulta;
 
 export type VMConsultaListaSimple = Pick<VMConsultaListaCompleta, 
-  'id' | 'resumen'| 'fecha'| 'estado' 
->&Partial<{
+  'id' | 'resumen' | 'fecha'
+> & {
+  estado: EstadoConsulta;  
+  estadotexto: string;         // ← enum
+} & Partial<{
   fecha_formato: string;
 }>;
 

@@ -8,7 +8,7 @@
           <h5 class="mb-4">Registrar Seguimiento</h5>
 
           <!-- Formulario reactivo -->
-          <form [formGroup]="form" novalidate>
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
             <div class="mb-3">
               <label class="form-label fw-semibold"> Cuerpo del seguimiento </label>
               <textarea class="form-control" formControlName="cuerposeguimiento" rows="4"></textarea>

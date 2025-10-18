@@ -2,15 +2,17 @@ import { ApiConsultaListaSimple,ApiConsultaDetalleSimple } from '../models/consu
 import { VMPage,VMConsultaCreate, VMConsultaListaSimple, VMConsultaListaOptions,
   VMConsultaDetalleSimple,VMConsultaUpdate,VMConsultaUpdateForm } from '../models/consulta.vm';
 import { DTOConsultaCreate, DTOConsultaListaOptions,DTOConsultaUpdate } from '../models/consulta.dtos';
-
+import { estadoConsultaToLabel,EstadoConsulta } from '../models/consulta.dominio';
 //traductor entre API ↔ VM ↔ DTO.
-export function MapConsultaListaItemVM(a: ApiConsultaListaSimple):VMConsultaListaSimple {
-  return{
+export function MapConsultaListaItemVM(a: ApiConsultaListaSimple): VMConsultaListaSimple {
+  const estado = a.co_estado as EstadoConsulta; // backend solo 1|2
+  return {
     id: a.co_ID,
     resumen: a.co_resumen,
-    fecha:a.co_fecha,
+    fecha: a.co_fecha,
     fecha_formato: formatFechaPeru(new Date(a.co_fecha)),
-    estado: a.co_estado,
+    estado,
+    estadotexto: estadoConsultaToLabel(estado),
   };
 }
 export function MapConsultaCreate(vm:VMConsultaCreate):DTOConsultaCreate{
@@ -73,8 +75,6 @@ export function MapConsultaUpdateParcial(id: number,vm: VMConsultaUpdateForm):DT
 
   return dto;
 }
-
-
 
 function toUpperSafe(s?: string|null): string {
   return (s ?? '').trim().toUpperCase();
