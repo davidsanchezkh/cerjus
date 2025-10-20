@@ -39,7 +39,7 @@
             <header class="cabecera">
               <div class="id">Seguimiento #</div>
               <div class="acciones">
-                <a class="btn btn-sm btn-outline-secondary">Editar</a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" disabled>Editar</button>
               </div>
               <span class="fecha"><span class="fecha-box placeholder"></span></span>
             </header>
@@ -53,6 +53,7 @@
           </article>
         }
       } @else {
+
         <!-- LISTA REAL -->
         @if (items.length > 0 && rows.length === items.length) {
           <div formArrayName="rows" class="stack">
@@ -60,17 +61,28 @@
               <article class="seguimiento-card" style="--fecha-minch: 28ch; --ta-rows: 2;" [formGroupName]="i">
                 <header class="cabecera">
                   <div class="id">Seguimiento #{{ c.id }}</div>
-                  <div class="acciones">
-                    <a class="btn btn-sm btn-outline-secondary" [routerLink]="['/seguimiento/editar', c.id]">Editar</a>
+
+                  <div class="acciones d-flex gap-2">
+                    @if (!isEditingRow(c.id)) {
+                      <button type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                              (click)="onEdit(i, $event)">Editar</button>
+                    } @else {
+                      <button type="button" class="btn btn-sm btn-warning" (click)="onCancel(i)">Cancelar</button>
+                      <button type="button" class="btn btn-sm btn-success" (click)="onSave(i)">Guardar</button>
+                    }
                   </div>
-                  <time class="fecha text-muted"><span class="fecha-box">{{ c.fecha_formato }}</span></time>
+
+                  <time class="fecha text-muted">
+                    <span class="fecha-box">{{ c.fecha_formato }}</span>
+                  </time>
                 </header>
+
                 <div class="contenido">
                   <textarea formControlName="cuerposeguimiento"
                             class="form-control"
                             rows="2"
-                            placeholder="Escriba el seguimiento…"
-                            (change)="onRowChange(i)"></textarea>
+                            placeholder="Escriba el seguimiento…"></textarea>
                 </div>
               </article>
             }
@@ -86,7 +98,7 @@
       }
     </div>
 
-    <!-- OVERLAY: cargas posteriores (opcional mostrar solo si había datos previos) -->
+    <!-- OVERLAY: cargas posteriores -->
     @if (showOverlay  && items.length > 0 ) {
       <div class="loading-overlay d-flex align-items-center justify-content-center">
         Cargando…
@@ -94,3 +106,4 @@
     }
   </div>
 </div>
+

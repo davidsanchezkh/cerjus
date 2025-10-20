@@ -47,11 +47,12 @@ export class SeguimientoService {
     .get<ApiSeguimientoDetalleSimple>(`${this.base}/${id}`)
     .pipe(map(apiItem => MapSeguimientoDetalleListaSimple(apiItem)));// mapper que convierte Api → VM
   }
-  async update(id: number, changes: Partial<VMSeguimientoUpdate>): Promise<number> {
-    const dto: DTOSeguimientoUpdate = MapSeguimientoUpdateParcial(id,id, changes);
+
+  async update(idconsulta: number,id: number, changes: Partial<VMSeguimientoUpdate>): Promise<number> {
+    const dto: DTOSeguimientoUpdate = MapSeguimientoUpdateParcial(id,idconsulta, changes);
     const response = await firstValueFrom(
-      this.http.patch<{ ci_ID: number }>(`${this.base}/${id}`, dto)
+      this.http.patch<{ se_ID: number }>(`${this.base}/${idconsulta}/${id}`, dto)
     );
-    return response.ci_ID;
+    return response.se_ID;
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder,Validators, FormControl} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder,Validators, FormControl,ValidatorFn, AbstractControl} from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { VMCiudadanoCreate } from '../models/ciudadano.vm';
@@ -9,8 +9,11 @@ import { CiudadanoService } from '../services/ciudadano.service';
 // Notificaciones centralizadas
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 
-type Supo = 'AMIGO' | 'VECINO' | 'VOLANTE' | 'OTROS' | 'ERROR';
+type Supo = 'AMIGO' | 'VECINO' | 'VOLANTE' | 'OTROS'|'';
 
+const noInicialSupo: ValidatorFn = (c: AbstractControl) => {
+  return c.value === '' ? { placeholder: true } : null;
+}
 @Component({
   selector: 'app-ciudadano-registrar',
   standalone: true,
@@ -36,7 +39,7 @@ export class CiudadanoRegistar {
     telefono: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     correoE: new FormControl('', { nonNullable: true }),
 
-    supo: new FormControl<Supo>('ERROR', { nonNullable: true, validators: [Validators.required] }),
+    supo: new FormControl<Supo>('', { nonNullable: true, validators: [Validators.required,noInicialSupo] }),
     supoOtrosDetalle: new FormControl('', { nonNullable: true })
   });
 

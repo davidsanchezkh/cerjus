@@ -27,7 +27,6 @@ export class ConsultaService {
     .get<ApiConsultaPageSimple>(this.base,{params})
     .pipe(map(apiPage=>MapPageToVM<ApiConsultaListaSimple,VMConsultaListaSimple>(apiPage,MapConsultaListaItemVM)));
   }
-  
 
   async create(vm: VMConsultaCreate): Promise<number> {
     const dto: DTOConsultaCreate = MapConsultaCreate(vm);
@@ -42,6 +41,7 @@ export class ConsultaService {
     .get<ApiConsultaDetalleSimple>(`${this.base}/${id}`)
     .pipe(map(apiItem => MapConsultaDetalleListaSimple(apiItem)));// mapper que convierte Api → VM
   }
+  
   async update(id: number, changes: Partial<VMConsultaUpdate>): Promise<number> {
     const dto: DTOConsultaUpdate = MapConsultaUpdateParcial(id, changes);
     const response = await firstValueFrom(

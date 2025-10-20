@@ -32,8 +32,8 @@ export type VMConsultaListaSimple = Pick<VMConsultaListaCompleta,
 export type  VMConsultaDetalleCompleta = VMConsulta;
 
 export type VMConsultaDetalleSimple = Pick<VMConsultaListaCompleta, 
-  'id' |'resumen'| 'fecha' | 'hechos' | 'materia' |'regresa'|
-  'absolucion' | 'estado'
+  'id'|'idciudadano' |'resumen'| 'fecha' | 'hechos' | 'materia' |
+  'regresa'|'absolucion' | 'estado'
 >
 
 export type VMConsultaCreate= Pick<VMConsulta, 

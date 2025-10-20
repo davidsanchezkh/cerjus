@@ -44,6 +44,7 @@ export function MapConsultaListaOpciones(vm:VMConsultaListaOptions):DTOConsultaL
 export function MapConsultaDetalleListaSimple(a:ApiConsultaDetalleSimple):VMConsultaDetalleSimple{
   return{
     id: a.co_ID,
+    idciudadano:a.co_ci_ID,
     resumen: a.co_resumen,
     fecha: a.co_fecha,
     regresa: a.co_regresa,

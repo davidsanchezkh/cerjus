@@ -9,7 +9,7 @@ import { SeguimientoListaConsulta } from '../../seguimiento/seguimiento.lista.co
 import { ESTADO_CONSULTA_OPCIONES, EstadoConsulta } from '../models/consulta.dominio';
 // Notificaciones centralizadas
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
-
+import { PageMetaService } from '@/app/services/page_meta.service';
 @Component({
   selector: 'app-consulta-detalle',
   standalone: true,
@@ -18,13 +18,17 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   styleUrl: './consulta.detalle.css'
 })
 export class ConsultaDetalle implements OnInit {
+
+  constructor(private pageMeta: PageMetaService) {}
+
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private service = inject(ConsultaService);
   private fb = inject(FormBuilder);
   private notify = inject(NotificacionesService);
-
+  
   idconsulta!: number;
+  ciudadanoId!: number;
   isEditing = false;
 
   // (si usas paneles colapsables en la UI)
@@ -53,14 +57,17 @@ export class ConsultaDetalle implements OnInit {
         this.form.patchValue(data);
         this.originalData = MapDetalleToUpdate(data);
         this.idconsulta = id;
+        this.ciudadanoId = data.idciudadano;
+        this.pageMeta.replace({ titulo: `Consulta Nº${data.id ?? id}` , ruta: ['/ciudadano', data.idciudadano] })
       },
       error: () => {
         // El interceptor ya mostró el diálogo (404, etc.).
-        // Si quieres, podrías redirigir tras cerrar el diálogo.
       }
     });
   }
-
+  ngOnDestroy() {
+    this.pageMeta.clear();
+  }
   // === Edición ===
   onEdit(ev: Event): void {
     ev.stopPropagation();
