@@ -68,7 +68,8 @@ export class CiudadanoDetalle implements OnInit {
         this.syncConocioOtros(); 
         this.originalData = MapDetalleToUpdate(data);
         this.idciudadano = id;
-        
+        this.pageMeta.replace({ titulo: `Ciudadano: ${data.apellidoPaterno??''} 
+          ${data.apellidoMaterno??''}, ${data.nombres??''} - ${data.dni??''}` , ruta: ['/ciudadano'] })
       },
       error: () => {
         // El interceptor ya mostró el diálogo (404, etc.).

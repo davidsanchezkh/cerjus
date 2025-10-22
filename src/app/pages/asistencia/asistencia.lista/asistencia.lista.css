@@ -165,3 +165,14 @@ html, body { scrollbar-gutter: stable both-edges; }
   white-space: pre-wrap;
 }
 
+.tipo-text {
+  font-weight: 700;
+}
+
+.tipo-text.entrada {
+  color:  #198754;
+}
+
+.tipo-text.salida {
+  color: #ffc107;
+}

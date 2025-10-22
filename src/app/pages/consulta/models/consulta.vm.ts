@@ -38,7 +38,9 @@ export type  VMConsultaDetalleCompleta = VMConsulta;
 export type VMConsultaDetalleSimple = Pick<VMConsultaListaCompleta, 
   'id'|'idciudadano' |'resumen'| 'fecha' | 'hechos' |'materias'|'materiaOtros'|
   'regresa'|'absolucion' | 'estado'
->
+>&{
+  ciudadanodni:string;
+}
 
 export type VMConsultaCreate= Pick<VMConsulta, 
   'idciudadano'|'resumen'|'hechos'|'regresa'|'materias'|'materiaOtros'|

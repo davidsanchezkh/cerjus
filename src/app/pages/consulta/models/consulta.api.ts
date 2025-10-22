@@ -27,7 +27,9 @@ export type ApiConsultaDetalleCompleta = ApiConsulta
 export type ApiConsultaDetalleSimple= Pick<ApiConsultaDetalleCompleta,
  'co_ID'| 'co_ci_ID'|'co_resumen'| 'co_fecha' | 'co_hechos_consulta' | 'co_materia_consulta' 
  |'co_regresa'|'co_absolucion_consulta' | 'co_estado'
->
+>&{
+  ci_DNI:string;
+}
 export interface ApiConsultaPageSimple {
   items: ApiConsultaListaSimple[];
   total: number;

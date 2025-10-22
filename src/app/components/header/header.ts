@@ -108,7 +108,7 @@ export class Header implements OnDestroy {
           return;
         }
         if (seg1) {                // /ciudadano/:id
-          this.title = 'Detalle del Ciudadano';
+          this.title = 'Ciudadano: ';
           this.backLink = '/ciudadano';
           return;
         }
@@ -121,12 +121,12 @@ export class Header implements OnDestroy {
           return;
         }
         if (seg1 === 'registrar' && seg2) { // /consulta/registrar/:id  → back: /ciudadano/:id
-          this.title = 'Consulta';
+          this.title = 'Registrar Nueva Consulta';
           this.backLink = `/ciudadano/${seg2}`;
           return;
         }
         if (seg1) {                // /consulta/:id → back: /consulta
-          this.title = '';
+          this.title = 'Consulta Nº';
           this.backLink = '/consulta';
           return;
         }

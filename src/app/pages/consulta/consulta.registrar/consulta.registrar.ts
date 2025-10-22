@@ -97,7 +97,7 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) =>
     try {
       // 3) Envío (errores → interceptor muestra diálogo con title/message del backend)
       const vm: VMConsultaCreate = this.form.getRawValue();
-      const createdId = await this.service.create(vm);
+      const consultaId = await this.service.create(vm);
 
       // 4) Éxito: OK bloqueante y navegar
       await this.notify.ok({
@@ -107,7 +107,7 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) =>
         primaryText: 'Ver detalle'
       });
 
-      this.navergar();
+      this.navergar(consultaId);
     } catch {
       // Nada aquí: el interceptor ya mostró el error adecuado
     } finally {
@@ -129,12 +129,17 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) =>
     this.navergar();
   }
 
-  private navergar() {
+  private navergar(consultaId?:number) {
+    
+    if(typeof consultaId === 'number' && !isNaN(consultaId)){
+      this.router.navigate(['/consulta', consultaId]);  
+      return;
+    } 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!isNaN(id)) {
-      this.router.navigate(['/ciudadano', id]);   // vuelve a la ficha del ciudadano
+      this.router.navigate(['/ciudadano', id]);   
     } else {
-      this.router.navigate(['/consulta']);        // fallback
+      this.router.navigate(['/consulta']);
     }
   }
 }

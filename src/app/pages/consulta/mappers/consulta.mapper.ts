@@ -41,6 +41,7 @@ export function MapConsultaListaOpciones(vm:VMConsultaListaOptions):DTOConsultaL
 export function MapConsultaDetalleListaSimple(a:ApiConsultaDetalleSimple):VMConsultaDetalleSimple{
   const { materias, materiaOtros } = materiaFromDB(a.co_materia_consulta);
   return{
+    ciudadanodni:a.ci_DNI,
     id: a.co_ID,
     idciudadano:a.co_ci_ID,
     resumen: a.co_resumen,

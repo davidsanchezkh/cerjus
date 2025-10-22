@@ -64,7 +64,7 @@ export class ConsultaDetalle implements OnInit {
         this.originalData = MapDetalleToUpdate(data);
         this.idconsulta = id;
         this.ciudadanoId = data.idciudadano;
-        this.pageMeta.replace({ titulo: `Consulta Nº${data.id ?? id}` , ruta: ['/ciudadano', data.idciudadano] })
+        this.pageMeta.replace({ titulo: `Consulta Nº${data.id ?? id} - ${data.ciudadanodni ?? ''}` , ruta: ['/ciudadano', data.idciudadano] })
       },
       error: () => {
         // El interceptor ya mostró el diálogo (404, etc.).
