@@ -1,19 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder,Validators,FormControl,ValidatorFn, AbstractControl} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder,Validators,FormControl,ValidatorFn, AbstractControl,FormGroup} from '@angular/forms';
 import { Router,ActivatedRoute } from '@angular/router';
 import { VMConsultaCreate} from '../models/consulta.vm'
 import { ConsultaService } from '../services/consulta.service';
-
+import { MATERIA_CONSULTA_OPCIONES, Materia } from '../models/consulta.dominio';
 // Notificaciones centralizadas
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 
-type Materia = 'DERECHO FAMILIA' | 'DERECHO PENAL' | 'DERECHO CIVIL' | 
-'DERECHO LABORAL' | 'OTROS' |''|'ERROR';
-
-const noInicialMateria: ValidatorFn = (c: AbstractControl) => {
-  return c.value === '' ? { placeholder: true } : null;
-}
+const noInicialMateria: ValidatorFn = (c: AbstractControl) =>
+  c.value === '' ? { placeholder: true } : null;
 @Component({
   selector: 'app-consulta-registrar',
   imports: [CommonModule,ReactiveFormsModule],
@@ -26,6 +22,8 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) => {
   private service = inject(ConsultaService);
   private notify = inject(NotificacionesService);
 
+  readonly materiaOpciones = MATERIA_CONSULTA_OPCIONES;
+
   submitting = false;
   errorMessage = '';
 
@@ -37,27 +35,29 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) => {
     regresa: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
 
     materias: new FormControl<Materia>('', { nonNullable: true,  validators: [Validators.required, noInicialMateria] }),
-    materiaOtros: new FormControl({ value: '', disabled: true }, { nonNullable: true })
+    materiaOtros: new FormControl({ value: '', disabled: true }, { nonNullable: true, validators: [Validators.maxLength(150)] }),
   });
 
-   ngOnInit() {
+  ngOnInit() {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!isNaN(id) && id > 0) {
+      this.form.get('materias')!.valueChanges.subscribe(() => this.syncMateriaOtros());
       this.form.patchValue({ idciudadano: id });
     }
-
-    // Habilitar/deshabilitar “materiaOtros” según selección
-    this.form.get('materias')?.valueChanges.subscribe(value => {
-      const otrosCtrl = this.form.get('materiaOtros');
-      if (value === 'OTROS') {
-        otrosCtrl?.enable();
-      } else {
-        otrosCtrl?.disable();
-        otrosCtrl?.reset();
-      }
-    });
   }
-
+  private syncMateriaOtros() {
+    const value = this.form.get('materias')!.value as Materia;
+    const otrosCtrl = this.form.get('materiaOtros')!;
+    if (value === 'OTROS') {
+      otrosCtrl.enable({ emitEvent: false });
+      otrosCtrl.addValidators(Validators.required);
+    } else {
+      otrosCtrl.clearValidators();
+      otrosCtrl.setValue('', { emitEvent: false });
+      otrosCtrl.disable({ emitEvent: false });
+    }
+    otrosCtrl.updateValueAndValidity({ emitEvent: false });
+  }
   /** Regla local: si materias = OTROS, exigir detalle */
   private validaMateriaOtros(): string | null {
     const v = this.form.value;
@@ -79,8 +79,7 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) => {
       });
       return;
     }
-
-
+    
     // 2) Regla de negocio local
     const msgOtros = this.validaMateriaOtros();
     if (msgOtros) {
@@ -116,7 +115,17 @@ const noInicialMateria: ValidatorFn = (c: AbstractControl) => {
     }
   }
 
-  onBack() {
+  async onBack() {
+    if (this.form.dirty) {
+      const ok = await this.notify.confirm({
+        variant: 'warning',
+        title: 'Descartar cambios',
+        message: 'Hay datos sin guardar. ¿Deseas descartarlos?',
+        confirmText: 'Descartar',
+        cancelText: 'Seguir aquí'
+      });
+      if (!ok) return;
+    }
     this.navergar();
   }
 

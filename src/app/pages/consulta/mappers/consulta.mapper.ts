@@ -2,7 +2,8 @@ import { ApiConsultaListaSimple,ApiConsultaDetalleSimple } from '../models/consu
 import { VMPage,VMConsultaCreate, VMConsultaListaSimple, VMConsultaListaOptions,
   VMConsultaDetalleSimple,VMConsultaUpdate,VMConsultaUpdateForm } from '../models/consulta.vm';
 import { DTOConsultaCreate, DTOConsultaListaOptions,DTOConsultaUpdate } from '../models/consulta.dtos';
-import { estadoConsultaToLabel,EstadoConsulta } from '../models/consulta.dominio';
+import { estadoConsultaToLabel,EstadoConsulta,materiaToDB,materiaFromDB,Materia} from '../models/consulta.dominio';
+
 //traductor entre API ↔ VM ↔ DTO.
 export function MapConsultaListaItemVM(a: ApiConsultaListaSimple): VMConsultaListaSimple {
   const estado = a.co_estado as EstadoConsulta; // backend solo 1|2
@@ -21,11 +22,7 @@ export function MapConsultaCreate(vm:VMConsultaCreate):DTOConsultaCreate{
     co_resumen: toUpperSafe(vm.resumen),
     co_hechos_consulta: toUpperSafe(vm.hechos),
     co_regresa:toUpperSafe(vm.regresa),
-    co_materia_consulta: toUpperSafe(
-      vm.materias === 'OTROS'
-        ? vm.materiaOtros?.trim() || 'OTROS'
-        : vm.materias
-    ),
+    co_materia_consulta: materiaToDB(vm.materias, vm.materiaOtros),
     co_absolucion_consulta: toUpperSafe(vm.absolucion),
   };
 }
@@ -42,6 +39,7 @@ export function MapConsultaListaOpciones(vm:VMConsultaListaOptions):DTOConsultaL
   }
 }
 export function MapConsultaDetalleListaSimple(a:ApiConsultaDetalleSimple):VMConsultaDetalleSimple{
+  const { materias, materiaOtros } = materiaFromDB(a.co_materia_consulta);
   return{
     id: a.co_ID,
     idciudadano:a.co_ci_ID,
@@ -49,7 +47,8 @@ export function MapConsultaDetalleListaSimple(a:ApiConsultaDetalleSimple):VMCons
     fecha: a.co_fecha,
     regresa: a.co_regresa,
     hechos: a.co_hechos_consulta,
-    materia: a.co_materia_consulta,
+    materias: materias,
+    materiaOtros:materiaOtros,
     absolucion: a.co_absolucion_consulta,
     estado: a.co_estado,
   }
@@ -60,7 +59,8 @@ export  function MapDetalleToUpdate(vm: VMConsultaDetalleSimple): VMConsultaUpda
     id: vm.id,
     resumen: vm.resumen,
     hechos: vm.hechos,
-    materia: vm.materia,
+    materias: vm.materias,
+    materiaOtros:vm.materiaOtros,
     absolucion: vm.absolucion,
     estado: vm.estado,
   };
@@ -70,7 +70,11 @@ export function MapConsultaUpdateParcial(id: number,vm: VMConsultaUpdateForm):DT
 
   if (vm.resumen !== undefined) dto.co_resumen = toUpperSafe(vm.resumen);
   if (vm.hechos !== undefined) dto.co_hechos_consulta = toUpperSafe(vm.hechos);
-  if (vm.materia !== undefined) dto.co_materia_consulta = toUpperSafe(vm.materia);
+  if (vm.materias !== undefined || vm.materiaOtros !== undefined) { dto.co_materia_consulta = materiaToDB(
+      (vm.materias as Materia) ?? '',
+      vm.materiaOtros
+    );
+  }
   if (vm.absolucion !== undefined) dto.co_absolucion_consulta = toUpperSafe(vm.absolucion);
   if (vm.estado !== undefined) dto.co_estado = vm.estado;
 

@@ -1,4 +1,5 @@
 //como el frontend lo trata la UI
+import { Conocio } from './ciudadano.dominio';
 export interface VMCiudadano{
   id: number;
   dni: string;
@@ -12,6 +13,10 @@ export interface VMCiudadano{
   telefono: string;
   correoE: string;
   conocio: string;
+
+  conocios: Conocio;
+  conocioOtros: string;
+
   estado: number;
   creadoPor: number;
   fechaCreadoPor: Date;
@@ -31,7 +36,7 @@ export type  VMCiudadanoDetalleCompleta = VMCiudadano;
 export type VMCiudadanoDetalleSimple = Pick<VMCiudadanoListaCompleta, 
   'id' | 'dni'| 'nombres'| 'apellidoPaterno' | 'apellidoMaterno'|'domicilio'|
   'ocupacion'|'fechaNacimiento'|'hijos'|'telefono'|'correoE'|
-  'conocio'
+  'conocios'|'conocioOtros'
 >
 
 export type VMCiudadanoCreate= Pick<VMCiudadano, 
@@ -46,12 +51,12 @@ export type VMCiudadanoUpdate=
   { id: VMCiudadano["id"] } & Partial<Pick<VMCiudadano, 
   'dni'| 'nombres'| 'apellidoPaterno' | 'apellidoMaterno'|'domicilio'|
   'ocupacion'|'fechaNacimiento'|'hijos'|'telefono'|'correoE'|
-  'conocio'
+  'conocios'|'conocioOtros'
 >>
 export type VMCiudadanoUpdateForm= Partial<Pick<VMCiudadanoUpdate, 
   'dni'| 'nombres'| 'apellidoPaterno' | 'apellidoMaterno'|'domicilio'|
   'ocupacion'|'fechaNacimiento'|'hijos'|'telefono'|'correoE'|
-  'conocio'
+  'conocios'|'conocioOtros'
 >>
 export interface VMPage<T> {
   items: T[];

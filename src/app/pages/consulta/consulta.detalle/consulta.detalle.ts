@@ -1,12 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder,FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder,FormControl,Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { VMConsultaDetalleSimple, VMConsultaUpdate, VMConsultaUpdateForm } from '../models/consulta.vm';
 import { ConsultaService } from '../services/consulta.service';
 import { MapDetalleToUpdate } from '../mappers/consulta.mapper';
 import { SeguimientoListaConsulta } from '../../seguimiento/seguimiento.lista.consulta/seguimiento.lista.consulta';
-import { ESTADO_CONSULTA_OPCIONES, EstadoConsulta } from '../models/consulta.dominio';
+import { ESTADO_CONSULTA_OPCIONES, EstadoConsulta,Materia,MATERIA_CONSULTA_OPCIONES } from '../models/consulta.dominio';
 // Notificaciones centralizadas
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 import { PageMetaService } from '@/app/services/page_meta.service';
@@ -30,7 +30,8 @@ export class ConsultaDetalle implements OnInit {
   idconsulta!: number;
   ciudadanoId!: number;
   isEditing = false;
-
+  submittedEdit = false;  
+  isOtros = false; 
   // (si usas paneles colapsables en la UI)
   open = false;
   open2 = true;
@@ -38,16 +39,20 @@ export class ConsultaDetalle implements OnInit {
   originalData!: VMConsultaUpdate;
   
   estadoOpciones = ESTADO_CONSULTA_OPCIONES;
+  materiaOpciones =MATERIA_CONSULTA_OPCIONES;
+
   form = this.fb.group<ControlsOf<VMConsultaUpdateForm>>({
     resumen:    new FormControl('', { nonNullable: true }),
     hechos:     new FormControl('', { nonNullable: true }),
-    materia:    new FormControl('', { nonNullable: true }),
+    materias:      new FormControl<Materia>('', { nonNullable: true }),
+    materiaOtros: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(150)] }),
     absolucion: new FormControl('', { nonNullable: true }),
-    estado:     new FormControl(0,  { nonNullable: true }),
+    estado:     new FormControl(0 as unknown as EstadoConsulta,  { nonNullable: true }),
   });
 
   ngOnInit(): void {
     this.form.disable();
+    this.form.get('materias')!.valueChanges.subscribe(() => this.syncMateriaOtros())
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
@@ -55,6 +60,7 @@ export class ConsultaDetalle implements OnInit {
     this.service.getById(id).subscribe({
       next: (data: VMConsultaDetalleSimple) => {
         this.form.patchValue(data);
+        this.syncMateriaOtros(); 
         this.originalData = MapDetalleToUpdate(data);
         this.idconsulta = id;
         this.ciudadanoId = data.idciudadano;
@@ -65,15 +71,46 @@ export class ConsultaDetalle implements OnInit {
       }
     });
   }
+  private syncMateriaOtros() {
+    const value = this.form.get('materias')!.value as Materia;
+    const otrosCtrl = this.form.get('materiaOtros')!;
+    this.isOtros  = (value === 'OTROS');
+    
+    if (this.isOtros ) {
+      // No deshabilites; sólo exige contenido y largo
+      otrosCtrl.setValidators([Validators.required, Validators.maxLength(150)]);
+    } else {
+      // Limpia y quita validadores, pero deja el control habilitado
+      otrosCtrl.clearValidators();
+      if (otrosCtrl.value) {
+        otrosCtrl.setValue('', { emitEvent: false });
+      }
+      otrosCtrl.markAsPristine();
+      otrosCtrl.markAsUntouched();
+    }
+    otrosCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  
+  private validaMateriaOtros(): string | null {
+    const v = this.form.value;
+    if (v.materias === 'OTROS' && !v.materiaOtros?.toString().trim()) {
+      return 'Indique la materia en “Otros”.';
+    }
+    return null;
+  }
+
   ngOnDestroy() {
     this.pageMeta.clear();
   }
   // === Edición ===
   onEdit(ev: Event): void {
     ev.stopPropagation();
+    this.submittedEdit = false;
     this.isEditing = true;
     this.open = true;
     this.form.enable();
+    this.syncMateriaOtros(); 
   }
 
   async onCancel(): Promise<void> {
@@ -90,11 +127,36 @@ export class ConsultaDetalle implements OnInit {
     this.form.reset(this.originalData);
     this.isEditing = false;
     this.form.disable();
+    this.submittedEdit = false;
+    this.syncMateriaOtros();
   }
 
   // === Guardado ===
   async onSave(): Promise<void> {
-    if (!this.form.valid) return;
+
+    this.submittedEdit = true;
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Datos incompletos',
+        message: 'Revisa los campos obligatorios e inténtalo nuevamente.',
+        primaryText: 'Aceptar'
+      });
+      return;
+    }
+    // 2) Regla de negocio local
+    const msgOtros = this.validaMateriaOtros();
+    if (msgOtros) {
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Falta información',
+        message: msgOtros,
+        primaryText: 'Aceptar'
+      });
+      return;
+    }
 
     // Cambios respecto a originalData
     const current = this.form.value;
@@ -153,6 +215,7 @@ export class ConsultaDetalle implements OnInit {
 
       this.isEditing = false;
       this.form.disable();
+      this.submittedEdit = false;
     } catch {
       // El interceptor ya mostró el diálogo de error (title/message del backend).
     }

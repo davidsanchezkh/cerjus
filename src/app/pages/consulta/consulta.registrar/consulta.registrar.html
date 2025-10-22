@@ -19,15 +19,11 @@
             <div class="row mb-3">
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold">Materia de la consulta</label>
-                <select class="form-select" formControlName="materias" required>
-                  <option value="" disabled selected>Seleccione una opción</option>
-                  <option value="DERECHO CIVIL">Derecho Civil</option>
-                  <option value="DERECHO FAMILIAR">Derecho Familiar</option>
-                  <option value="DERECHO LABORAL">Derecho Laboral</option>
-                  <option value="DERECHO PENAL">Derecho Penal</option>
-                  <option value="DERECHO CONSTITUCIONAL">Derecho Constitucional</option>
-                  <option value="DERECHO SUCESORIO">Derecho Sucesorio</option>
-                  <option value="OTROS">Otros</option>
+                <select class="form-select" formControlName="materias">
+                  <option value="" disabled>Selecione una materia</option>
+                  @for (opt of materiaOpciones; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
                 </select>
               </div>
               <div class="col-12 col-md-6">

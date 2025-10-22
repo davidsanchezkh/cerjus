@@ -1,5 +1,5 @@
 //como el frontend lo trata la UI
-import { EstadoConsulta } from './consulta.dominio';
+import { EstadoConsulta,Materia } from './consulta.dominio';
 export interface VMConsulta{
   id: number;
   idciudadano: number;
@@ -7,6 +7,10 @@ export interface VMConsulta{
   fecha: Date;
   hechos: string;
   materia: string;
+
+  materias: Materia;
+  materiaOtros: string;
+  
   absolucion: string;
   regresa:string;
   estado: number;
@@ -32,25 +36,24 @@ export type VMConsultaListaSimple = Pick<VMConsultaListaCompleta,
 export type  VMConsultaDetalleCompleta = VMConsulta;
 
 export type VMConsultaDetalleSimple = Pick<VMConsultaListaCompleta, 
-  'id'|'idciudadano' |'resumen'| 'fecha' | 'hechos' | 'materia' |
+  'id'|'idciudadano' |'resumen'| 'fecha' | 'hechos' |'materias'|'materiaOtros'|
   'regresa'|'absolucion' | 'estado'
 >
 
 export type VMConsultaCreate= Pick<VMConsulta, 
-  'idciudadano'|'resumen'|'hechos'|'regresa'|
-  'absolucion'>
-&{
-  materias: string;
-  materiaOtros: string;
-}
+  'idciudadano'|'resumen'|'hechos'|'regresa'|'materias'|'materiaOtros'|
+  'absolucion'
+>
+
 
 export type VMConsultaUpdate= 
   { id: VMConsulta["id"] } & Partial<Pick<VMConsulta, 
-  'resumen'| 'hechos'| 'materia'|'absolucion'|
+  'resumen'| 'hechos'|'absolucion'|'materias'|'materiaOtros'|
   'estado'
 >>
+
 export type VMConsultaUpdateForm= Partial<Pick<VMConsultaUpdate, 
-  'resumen'| 'hechos' | 'materia'|'absolucion'|
+  'resumen'| 'hechos' |'absolucion'|'materias'|'materiaOtros'|
   'estado'
 >>
 export interface VMPage<T> {
@@ -67,6 +70,7 @@ Partial<Pick<VMConsulta, 'idciudadano'>>
   pageSize?: number;
   sort?:string;
 };
+
 
 
 

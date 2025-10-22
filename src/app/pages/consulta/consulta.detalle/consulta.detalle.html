@@ -58,15 +58,39 @@
           <div class="row g-3">
             <div class="col-12 col-md-6">
               <label class="form-label">Materia</label>
-              <input type="text"
-                formControlName="materia"
-                [class.value-box-edit]="isEditing"  
-                [class.value-box-noedit]="!isEditing"/>
+              <select class="form-select"
+                      formControlName="materias"
+                      [class.value-box-edit]="isEditing"
+                      [class.value-box-noedit]="!isEditing">
+                <option value="" disabled>Seleccione una materia</option>
+                @for (opt of materiaOpciones; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
             </div>
 
             <div class="col-12 col-md-6">
+              <label class="form-label">Especifique otros</label>
+              <input
+                type="text"
+                maxlength="150"
+                formControlName="materiaOtros"
+                placeholder="Especifique la materia"
+                class="form-control w-100"
+                [readonly]="!isOtros || !isEditing"                
+                [attr.tabindex]="(!isOtros || !isEditing) ? -1 : 0"
+                [class.value-box-edit]="isOtros && isEditing"      
+                [class.value-box-noedit]="!(isOtros && isEditing)" 
+              />
+            </div>
+          </div>
+          <div style="height: 1rem;"></div>
+          
+          <!--Sección: Estado-->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
               <label class="form-label">Estado</label>
-              <select formControlName="estado" 
+              <select class="form-select"  formControlName="estado" 
                 [class.value-box-edit]="isEditing"
                 [class.value-box-noedit]="!isEditing">
                 @for (opt of estadoOpciones; track opt.value) {
@@ -75,7 +99,6 @@
               </select>
             </div>
           </div>
-
           <div style="height: 1rem;"></div>
 
           <!-- Sección: Absolución -->

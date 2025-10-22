@@ -2,7 +2,7 @@ import { ApiCiudadanoListaSimple,ApiCiudadanoDetalleSimple } from '../models/ciu
 import { VMPage,VMCiudadanoCreate, VMCiudadanoListaSimple, VMCiudadanoListaOptions,
   VMCiudadanoDetalleSimple,VMCiudadanoUpdate,VMCiudadanoUpdateForm } from '../models/ciudadano.vm';
 import { DTOCiudadanoCreate, DTOCiudadanoListaOptions,DTOCiudadanoUpdate } from '../models/ciudadano.dtos';
-
+import { conocioToDB,conocioFromDB,Conocio} from '../models/ciudadano.dominio';
 //traductor entre API ↔ VM ↔ DTO.
 export function MapCiudadanoListaItemVM(a: ApiCiudadanoListaSimple):VMCiudadanoListaSimple {
   return{
@@ -45,6 +45,7 @@ export function MapCiudadanoListaOpciones(vm:VMCiudadanoListaOptions):DTOCiudada
   }
 }
 export function MapCiudadanoDetalleListaSimple(a:ApiCiudadanoDetalleSimple):VMCiudadanoDetalleSimple{
+  const { conocios, conocioOtros } = conocioFromDB(a.ci_conocio);
   return{
     id: Number(a.ci_ID),
     dni: a.ci_DNI,
@@ -59,7 +60,8 @@ export function MapCiudadanoDetalleListaSimple(a:ApiCiudadanoDetalleSimple):VMCi
       : '',
     telefono: a.ci_telefono,
     correoE: a.ci_correo_e,
-    conocio: a.ci_conocio,
+    conocios: conocios,
+    conocioOtros:conocioOtros,
   }
 }
 export  function MapDetalleToUpdate(vm: VMCiudadanoDetalleSimple): VMCiudadanoUpdate {
@@ -75,7 +77,8 @@ export  function MapDetalleToUpdate(vm: VMCiudadanoDetalleSimple): VMCiudadanoUp
     hijos: vm.hijos,
     telefono: vm.telefono,
     correoE: vm.correoE,
-    conocio: vm.conocio
+    conocios: vm.conocios,
+    conocioOtros:vm.conocioOtros,
   };
 }
 export function MapCiudadanoUpdateParcial(id: number,vm: VMCiudadanoUpdateForm):DTOCiudadanoUpdate{
@@ -89,9 +92,13 @@ export function MapCiudadanoUpdateParcial(id: number,vm: VMCiudadanoUpdateForm):
   if (vm.ocupacion !== undefined) dto.ci_ocupacion = toUpperSafe(vm.ocupacion);
   if (vm.fechaNacimiento !== undefined) dto.ci_fecha_nacimiento = new Date(vm.fechaNacimiento).toISOString();
   if (vm.hijos !== undefined) dto.ci_hijos = Number(vm.hijos);
-  if (vm.telefono !== undefined) dto.ci_telefono = toUpperSafe(vm.telefono);
-  if (vm.correoE !== undefined) dto.ci_correo_e = toUpperSafe(vm.correoE);
-
+  if (vm.telefono !== undefined) dto.ci_telefono = vm.telefono.trim();
+  if (vm.correoE !== undefined) dto.ci_correo_e = vm.correoE.trim();
+  if (vm.conocios !== undefined || vm.conocioOtros !== undefined) { dto.ci_conocio = conocioToDB(
+        (vm.conocios as Conocio) ?? '',
+        vm.conocioOtros
+      );
+    }
   return dto;
 }
 

@@ -126,25 +126,47 @@
 
           <!-- Sección: ¿Cómo supo del consultorio? -->
           <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label" for="cdf1campo11">¿Cómo supo del consultorio?</label>
-              <input type="text"
-                name="cdf1campo11" id="cdf1campo11"
-                formControlName="conocio"
-                [class.value-box-edit]="isEditing"
-                [class.value-box-noedit]="!isEditing"/>
+            <div class="col-12 col-md-6">
+              <label class="form-label">¿Cómo nos conoció?</label>
+              <select class="form-select"
+                      formControlName="conocios"
+                      [class.value-box-edit]="isEditing"
+                      [class.value-box-noedit]="!isEditing">
+                <option value="" disabled>Seleccione una opción</option>
+                @for (opt of supoOpciones; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Especifique otros</label>
+              <input
+                type="text"
+                maxlength="30"
+                formControlName="conocioOtros"
+                placeholder="Describe brevemente"
+                class="form-control w-100"
+                [readonly]="!isOtros || !isEditing"
+                [attr.tabindex]="(!isOtros || !isEditing) ? -1 : 0"
+                [class.value-box-edit]="isOtros && isEditing"
+                [class.value-box-noedit]="!(isOtros && isEditing)"
+              />
             </div>
           </div>
+          
           <div style="height: 1rem; "></div>
             <!-- Botones -->
-          <div class="d-flex justify-content-between mt-4" *ngIf="isEditing">
-            <button type="button" name="btn1" id="cdf1btn1" class="btn btn-warning"(click)=" onCancel() ">
-              Cancelar
-            </button>
-            <button type="button" name="btn2" id="cdf1btn2" class="btn btn-success" (click)=" onSave()">
-              Guardar
-            </button>
-          </div>
+          @if (isEditing) {
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning" (click)="onCancel()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-success" (click)="onSave()">
+                Guardar
+              </button>
+            </div>
+          }
         </form>   
       </div>
     </div>

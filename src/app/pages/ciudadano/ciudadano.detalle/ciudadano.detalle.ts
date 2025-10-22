@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder,Validators} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
@@ -8,10 +8,10 @@ import { VMCiudadanoDetalleSimple, VMCiudadanoUpdate, VMCiudadanoUpdateForm } fr
 import { CiudadanoService } from '../services/ciudadano.service';
 import { MapDetalleToUpdate } from '../mappers/ciudadano.mapper';
 import { ConsultaListaCiudadano } from '../../consulta/consulta.lista.ciudadano/consulta.lista.ciudadano';
-
+import { Conocio,CONOCIO_CIUDADANO_OPCIONES } from '../models/ciudadano.dominio';
 // Notificaciones (OK/Confirm/Loading ya están centralizados)
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
-
+import { PageMetaService } from '@/app/services/page_meta.service';
 @Component({
   selector: 'app-ciudadano-detalle',
   standalone: true,
@@ -20,21 +20,26 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   styleUrl: './ciudadano.detalle.css'
 })
 export class CiudadanoDetalle implements OnInit {
+
+  constructor(private pageMeta: PageMetaService) {}
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private service = inject(CiudadanoService);
   private fb = inject(FormBuilder);
   private notify = inject(NotificacionesService);
 
+   
   idciudadano!: number;
   isEditing = false;
-
+  submittedEdit = false;  
+  isOtros = false; 
   // controla el colapso del panel (ajusta a tu UI real)
   open = false;
   open2 = true;
 
   originalData!: VMCiudadanoUpdate;
 
+  readonly supoOpciones = CONOCIO_CIUDADANO_OPCIONES;
   form = this.fb.group<ControlsOf<VMCiudadanoUpdateForm>>({
     nombres: new FormControl('', { nonNullable: true }),
     apellidoPaterno: new FormControl('', { nonNullable: true }),
@@ -46,11 +51,13 @@ export class CiudadanoDetalle implements OnInit {
     hijos: new FormControl(0, { nonNullable: true }),
     telefono: new FormControl('', { nonNullable: true }),
     correoE: new FormControl('', { nonNullable: true }),
-    conocio: new FormControl('', { nonNullable: true }),
+    conocios: new FormControl<Conocio>('', { nonNullable: true }),
+    conocioOtros: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(30)] }),
   });
 
   ngOnInit(): void {
     this.form.disable();
+    this.form.get('conocios')!.valueChanges.subscribe(() => this.syncConocioOtros())
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
@@ -58,8 +65,10 @@ export class CiudadanoDetalle implements OnInit {
     this.service.getById(id).subscribe({
       next: (data: VMCiudadanoDetalleSimple) => {
         this.form.patchValue(data);
+        this.syncConocioOtros(); 
         this.originalData = MapDetalleToUpdate(data);
         this.idciudadano = id;
+        
       },
       error: () => {
         // El interceptor ya mostró el diálogo (404, etc.).
@@ -67,17 +76,44 @@ export class CiudadanoDetalle implements OnInit {
       }
     });
   }
+  private syncConocioOtros() {
+    const value = this.form.get('conocios')!.value as Conocio;
+    const otrosCtrl = this.form.get('conocioOtros')!;
+    this.isOtros = (value === 'OTROS');
 
+    if (this.isOtros) {
+      otrosCtrl.setValidators([Validators.required, Validators.maxLength(30)]);
+    } else {
+      otrosCtrl.clearValidators();
+      if (otrosCtrl.value) {
+        otrosCtrl.setValue('', { emitEvent: false });
+      }
+      otrosCtrl.markAsPristine();
+      otrosCtrl.markAsUntouched();
+    }
+    otrosCtrl.updateValueAndValidity({ emitEvent: false });
+  }
+  private validaConocioOtros(): string | null {
+    const v = this.form.value;
+    if (v.conocios === 'OTROS' && !v.conocioOtros?.toString().trim()) {
+      return 'Indique la conocio en “Otros”.';
+    }
+    return null;
+  }
+  ngOnDestroy() {
+    this.pageMeta.clear();
+  }
   // === Edición ===
   onEdit(ev: Event): void {
     ev.stopPropagation();
+    this.submittedEdit = false;
     this.isEditing = true;
     this.open = true;
     this.form.enable();
+    this.syncConocioOtros();
   }
 
   async onCancel(): Promise<void> {
-    // Si hay cambios sin guardar, pedimos confirmación
     if (this.hasUnsavedChanges()) {
       const ok = await this.notify.confirm({
         variant: 'warning',
@@ -91,13 +127,37 @@ export class CiudadanoDetalle implements OnInit {
     this.form.reset(this.originalData);
     this.isEditing = false;
     this.form.disable();
+    this.submittedEdit = false;
+    this.syncConocioOtros();
   }
 
   // === Guardado ===
-  async onSave(): Promise<void> {
-    if (!this.form.valid) return;
+async onSave(): Promise<void> {
+    this.submittedEdit = true;
 
-    // Calcula cambios respecto a originalData
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Datos incompletos',
+        message: 'Revisa los campos obligatorios e inténtalo nuevamente.',
+        primaryText: 'Aceptar'
+      });
+      return;
+    }
+
+    const msgOtros = this.validaConocioOtros();
+    if (msgOtros) {
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Falta información',
+        message: msgOtros,
+        primaryText: 'Aceptar'
+      });
+      return;
+    }
+
+    // Cambios respecto a originalData
     const current = this.form.value;
     const changes: Partial<typeof current> = {};
     for (const key of Object.keys(current) as (keyof typeof current)[]) {
@@ -116,7 +176,6 @@ export class CiudadanoDetalle implements OnInit {
       return;
     }
 
-    // Confirmar guardado
     const confirm = await this.notify.confirm({
       variant: 'info',
       title: 'Guardar cambios',
@@ -126,10 +185,8 @@ export class CiudadanoDetalle implements OnInit {
     });
     if (!confirm) return;
 
-    // Asegurar id
     const id = this.originalData.id;
     if (id == null) {
-      // Caso anómalo
       await this.notify.ok({
         variant: 'error',
         title: 'Operación inválida',
@@ -139,20 +196,22 @@ export class CiudadanoDetalle implements OnInit {
       return;
     }
 
-    // Guardar (errores los maneja el interceptor con title/message backend)
     try {
       await this.service.update(id, changes as any);
-
-      // Normalizar mayúsculas en cambios string
+      const UPPER_KEYS = new Set([
+        'nombres','apellidoPaterno','apellidoMaterno','domicilio','ocupacion','conocioOtros'
+      ])
       const normalizedChanges = Object.fromEntries(
-        Object.entries(changes).map(([k, v]) => [k, typeof v === 'string' ? v.toUpperCase() : v])
+        Object.entries(changes).map(([k, v]) =>
+          (typeof v === 'string' && UPPER_KEYS.has(k))
+            ? [k, v.toUpperCase()]
+            : [k, v]
+        )
       );
 
-      // Actualizar original + form
       this.originalData = { ...this.originalData, ...(normalizedChanges as any) };
       this.form.patchValue(this.originalData);
 
-      // Éxito
       await this.notify.ok({
         variant: 'success',
         title: 'Cambios guardados',
@@ -162,8 +221,9 @@ export class CiudadanoDetalle implements OnInit {
 
       this.isEditing = false;
       this.form.disable();
+      this.submittedEdit = false;
     } catch {
-      // No hacer nada aquí; el interceptor ya mostró el diálogo de error.
+      // El interceptor ya mostró el diálogo de error.
     }
   }
 

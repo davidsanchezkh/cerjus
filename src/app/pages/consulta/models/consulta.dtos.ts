@@ -1,5 +1,5 @@
 //lo que se envia al backend
-import { EstadoConsulta } from './consulta.dominio';
+import { EstadoConsulta,Materia } from './consulta.dominio';
 export interface DTOConsulta{
   co_ID: number;
   co_ci_ID: number;
