@@ -4,54 +4,104 @@
   </a>
   <hr>
 
-  <ul class="nav nav-pills flex-column mb-auto">
+  <ul class="nav flex-column mb-auto sidebar-nav">
 
-    <!-- Asesor (lvl 3) y superiores (2,1) -->
+    <!-- GRUPO ASESORÍA (lvl 3+) -->
     @if (canSee(3)) {
-      <li class="nav-item">
-        <a class="nav-link text-white"
-           [routerLink]="['/asistencia']"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: true }">
-          Asistencia
-        </a>
-      </li>
+      <li class="sidebar-group">
+        <!-- Cabecera del grupo -->
+        <button
+          class="w-100 d-flex justify-content-between align-items-center sidebar-group-toggle"
+          type="button"
+          (click)="toggleGroup('asesoria')">
+          <span class="sidebar-group-title">Asesoría</span>
+          <span class="sidebar-chevron"
+                [class.sidebar-chevron-open]="openGroups.asesoria">
+            &#9662;
+          </span>
+        </button>
 
-      <li class="nav-item">
-        <a class="nav-link text-white"
-           [routerLink]="['/ciudadano']"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: false }">
-          Ciudadano
-        </a>
+        <!-- Contenido del grupo -->
+        <div class="sidebar-submenu"
+             [class.show]="openGroups.asesoria"
+             [class.collapse]="true">
+
+          <a class="nav-link sidebar-item-link"
+             [routerLink]="['/asistencia']"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }">
+            Asistencia
+          </a>
+
+          <a class="nav-link sidebar-item-link"
+             [routerLink]="['/ciudadano']"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: false }">
+            Ciudadano
+          </a>
+
+        </div>
       </li>
     }
 
-    <!-- Supervisor (lvl 2) y admin (lvl 1) -->
+    <!-- GRUPO SUPERVISIÓN (lvl 2+) -->
     @if (canSee(2)) {
-      <li class="nav-item">
-        <a class="nav-link text-white"
-           [routerLink]="['/usuarios']"
-           routerLinkActive="active"
-           [routerLinkActiveOptions]="{ exact: false }">
-          Usuarios
-        </a>
+      <li class="sidebar-group">
+        <button
+          class="w-100 d-flex justify-content-between align-items-center sidebar-group-toggle"
+          type="button"
+          (click)="toggleGroup('supervision')">
+          <span class="sidebar-group-title">Supervisión</span>
+          <span class="sidebar-chevron"
+                [class.sidebar-chevron-open]="openGroups.supervision">
+            &#9662;
+          </span>
+        </button>
+
+        <div class="sidebar-submenu"
+             [class.show]="openGroups.supervision"
+             [class.collapse]="true">
+
+          <a class="nav-link sidebar-item-link"
+             [routerLink]="['/analiticas']"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: false }">
+            Analíticas
+          </a>
+
+        </div>
       </li>
     }
 
-    <!-- Admin-only (lvl 1) – opcional -->
+    <!-- GRUPO ADMIN (solo lvl 1, opcional) -->
     @if (canSee(1)) {
-      <!-- Más opciones exclusivas de admin aquí -->
-      <!--
-      <li class="nav-item">
-        <a class="nav-link text-white"
-           [routerLink]="['/admin']"
-           routerLinkActive="active">
-          Admin
-        </a>
+      <li class="sidebar-group">
+        <button
+          class="w-100 d-flex justify-content-between align-items-center sidebar-group-toggle"
+          type="button"
+          (click)="toggleGroup('admin')">
+          <span class="sidebar-group-title">Administración</span>
+          <span class="sidebar-chevron"
+                [class.sidebar-chevron-open]="openGroups.admin">
+            &#9662;
+          </span>
+        </button>
+
+        <div class="sidebar-submenu"
+             [class.show]="openGroups.admin"
+             [class.collapse]="true">
+
+          <a class="nav-link sidebar-item-link"
+             [routerLink]="['/admin']"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: false }">
+            Gestión admin
+          </a>
+
+        </div>
       </li>
-      -->
     }
+
   </ul>
 
   <hr>

@@ -1,0 +1,189 @@
+:host {
+  display: block;
+}
+
+.analytics-shell {
+  padding: 0.75rem 0.25rem 1.5rem;
+}
+
+/* ===== Encabezado principal ===== */
+.analytics-header {
+  border-radius: 0.9rem;
+  border: none;
+  background: linear-gradient(135deg, #0b7285, #134a73);
+  color: #f8f9fa;
+}
+
+/* cuerpo del encabezado para mejor distribución */
+.analytics-header-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: flex-start;
+  padding: 0.9rem 1.5rem;
+}
+
+.analytics-header-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.analytics-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .analytics-header-meta {
+    margin-left: auto;
+    align-items: flex-end;
+  }
+}
+
+.analytics-title {
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* Subtítulo: rango + filtros + ETL (más grande) */
+.analytics-subtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 52rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Periodo: "Mes actual · noviembre de 2025" (más visible) */
+.period-badge {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.3rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* Texto de ETL: "Última ETL: ..." (más grande y legible) */
+.analytics-etl-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  opacity: 0.98;
+}
+
+/* Botón de exportación del panel: estilo más integrado */
+.analytics-export-btn {
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.3rem 1rem;
+  border-width: 1px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+/* ===== Toolbar filtros ===== */
+.analytics-toolbar {
+  gap: 0.75rem;
+}
+
+.btn-filter {
+  border-radius: 999px;
+  border: 1px solid #d0e3f2;
+  background: #ffffff;
+  color: #215472;
+  font-size: 0.8rem;
+  padding-inline: 0.9rem;
+}
+
+.btn-filter.active {
+  background: #0b7285;
+  color: #ffffff;
+  border-color: #0b7285;
+  box-shadow: 0 0 0 0.08rem rgba(11, 114, 133, 0.35);
+}
+
+.filters-selects .filter-select {
+  min-width: 160px;
+  max-width: 220px;
+}
+
+/* ===== ETL box ===== */
+.etl-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #0b7285;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.btn-ghost {
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: #f3f7fb;
+  color: #245a74;
+}
+
+.btn-ghost:hover {
+  background: #e3edf8;
+  border-color: #c8d9ee;
+}
+
+.btn-warning-soft {
+  color: #b35c00;
+  background: #fff4e0;
+}
+
+.btn-warning-soft:hover {
+  background: #ffe3b5;
+}
+
+.btn-danger-soft {
+  color: #a3002f;
+  background: #fde0e6;
+}
+
+.btn-danger-soft:hover {
+  background: #fac1cf;
+}
+
+/* ===== Cards de gráficos ===== */
+.analytics-card {
+  border-radius: 0.9rem;
+  border: 1px solid #dde5f0;
+}
+
+.analytics-card-title {
+  font-weight: 600;
+  color: #12344d;
+  font-size: 0.95rem;
+}
+
+.analytics-layout .card-body {
+  padding-top: 0.75rem;
+}
+
+/* ===== Ajustes para exportación (html2canvas) ===== */
+/* Durante la exportación, ocultamos el botón de exportar y la toolbar de Apex
+   para que la imagen del panel quede "limpia". */
+.analytics-shell.exporting .analytics-export-btn,
+.analytics-shell.exporting .apexcharts-toolbar {
+  display: none !important;
+}
+
+/* Pequeños ajustes responsivos */
+@media (max-width: 767.98px) {
+  .analytics-header {
+    border-radius: 0;
+  }
+
+  .filters-selects .filter-select {
+    flex: 1 1 100%;
+  }
+
+  .analytics-header-meta {
+    align-items: flex-start;
+  }
+}

@@ -14,8 +14,19 @@ export class Sidebar {
   @Input() userLevel: number | null = null;
   @Input() loggedIn = false;
 
+  /** Estado de los grupos desplegables */
+  openGroups = {
+    asesoria: true,
+    supervision: false,
+    admin: false
+  };
+
   /** Regla correcta: menor número = más permisos */
   canSee(requiredLevel: number): boolean {
     return this.loggedIn && this.userLevel != null && this.userLevel <= requiredLevel;
+  }
+
+  toggleGroup(group: keyof typeof this.openGroups): void {
+    this.openGroups[group] = !this.openGroups[group];
   }
 }

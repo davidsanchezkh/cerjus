@@ -9,6 +9,7 @@ import { consultaRoutes } from './pages/consulta/consulta.routes';
 import { seguimientoRoutes } from './pages/seguimiento/seguimiento.routes';
 import { asistenciaRoutes } from './pages/asistencia/asistencia.routes';
 import { loginRoutes } from './pages/login/login.routes';
+import { analiticasRoutes } from './pages/analiticas/analiticas.routes';
 import { PaginaNoEncontradaComponent } from './components/paginanoencontrada/pagina';
 
 
@@ -25,6 +26,7 @@ export const routes: Routes = [
             ...ciudadanoRoutes,
             ...consultaRoutes,
             ...seguimientoRoutes,
+            ...analiticasRoutes,
         ]
     },
     {path:'**', component: PaginaNoEncontradaComponent },

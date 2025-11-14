@@ -1,30 +1,128 @@
-.color_azul{
-    background-color: #015675; 
-}
-.color_resaltado{
-    background-color:#01BAFE;
-}
-/* Resalta la opción activa */
-.nav-link.active,
-.nav-link.active:focus,
-.nav-link.active:hover {
-  background-color: rgba(255,255,255, .15);
-  color: #fff;
+/* Fondo general del sidebar */
+.color_azul {
+  background-color: #015675;
 }
 
-/* Suaviza hover aunque no esté activa */
-.nav-link.text-white:hover { 
-  background-color: rgba(255,255,255, .08);
+/* Opcional: color resaltado si lo necesita en algún otro sitio */
+.color_resaltado {
+  background-color: #01BAFE;
 }
 
-/* Mantener tipografía legible */
-.nav-link { border-radius: .375rem; }
-
-
-.nav-pills .nav-link {
-  padding: 0.75rem 1rem; /* más espacio interno */
+/* Fondo general del sidebar */
+.color_azul {
+  background-color: #015675;
 }
 
-.nav-pills .nav-item + .nav-item {
-  margin-top: 0.75rem; /* espacio entre items */
+/* Opcional: color resaltado si lo necesita en algún otro sitio */
+.color_resaltado {
+  background-color: #01BAFE;
+}
+
+/* Lista principal del sidebar */
+.sidebar-nav {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* Cada grupo (Asesoría, Supervisión, Admin) con espacio claro entre ellos */
+.sidebar-group {
+  margin-bottom: 1.25rem; /* mayor separación entre grupos */
+}
+
+/* Cabecera del grupo (botón que abre/cierra) */
+.sidebar-group-toggle {
+  background: transparent;
+  border: none;
+  padding: 0.25rem 0;
+  cursor: pointer;
+}
+
+/* Texto del título del grupo: estilo "sección" */
+.sidebar-group-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Chevron de los grupos */
+.sidebar-chevron {
+  font-size: 0.75rem;
+  transition: transform 0.2s ease;
+  color: rgba(255, 255, 255,1);
+}
+
+.sidebar-chevron-open {
+  transform: rotate(180deg);
+}
+
+/* Contenedor del submenú: un poco de sangría y línea guía */
+.sidebar-submenu {
+  padding-left: 0.75rem;
+  margin-top: 0.4rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Comportamiento tipo collapse, pero controlado por Angular */
+.sidebar-submenu.collapse {
+  display: none;
+}
+
+.sidebar-submenu.collapse.show {
+  display: block;
+}
+
+/* Estilo base de los links del submenú */
+.sidebar-item-link {
+  display: block;
+  margin-bottom: 0.35rem;           /* separación entre opciones */
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;             /* forma de "pastilla" */
+  font-size: 0.9rem;
+  text-decoration: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85); /* texto claro pero no completamente blanco */
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Hover sobre items no activos: muy sutil */
+.sidebar-item-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+/* ESTADO ACTIVO (ruta actual): aquí se marca claramente */
+.sidebar-item-link.active {
+  background-color: #ffffff;   /* fondo blanco */
+  color: #015675;              /* texto azul oscuro, coherente con el fondo principal */
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
+}
+
+/* Si quiere mantener el estilo de .nav-link activa en otros lugares,
+   limítelo al contexto del sidebar */
+.sidebar-nav .nav-link.active,
+.sidebar-nav .nav-link.active:focus,
+.sidebar-nav .nav-link.active:hover {
+  background-color: #ffffff;
+  color: #015675;
+}
+
+/* Eliminamos el hover general agresivo que tenía antes para todo nav-link */
+.nav-link.text-white:hover {
+  background-color: transparent;
+}
+
+/* Ajustes de tipografía y forma para que todo se vea más "texto" */
+.nav-link {
+  border-radius: 0; /* anulamos el borde por defecto de Bootstrap para los nav-link */
+}
+
+/* Si quiere un poco más de respiración dentro del sidebar completo */
+.d-flex.flex-column.flex-shrink-0.p-3.text-white.color_azul.min-vh-100 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
 }
