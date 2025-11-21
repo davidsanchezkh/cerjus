@@ -1,3 +1,4 @@
+<!-- src/app/pages/analiticas/analiticas.dashboard/analiticas.dashboard.html -->
 <div class="analytics-shell">
   <!-- ===== Encabezado principal ===== -->
   <div class="card analytics-header mb-3 shadow-sm">
@@ -5,7 +6,7 @@
       <div class="analytics-header-main">
         <div class="analytics-title">Panel de analíticas</div>
 
-        <!-- Subtítulo con rango + filtros + ETL, ahora con letra más grande -->
+        <!-- Subtítulo con rango + filtros (sin texto ETL) -->
         <div class="analytics-subtitle text-light">
           {{ headerDetail || 'Configure los filtros para ver el detalle.' }}
         </div>
@@ -179,87 +180,121 @@
     </div>
   </div>
 
-  <!-- ====== Gráficos ====== -->
-  <div class="row g-3 analytics-layout">
-    <!-- Columna izquierda: línea + barras -->
-    <div class="col-lg-8 col-xl-9 d-flex flex-column gap-3">
-      <!-- Línea: Ciudadanos registrados -->
-      <div class="card analytics-card shadow-sm">
-        <div
-          class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
-        >
-          <h6 class="mb-0 analytics-card-title">Ciudadanos registrados</h6>
-          <!-- Ya NO hay botón "Descargar PNG" propio.
-               Se usará el botón de la toolbar nativa de ApexCharts. -->
-        </div>
-        <div class="card-body">
-          <apx-chart
-            #chartLine
-            [series]="optLine.series"
-            [chart]="optLine.chart"
-            [xaxis]="optLine.xaxis"
-            [dataLabels]="optLine.dataLabels"
-            [stroke]="optLine.stroke"
-            [legend]="optLine.legend"
-            [tooltip]="optLine.tooltip"
-            [title]="optLine.title"
-            [subtitle]="optLine.subtitle"
+  <!-- ====== Zona de gráficos + overlay de carga ====== -->
+  <div class="analytics-grid-wrap">
+    <div class="row g-3 analytics-layout">
+      <!-- Columna izquierda: línea + barras -->
+      <div class="col-lg-8 col-xl-9 d-flex flex-column gap-3">
+        <!-- Línea: Ciudadanos registrados -->
+        <div class="card analytics-card shadow-sm">
+          <div
+            class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
           >
-          </apx-chart>
+            <h6 class="mb-0 analytics-card-title">Ciudadanos registrados</h6>
+          </div>
+          <div class="card-body">
+            <!-- Primera carga: skeleton -->
+            <ng-container *ngIf="firstLoad; else lineChartTpl">
+              <div class="chart-skeleton">
+                <div class="sk-bar sk-bar-1"></div>
+                <div class="sk-bar sk-bar-2"></div>
+                <div class="sk-bar sk-bar-3"></div>
+              </div>
+            </ng-container>
+            <ng-template #lineChartTpl>
+              <apx-chart
+                #chartLine
+                [series]="optLine.series"
+                [chart]="optLine.chart"
+                [xaxis]="optLine.xaxis"
+                [dataLabels]="optLine.dataLabels"
+                [stroke]="optLine.stroke"
+                [legend]="optLine.legend"
+                [tooltip]="optLine.tooltip"
+                [title]="optLine.title"
+                [subtitle]="optLine.subtitle"
+              >
+              </apx-chart>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Barras apiladas: Atenciones -->
+        <div class="card analytics-card shadow-sm">
+          <div
+            class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
+          >
+            <h6 class="mb-0 analytics-card-title">
+              Atenciones (Consultas + Seguimientos)
+            </h6>
+          </div>
+          <div class="card-body">
+            <!-- Primera carga: skeleton -->
+            <ng-container *ngIf="firstLoad; else barChartTpl">
+              <div class="chart-skeleton">
+                <div class="sk-bar sk-bar-1"></div>
+                <div class="sk-bar sk-bar-2"></div>
+                <div class="sk-bar sk-bar-3"></div>
+              </div>
+            </ng-container>
+            <ng-template #barChartTpl>
+              <apx-chart
+                #chartBar
+                [series]="optBar.series"
+                [chart]="optBar.chart"
+                [xaxis]="optBar.xaxis"
+                [plotOptions]="optBar.plotOptions"
+                [dataLabels]="optBar.dataLabels"
+                [legend]="optBar.legend"
+                [tooltip]="optBar.tooltip"
+                [title]="optBar.title"
+                [subtitle]="optBar.subtitle"
+              >
+              </apx-chart>
+            </ng-template>
+          </div>
         </div>
       </div>
 
-      <!-- Barras apiladas: Atenciones -->
-      <div class="card analytics-card shadow-sm">
-        <div
-          class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
-        >
-          <h6 class="mb-0 analytics-card-title">
-            Atenciones (Consultas + Seguimientos)
-          </h6>
-          <!-- Sin botón extra, se usa toolbar de Apex -->
-        </div>
-        <div class="card-body">
-          <apx-chart
-            #chartBar
-            [series]="optBar.series"
-            [chart]="optBar.chart"
-            [xaxis]="optBar.xaxis"
-            [plotOptions]="optBar.plotOptions"
-            [dataLabels]="optBar.dataLabels"
-            [legend]="optBar.legend"
-            [tooltip]="optBar.tooltip"
-            [title]="optBar.title"
-            [subtitle]="optBar.subtitle"
+      <!-- Columna derecha: Donut -->
+      <div class="col-lg-4 col-xl-3">
+        <div class="card analytics-card shadow-sm h-100">
+          <div
+            class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
           >
-          </apx-chart>
+            <h6 class="mb-0 analytics-card-title">Materias de la consulta</h6>
+          </div>
+          <div class="card-body">
+            <!-- Primera carga: skeleton -->
+            <ng-container *ngIf="firstLoad; else donutChartTpl">
+              <div class="chart-skeleton chart-skeleton-donut">
+                <div class="sk-donut"></div>
+              </div>
+            </ng-container>
+            <ng-template #donutChartTpl>
+              <apx-chart
+                #chartDonut
+                [series]="optDonut.series"
+                [chart]="optDonut.chart"
+                [labels]="optDonut.labels"
+                [legend]="optDonut.legend"
+                [tooltip]="optDonut.tooltip"
+                [title]="optDonut.title"
+                [subtitle]="optDonut.subtitle"
+              >
+              </apx-chart>
+            </ng-template>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Columna derecha: Donut -->
-    <div class="col-lg-4 col-xl-3">
-      <div class="card analytics-card shadow-sm h-100">
-        <div
-          class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
-        >
-          <h6 class="mb-0 analytics-card-title">Materias de la consulta</h6>
-          <!-- Sin botón extra, se usa toolbar de Apex -->
-        </div>
-        <div class="card-body">
-          <apx-chart
-            #chartDonut
-            [series]="optDonut.series"
-            [chart]="optDonut.chart"
-            [labels]="optDonut.labels"
-            [legend]="optDonut.legend"
-            [tooltip]="optDonut.tooltip"
-            [title]="optDonut.title"
-            [subtitle]="optDonut.subtitle"
-          >
-          </apx-chart>
-        </div>
-      </div>
+    <!-- Overlay de carga suave, SIN parpadeos y sin salirse a la izquierda -->
+    <div
+      *ngIf="showOverlay"
+      class="analytics-loading-overlay d-flex align-items-center justify-content-center"
+    >
+      Cargando…
     </div>
   </div>
 </div>

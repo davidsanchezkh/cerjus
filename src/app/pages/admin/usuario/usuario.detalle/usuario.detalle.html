@@ -1,0 +1,179 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="open = !open"
+          role="button"
+          [attr.aria-expanded]="open">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+              Información del usuario
+            </span>
+            <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
+              Editar
+            </button>
+          </div>
+          <span class="caret">{{ open ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Cuerpo -->
+        <form class="card-body selectable-fix" [hidden]="!open" [formGroup]="form" id="formUsuario" name="formUsuario">
+
+          <!-- Identificación básica -->
+          <div class="row g-3">
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="udf1campo1">Nombres</label>
+              <input
+                id="udf1campo1"
+                type="text"
+                formControlName="nombres"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="udf1campo2">Apellido paterno</label>
+              <input
+                id="udf1campo2"
+                type="text"
+                formControlName="apellidoPaterno"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="udf1campo3">Apellido materno</label>
+              <input
+                id="udf1campo3"
+                type="text"
+                formControlName="apellidoMaterno"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="udf1campo4">DNI</label>
+              <input
+                id="udf1campo4"
+                type="text"
+                formControlName="dni"
+                class="value-box-noedit"
+                readonly />
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Contacto -->
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="udf1campo5">Correo electrónico</label>
+              <input
+                id="udf1campo5"
+                type="email"
+                formControlName="correoE"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="udf1campo6">Teléfono</label>
+              <input
+                id="udf1campo6"
+                type="tel"
+                formControlName="telefono"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="udf1campo7">Zona horaria</label>
+              <input
+                id="udf1campo7"
+                type="text"
+                formControlName="tz"
+                class="value-box-noedit"
+                readonly />
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Estado y rol (únicos editables) -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="udf1campo8">Rol</label>
+              <select
+                id="udf1campo8"
+                class="form-select"
+                formControlName="rolId"
+                [disabled]="!isEditing"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing">
+                <option [ngValue]="null" disabled>Seleccione un rol</option>
+                @for (t of tipos; track t.tu_ID) {
+                  <option [ngValue]="t.tu_ID">
+                    {{ t.tu_nombre }}
+                  </option>
+                }
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="udf1campo9">Estado</label>
+              <select
+                id="udf1campo9"
+                class="form-select"
+                formControlName="estado"
+                [disabled]="!isEditing"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing">
+                @for (opt of estadoOpciones; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Metadatos simples -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="udf1campo10">Creado el</label>
+              <input
+                id="udf1campo10"
+                type="text"
+                formControlName="fechaCreadoPorTexto"
+                class="value-box-noedit"
+                readonly />
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Estado actual</label>
+              <div class="value-box-noedit">
+                {{ usuario?.estadoTexto || '—' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Botones -->
+          @if (isEditing) {
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning" (click)="onCancel()">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-success" (click)="onSave()">
+                Guardar
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

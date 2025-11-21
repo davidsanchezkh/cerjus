@@ -1,3 +1,4 @@
+// src/app/pages/analiticas/analiticas.dashboard/analiticas.dashboard.ts
 import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -29,7 +30,8 @@ import {
   VMDimCanal,
   VMDimUsuario,
 } from '../models/analiticas.vm';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import html2canvas from 'html2canvas'; // npm i html2canvas
 
 type ChartOptionsBar = {
@@ -92,25 +94,25 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
   etlStatus: VMEtlStatus | null = null;
   etlLabel = '—'; // texto largo de ETL
   periodMain = ''; // ej. "Mes actual · noviembre de 2025"
-  headerDetail = ''; // ej. "Rango: ... · Materia: ... · ... · Última ETL..."
+  headerDetail = ''; // ej. "Rango: ... · Materia: ... · Canal: ... · Usuario: ..."
 
   materias: VMDimMateria[] = [];
   canales: VMDimCanal[] = [];
   usuarios: VMDimUsuario[] = [];
 
-  // ====== referencias a los charts (por si se necesitan luego) ======
+  // ====== referencias a los charts ======
   @ViewChild('chartLine') chartLine?: ChartComponent;
   @ViewChild('chartBar') chartBar?: ChartComponent;
   @ViewChild('chartDonut') chartDonut?: ChartComponent;
 
-  // ====== opciones de chart (defaults no-undefined) ======
+  // ====== opciones de chart (estado visible) ======
   optLine: ChartOptionsLine = {
     series: [],
     chart: {
       type: 'line',
       height: 320,
       toolbar: {
-        show: true, // recuperamos botón nativo de Apex (incluye descarga del gráfico)
+        show: true, // botón nativo Apex (incluye descarga)
       },
       zoom: { enabled: false },
     },
@@ -191,17 +193,50 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
     },
   };
 
+  // ====== estado de carga tipo "asistencia" ======
+  loading = false;
+  firstLoad = true;
+  showOverlay = false;
+
+  private reqSeq = 0;
+  private overlayTimer: any;
+  private overlayShownAt = 0;
+  private firstPaintStart = 0;
+
+  private readonly overlayDelay = 180;
+  private readonly minOverlayMs = 220;
+  private readonly firstSkeletonMinMs = 200;
+
+  // reintento para la primera carga (servidor “despertando”)
+  private firstRetryDone = false;
+
+  // Pendientes (se aplican al final para evitar saltos)
+  private pendLine?: ChartOptionsLine;
+  private pendBar?: ChartOptionsBar;
+  private pendDonut?: ChartOptionsDonut;
+  private pendPeriodMain = '';
+  private pendHeaderDetail = '';
+
   private sub?: Subscription;
 
   ngOnInit(): void {
+    // Cargamos meta + dimensiones + datos iniciales
     this.loadEtlStatus();
     this.loadDims();
-    this.sub = this.filtros.valueChanges.subscribe(() => this.loadAll());
-    this.loadAll(); // primera carga
+    this.loadAll();
+
+    // Cambios de filtros con debounce + comparación profunda
+    this.sub = this.filtros.valueChanges
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+      )
+      .subscribe(() => this.loadAll());
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.cancelTimers();
   }
 
   // =======================
@@ -224,8 +259,11 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
     });
   }
 
-  // ====== Acciones toolbar
+  // ====== Acciones toolbar ======
   actualizar(): void {
+    // Botón fuerte: refresca ETL + dimensiones + datos
+    this.loadEtlStatus();
+    this.loadDims();
     this.loadAll();
   }
 
@@ -323,13 +361,56 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
 
     const filtros = `Materia: ${materia} · Canal: ${canal} · Usuario: ${usuario}`;
 
-    const parts = [rango, filtros];
-    if (this.etlLabel && this.etlLabel !== '—') {
-      parts.push(this.etlLabel); // ya incluye "Última ETL..."
-    }
-
-    const subtitle = parts.join(' · ');
+    // IMPORTANTE: ya no añadimos etlLabel aquí para que no duplique/salte
+    const subtitle = `${rango} · ${filtros}`;
     return { periodMain, subtitle };
+  }
+
+  // =======================
+  // Timers
+  // =======================
+  private cancelTimers(): void {
+    clearTimeout(this.overlayTimer);
+  }
+
+  private finishLoadingWithOverlayMin(): void {
+    const applyData = () => {
+      if (this.pendLine) this.optLine = this.pendLine;
+      if (this.pendBar) this.optBar = this.pendBar;
+      if (this.pendDonut) this.optDonut = this.pendDonut;
+
+      this.periodMain = this.pendPeriodMain;
+      this.headerDetail = this.pendHeaderDetail;
+
+      if (this.firstLoad) {
+        this.firstLoad = false;
+      }
+    };
+
+    const complete = () => {
+      this.loading = false;
+      clearTimeout(this.overlayTimer);
+
+      if (this.showOverlay) {
+        const elapsed = performance.now() - this.overlayShownAt;
+        const remain = Math.max(0, this.minOverlayMs - elapsed);
+        setTimeout(() => {
+          this.showOverlay = false;
+          applyData();
+        }, remain);
+      } else {
+        this.showOverlay = false;
+        applyData();
+      }
+    };
+
+    if (this.firstLoad) {
+      const elapsed = performance.now() - this.firstPaintStart;
+      const remain = Math.max(0, this.firstSkeletonMinMs - elapsed);
+      setTimeout(complete, remain);
+    } else {
+      complete();
+    }
   }
 
   // =======================
@@ -338,37 +419,82 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
   private loadAll(): void {
     const q = this.currentQuery();
     const meta = this.buildHeaderMeta(q);
-    this.periodMain = meta.periodMain;
-    this.headerDetail = meta.subtitle;
+    this.pendPeriodMain = meta.periodMain;
+    this.pendHeaderDetail = meta.subtitle;
 
-    // LINEA: ciudadanos
-    this.svc.lineaCiudadanos(q).subscribe((vm: VMLineaCiudadanos) => {
-      this.optLine = {
-        ...this.optLine,
-        series: [
-          { name: 'Nuevos', data: vm.nuevos },
-          { name: 'Acumulado', data: vm.acumulado },
-        ],
-        xaxis: { categories: vm.categories },
-      };
-    });
+    this.cancelTimers();
+    const myReq = ++this.reqSeq;
+    this.loading = true;
 
-    // BARRAS APILADAS: atenciones (Consultas + Seguimientos)
-    this.svc.barrasAtenciones(q).subscribe((vm: VMBarrasApiladas) => {
-      this.optBar = {
-        ...this.optBar,
-        series: vm.series,
-        xaxis: { categories: vm.categories },
-      };
-    });
+    if (!this.firstLoad) {
+      this.overlayTimer = setTimeout(() => {
+        if (this.reqSeq === myReq) {
+          this.showOverlay = true;
+          this.overlayShownAt = performance.now();
+        }
+      }, this.overlayDelay);
+    } else {
+      this.firstPaintStart = performance.now();
+      this.showOverlay = false;
+    }
 
-    // DONUT: materias
-    this.svc.pastelMaterias(q).subscribe((vm: VMPastelMaterias) => {
-      this.optDonut = {
-        ...this.optDonut,
-        series: vm.series,
-        labels: vm.labels,
-      };
+    forkJoin({
+      linea: this.svc.lineaCiudadanos(q),
+      barras: this.svc.barrasAtenciones(q),
+      donut: this.svc.pastelMaterias(q),
+    }).subscribe({
+      next: (vm: {
+        linea: VMLineaCiudadanos;
+        barras: VMBarrasApiladas;
+        donut: VMPastelMaterias;
+      }) => {
+        if (myReq !== this.reqSeq) return;
+
+        this.pendLine = {
+          ...this.optLine,
+          series: [
+            { name: 'Nuevos', data: vm.linea.nuevos },
+            { name: 'Acumulado', data: vm.linea.acumulado },
+          ],
+          xaxis: { categories: vm.linea.categories },
+        };
+
+        this.pendBar = {
+          ...this.optBar,
+          series: vm.barras.series,
+          xaxis: { categories: vm.barras.categories },
+        };
+
+        this.pendDonut = {
+          ...this.optDonut,
+          series: vm.donut.series,
+          labels: vm.donut.labels,
+        };
+
+        this.finishLoadingWithOverlayMin();
+      },
+      error: () => {
+        if (myReq !== this.reqSeq) return;
+
+        // Primer intento fallido (servidor “despertando”): reintentar una vez
+        if (this.firstLoad && !this.firstRetryDone) {
+          this.firstRetryDone = true;
+          setTimeout(() => {
+            // sólo reintentar si seguimos en la misma request lógica
+            if (this.reqSeq === myReq) {
+              this.loadAll();
+            }
+          }, 1200);
+          return;
+        }
+
+        // En errores posteriores, mantenemos los datos anteriores
+        this.pendLine = this.optLine;
+        this.pendBar = this.optBar;
+        this.pendDonut = this.optDonut;
+
+        this.finishLoadingWithOverlayMin();
+      },
     });
   }
 
@@ -421,7 +547,7 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
 
   // ====== ETL acciones (coinciden con el HTML)
   runPreset(preset: string): void {
-    this.svc.runEtlPreset(preset).subscribe(() => {
+    this.svc.runEtlPreset(preset as any).subscribe(() => {
       this.loadEtlStatus();
       this.actualizar();
     });
@@ -429,7 +555,7 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
 
   runFillMissing(): void {
     this.svc
-      .runEtlPreset('FILL_MISSING_TO_TODAY')
+      .runEtlPreset('MISSING')
       .subscribe(() => {
         this.loadEtlStatus();
         this.actualizar();

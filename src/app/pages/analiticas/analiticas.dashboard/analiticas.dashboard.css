@@ -1,9 +1,11 @@
+/* src/app/pages/analiticas/analiticas.dashboard/analiticas.dashboard.css */
 :host {
   display: block;
 }
 
 .analytics-shell {
   padding: 0.75rem 0.25rem 1.5rem;
+  position: relative;
 }
 
 /* ===== Encabezado principal ===== */
@@ -11,6 +13,7 @@
   border-radius: 0.9rem;
   border: none;
   background: linear-gradient(135deg, #0b7285, #134a73);
+  height: 200px;
   color: #f8f9fa;
 }
 
@@ -48,7 +51,7 @@
   margin-bottom: 0.25rem;
 }
 
-/* Subtítulo: rango + filtros + ETL (más grande) */
+/* Subtítulo: rango + filtros (más grande) */
 .analytics-subtitle {
   font-size: 0.95rem;
   line-height: 1.5;
@@ -57,20 +60,24 @@
   word-break: break-word;
 }
 
-/* Periodo: "Mes actual · noviembre de 2025" (más visible) */
+/* Periodo: badge estable */
 .period-badge {
   background: rgba(255, 255, 255, 0.16);
   border-radius: 999px;
   padding: 0.3rem 0.95rem;
   font-size: 0.88rem;
   font-weight: 600;
+  min-width: 14ch;          /* reserva de ancho para evitar saltos grandes */
+  text-align: center;
 }
 
-/* Texto de ETL: "Última ETL: ..." (más grande y legible) */
+/* Texto de ETL: "Última ETL: ..." (espacio propio) */
 .analytics-etl-label {
   font-size: 0.9rem;
   font-weight: 500;
   opacity: 0.98;
+  min-height: 1.1rem;       /* altura estable aunque tarde en llegar el texto */
+  max-width: 32rem;
 }
 
 /* Botón de exportación del panel: estilo más integrado */
@@ -163,6 +170,82 @@
 
 .analytics-layout .card-body {
   padding-top: 0.75rem;
+}
+
+/* ===== Zona de gráficos y overlay de carga ===== */
+.analytics-grid-wrap {
+  position: relative;
+}
+
+/* anulamos márgenes negativos de .row para que el overlay no se "salga" a la izquierda */
+.analytics-layout {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Overlay suave mientras hay datos previos (sin parpadeo, dentro de la zona) */
+.analytics-loading-overlay {
+  position: absolute;
+  inset: 0.25rem 0 0 0; /* un poco de margen arriba para no pegar al borde del header ETL */
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(1px);
+  font-weight: 600;
+  z-index: 5;
+  border-radius: 0.9rem;
+}
+
+/* ===== Skeletons para gráficos (primera carga) ===== */
+.chart-skeleton {
+  width: 100%;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.chart-skeleton-donut {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Barras skeleton (línea y barras) */
+.sk-bar {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: 0.4rem;
+  height: 0.9rem;
+}
+
+.sk-bar-1 {
+  width: 80%;
+}
+.sk-bar-2 {
+  width: 65%;
+}
+.sk-bar-3 {
+  width: 50%;
+}
+
+/* Donut skeleton */
+.sk-donut {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: 50%;
+  width: 160px;
+  height: 160px;
+}
+
+/* Animación shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
 }
 
 /* ===== Ajustes para exportación (html2canvas) ===== */
