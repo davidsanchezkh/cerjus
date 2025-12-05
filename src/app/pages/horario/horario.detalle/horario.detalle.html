@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+          (click)="open = !open"
+          role="button"
+          [attr.aria-expanded]="open">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold">Información del horario</span>
+            <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
+              Editar
+            </button>
+          </div>
+          <span class="caret">{{ open ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Cuerpo -->
+        <form class="card-body" [hidden]="!open" [formGroup]="form">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Nombre del horario</label>
+              <input type="text"
+                     formControlName="nombre"
+                     [class.value-box-edit]="isEditing"
+                     [class.value-box-noedit]="!isEditing"/>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Zona horaria</label>
+              <input type="text"
+                     formControlName="tz"
+                     [class.value-box-edit]="isEditing"
+                     [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Sección: Bloques -->
+          <div>
+            <div class="section-title mb-2">Bloques de días y horas</div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-sm align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-center">Día</th>
+                    <th class="text-center">Hora inicio</th>
+                    <th class="text-center">Hora fin</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (b of bloques; track b.id) {
+                    <tr>
+                      <td class="text-center">{{ b.dia }}</td>
+                      <td class="text-center">{{ b.horaInicio }}</td>
+                      <td class="text-center">{{ b.horaFin }}</td>
+                    </tr>
+                  }
+                  @if (bloques.length === 0) {
+                    <tr><td colspan="3" class="text-center text-muted">Sin bloques registrados</td></tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          @if (isEditing) {
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning" (click)="onCancel()">Cancelar</button>
+              <button type="button" class="btn btn-success" (click)="onSave()">Guardar</button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

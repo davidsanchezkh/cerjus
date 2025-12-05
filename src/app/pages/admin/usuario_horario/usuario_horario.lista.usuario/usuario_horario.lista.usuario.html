@@ -1,0 +1,112 @@
+<div class="card-body" [formGroup]="asignarForm">
+
+  <!-- Formulario de asignación -->
+  <div class="mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-5">
+        <label class="form-label fw-semibold">Horario</label>
+        <select
+          class="form-select"
+          formControlName="horarioId"
+          [disabled]="loading || !idUsuario">
+          <option [ngValue]="null" disabled>Seleccione un horario</option>
+          @for (h of horarios; track h.id) {
+            <option [ngValue]="h.id">
+              {{ h.nombre }} ({{ h.tz }})
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label fw-semibold">Desde</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="desde" />
+      </div>
+
+      <div class="col-6 col-md-3 col-lg-2">
+        <label class="form-label fw-semibold">Hasta</label>
+        <input
+          type="date"
+          class="form-control"
+          formControlName="hasta" />
+      </div>
+
+      <div class="col-12 col-md-2">
+        <div class="form-check mt-4 pt-1">
+          <input
+            id="cerrarAnteriorChk"
+            type="checkbox"
+            class="form-check-input"
+            formControlName="cerrarAnterior" />
+          <label class="form-check-label small" for="cerrarAnteriorChk">
+            Cerrar horario anterior si se solapa
+          </label>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-2 text-md-end">
+        <button
+          type="button"
+          class="btn btn-sm btn-success mt-3 mt-md-0"
+          (click)="onAsignar()"
+          [disabled]="loading || !idUsuario">
+          Asignar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <hr class="my-3" />
+
+  <!-- Tabla de asignaciones -->
+  <div class="tabla-wrap">
+    <table class="table table-striped table-hover m-0">
+      <thead class="table-light">
+        <tr>
+          <th style="width: 4rem;">ID</th>
+          <th>Horario</th>
+          <th style="width: 20rem;">Vigencia</th>
+          <th style="width: 7rem;">Estado</th>
+          <th style="width: 8rem;">Opciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (loading) {
+          <tr>
+            <td colspan="5" class="text-center text-muted py-3">
+              Cargando…
+            </td>
+          </tr>
+        } @else if (items.length > 0) {
+          @for (row of items; track row.id) {
+            <tr>
+              <td>{{ row.id }}</td>
+              <td>
+                <div class="fw-semibold">{{ row.horarioNombre }}</div>
+                <div class="text-muted small">{{ row.horarioTz }}</div>
+              </td>
+              <td>{{ row.vigenciaTexto }}</td>
+              <td>{{ row.estadoTexto }}</td>
+              <td>
+                <a
+                  class="btn btn-sm btn-outline-primary"
+                  [routerLink]="['/horario', row.horarioId]">
+                  Ver horario
+                </a>
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td colspan="5" class="text-center text-muted py-3">
+              No hay horarios asignados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

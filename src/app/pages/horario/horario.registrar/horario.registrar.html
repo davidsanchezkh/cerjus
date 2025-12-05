@@ -1,0 +1,121 @@
+<!-- src/app/pages/horario/horario.registrar/horario.registrar.html -->
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar horario</h5>
+
+          <!-- Formulario reactivo -->
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
+
+            <!-- Fila 1: Nombre del horario / Zona horaria -->
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-7">
+                <label class="form-label fw-semibold">Nombre del horario</label>
+                <input type="text"
+                       class="form-control"
+                       formControlName="nombre"
+                       placeholder="Ej. Turno tarde semana"
+                       required>
+              </div>
+              <div class="col-12 col-md-5">
+                <label class="form-label fw-semibold">Zona horaria</label>
+                <select class="form-control"
+                        formControlName="tz"
+                        required>
+                  <option value="America/Lima">America/Lima</option>
+                  <option value="America/Bogota">America/Bogota</option>
+                  <option value="America/Mexico_City">America/Mexico_City</option>
+                  <option value="UTC">UTC</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <!-- Bloques de días y horas -->
+            <div formArrayName="bloques">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-semibold">Bloques de días y horas</span>
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="addBloque()">
+                  Añadir bloque
+                </button>
+              </div>
+
+              @for (bloque of bloques.controls; let i = $index; track i) {
+                <div [formGroupName]="i" class="border rounded p-3 mb-2">
+
+                  <div class="row g-3 align-items-end">
+
+                    <!-- Días -->
+                    <div class="col-12 col-md-6">
+                      <label class="form-label fw-semibold">Días</label>
+                      <div class="d-flex flex-wrap gap-2">
+                        @for (d of diasSemana; track d.value) {
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   [value]="d.value"
+                                   (change)="onDiaChange(i, d.value, $event.target.checked)"
+                                   [checked]="bloques.at(i).controls.dias.value.includes(d.value)">
+                            <label class="form-check-label">{{ d.label }}</label>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Hora inicio -->
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <label class="form-label fw-semibold">Hora inicio</label>
+                        <input type="time"
+                            class="form-control"
+                            formControlName="horaInicio">
+                    </div>
+
+                    <!-- Hora fin -->
+                    <div class="col-12 col-md-3 col-lg-2">
+                        <label class="form-label fw-semibold">Hora fin</label>
+                        <input type="time"
+                            class="form-control"
+                            formControlName="horaFin">
+                    </div>
+
+                    <!-- Eliminar bloque -->
+                    <div class="col-12 col-md-3 col-lg-2 text-md-end mt-2 mt-md-0">
+                      @if (bloques.length > 1) {
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger"
+                                (click)="removeBloque(i)">
+                          Eliminar
+                        </button>
+                      }
+                    </div>
+
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning"
+                      (click)="onBack()">
+                Regresar
+              </button>
+              <button type="button" class="btn btn-success"
+                      (click)="onSubmit()">
+                Registrar
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

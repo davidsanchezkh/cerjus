@@ -10,6 +10,8 @@ import { seguimientoRoutes } from './pages/seguimiento/seguimiento.routes';
 import { asistenciaRoutes } from './pages/asistencia/asistencia.routes';
 import { loginRoutes } from './pages/login/login.routes';
 import { analiticasRoutes } from './pages/analiticas/analiticas.routes';
+import { horarioRoutes} from './pages/horario/horario.routes'
+import { asistenciaanaliticasRoutes} from './pages/asistencia.analiticas/asistencia.analiticas.routes'
 import { adminRoutes } from './pages/admin/admin.router'
 import { PaginaNoEncontradaComponent } from './components/paginanoencontrada/pagina';
 
@@ -28,6 +30,8 @@ export const routes: Routes = [
             ...consultaRoutes,
             ...seguimientoRoutes,
             ...analiticasRoutes,
+            ...horarioRoutes,
+            ...asistenciaanaliticasRoutes,
             ...adminRoutes,
         ]
     },

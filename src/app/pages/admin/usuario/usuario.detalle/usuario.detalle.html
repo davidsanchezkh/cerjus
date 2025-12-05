@@ -175,5 +175,27 @@
         </form>
       </div>
     </div>
+    <!-- Panel de horarios asignados -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="openHorarios = !openHorarios"
+          role="button"
+          [attr.aria-expanded]="openHorarios">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+              Horarios asignados
+            </span>
+          </div>
+          <span class="caret">{{ openHorarios ? "▴" : "▾" }}</span>
+        </div>
+
+        <app-usuario-horario-lista-usuario
+          [idUsuario]="usuario?.id"
+          [hidden]="!openHorarios">
+        </app-usuario-horario-lista-usuario>
+      </div>
+    </div>
   </div>
 </div>

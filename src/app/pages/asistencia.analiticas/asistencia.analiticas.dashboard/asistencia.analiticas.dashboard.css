@@ -1,0 +1,224 @@
+:host {
+  display: block;
+}
+
+.asist-shell {
+  padding: 0.75rem 0.25rem 1.5rem;
+  position: relative;
+}
+
+/* ===== Encabezado ===== */
+.asist-header {
+  border-radius: 0.9rem;
+  border: none;
+  background: linear-gradient(135deg, #0b7285, #134a73);
+  color: #f8f9fa;
+}
+
+.asist-header-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: flex-start;
+  padding: 0.9rem 1.5rem;
+}
+
+.asist-header-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.asist-header-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .asist-header-meta {
+    margin-left: auto;
+    align-items: flex-end;
+  }
+}
+
+.asist-title {
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.asist-subtitle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 52rem;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.asist-period-badge {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0.3rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  min-width: 12ch;
+  text-align: center;
+}
+
+.asist-refresh-btn {
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0.3rem 1rem;
+  border-width: 1px;
+}
+
+/* ===== Toolbar filtros ===== */
+.btn-filter {
+  border-radius: 999px;
+  border: 1px solid #d0e3f2;
+  background: #ffffff;
+  color: #215472;
+  font-size: 0.8rem;
+  padding-inline: 0.9rem;
+}
+
+.btn-filter.active {
+  background: #0b7285;
+  color: #ffffff;
+  border-color: #0b7285;
+  box-shadow: 0 0 0 0.08rem rgba(11, 114, 133, 0.35);
+}
+
+/* ===== Cards KPI ===== */
+.card-kpi {
+  border-radius: 0.9rem;
+  border: 1px solid #dde5f0;
+}
+
+.kpi-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6c757d;
+  margin-bottom: 0.15rem;
+}
+
+.kpi-value {
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: #12344d;
+}
+
+.kpi-sub {
+  font-size: 0.78rem;
+  color: #6c757d;
+}
+
+/* ===== Cards de contenido ===== */
+.asist-card {
+  border-radius: 0.9rem;
+  border: 1px solid #dde5f0;
+}
+
+.asist-card-title {
+  font-weight: 600;
+  color: #12344d;
+  font-size: 0.95rem;
+}
+
+/* ===== Tabla ===== */
+.table-asist thead th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6c757d;
+  border-bottom-width: 1px;
+}
+
+.table-asist tbody td {
+  font-size: 0.85rem;
+}
+
+/* Badges de estado */
+.badge-ok {
+  background-color: #d1f7d6;
+  color: #116622;
+}
+
+.badge-warn {
+  background-color: #fff3cd;
+  color: #8a5a00;
+}
+
+.badge-warn-soft {
+  background-color: #f9e5ff;
+  color: #7a2d9b;
+}
+
+.badge-danger {
+  background-color: #fde2e3;
+  color: #9b1c31;
+}
+
+.badge-info {
+  background-color: #e0f2ff;
+  color: #145a86;
+}
+
+.badge-muted {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+/* ===== Skeleton chart ===== */
+.chart-skeleton {
+  width: 100%;
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.sk-bar {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: 0.4rem;
+  height: 0.9rem;
+}
+
+.sk-bar-1 {
+  width: 80%;
+}
+.sk-bar-2 {
+  width: 65%;
+}
+.sk-bar-3 {
+  width: 50%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0% 0;
+  }
+}
+
+/* ===== Hint de carga ===== */
+.asist-loading-hint {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Responsivo */
+@media (max-width: 767.98px) {
+  .asist-header {
+    border-radius: 0;
+  }
+}

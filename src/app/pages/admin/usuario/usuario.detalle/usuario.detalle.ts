@@ -16,10 +16,12 @@ import {
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 import { PageMetaService } from '@/app/services/page_meta.service';
 
+import { UsuarioHorarioListaUsuario } from 'src/app/pages/admin/usuario_horario/usuario_horario.lista.usuario/usuario_horario.lista.usuario';
+
 @Component({
   selector: 'app-usuario-detalle',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,UsuarioHorarioListaUsuario ],
   templateUrl: './usuario.detalle.html',
   styleUrl: './usuario.detalle.css',
 })
@@ -41,6 +43,8 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
 
   estadoOpciones = ESTADO_USUARIO_OPCIONES;
 
+  openHorarios = true;
+  
   originalData!: VMUsuarioUpdate;
 
   form = this.fb.group<ControlsOf<UsuarioDetalleForm>>({
