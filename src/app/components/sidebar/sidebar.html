@@ -81,7 +81,7 @@
     }
 
     <!-- GRUPO ADMIN (solo lvl 1, opcional) -->
-    @if (canSee(1)) {
+    @if (canSee(2)) {
       <li class="sidebar-group">
         <button
           class="w-100 d-flex justify-content-between align-items-center sidebar-group-toggle"
@@ -104,12 +104,14 @@
              [routerLinkActiveOptions]="{ exact: false }">
              Usuarios
           </a>
+          @if (canSee(1)) {
           <a class="nav-link sidebar-item-link"
              [routerLink]="['/horario']"
              routerLinkActive="active"
              [routerLinkActiveOptions]="{ exact: false }">
              Horario
           </a>
+          }
         </div>
       </li>
     }
@@ -117,4 +119,10 @@
   </ul>
 
   <hr>
+  <a class="nav-link sidebar-item-link"
+    [routerLink]="['/cuenta/perfil']"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{ exact: false }">
+    Perfil
+  </a>
 </div>

@@ -8,7 +8,7 @@ import { ciudadanoRoutes } from './pages/ciudadano/ciudadano.routes';
 import { consultaRoutes } from './pages/consulta/consulta.routes';
 import { seguimientoRoutes } from './pages/seguimiento/seguimiento.routes';
 import { asistenciaRoutes } from './pages/asistencia/asistencia.routes';
-import { loginRoutes } from './pages/login/login.routes';
+import { loginRoutes ,cuentaRoutes} from './pages/cuenta/cuenta.routes';
 import { analiticasRoutes } from './pages/analiticas/analiticas.routes';
 import { horarioRoutes} from './pages/horario/horario.routes'
 import { asistenciaanaliticasRoutes} from './pages/asistencia.analiticas/asistencia.analiticas.routes'
@@ -32,6 +32,7 @@ export const routes: Routes = [
             ...analiticasRoutes,
             ...horarioRoutes,
             ...asistenciaanaliticasRoutes,
+            ...cuentaRoutes,
             ...adminRoutes,
         ]
     },

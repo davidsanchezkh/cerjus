@@ -7,8 +7,7 @@
         <label class="form-label fw-semibold">Horario</label>
         <select
           class="form-select"
-          formControlName="horarioId"
-          [disabled]="loading || !idUsuario">
+          formControlName="horarioId">
           <option [ngValue]="null" disabled>Seleccione un horario</option>
           @for (h of horarios; track h.id) {
             <option [ngValue]="h.id">

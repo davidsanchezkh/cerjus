@@ -1,7 +1,9 @@
 import { Routes,UrlMatcher,UrlSegment } from '@angular/router';
 import { loginGuardMactch } from '@app/guard/guard.login';
-import { Ingresar } from './login.ingresar/ingresar';
-import { Registar } from './login.registrar/registar';
+import { accessGuardMatch } from '@app/guard/guard.access';
+import { Ingresar } from './cuenta.ingresar/ingresar';
+import { Registar } from './cuenta.registrar/registrar';
+import { Perfil } from './cuenta.perfil/perfil';
 import { PaginaNoEncontradaComponent } from '../../components/paginanoencontrada/pagina';
 
 export const numericIdMatcher: UrlMatcher = (segments: UrlSegment[]) =>
@@ -23,7 +25,7 @@ export const loginRoutes: Routes = [
     children: [
       
       {path:'', component: Ingresar,pathMatch: 'full'},
-      {path:'registrar', component: Registar,pathMatch: 'full'},
+      {path:'registrar', component: Registar,pathMatch: 'full',  data: { mode: 'public' },},
       //{matcher:registrarNumericIdMatcher, component: ConsultaRegistar,data:{minLevel:3}},
       //{matcher:numericIdMatcher, component: ConsultaDetalle,data:{minLevel:3}},
       {path:'**', component: PaginaNoEncontradaComponent },
@@ -31,3 +33,27 @@ export const loginRoutes: Routes = [
     
   }
 ];
+export const cuentaRoutes: Routes = [
+  {
+    path: 'cuenta',
+    canMatch: [accessGuardMatch],
+    children: [
+      
+      {path:'perfil', component: Perfil,pathMatch: 'full',data:{minLevel:3}},
+      {path:'**', component: PaginaNoEncontradaComponent },
+    ],
+    
+  }
+]
+export const cuentaregistrarSuper: Routes = [
+  {
+    path: 'registrar',
+    canMatch: [accessGuardMatch],
+    children: [
+      
+      {path:'', component: Registar,pathMatch: 'full',data:{minLevel:2, mode: 'admin'}},
+      {path:'**', component: PaginaNoEncontradaComponent },
+    ],
+    
+  }
+]

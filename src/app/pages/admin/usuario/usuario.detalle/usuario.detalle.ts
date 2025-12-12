@@ -3,8 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import {VMUsuarioDetalle,VMUsuarioUpdate,VMUsuarioUpdateForm} from '../models/usuario.vm';
-import {ApiTipoUsuario} from '../models/usuario.api';
+import {
+  VMUsuarioDetalle,
+  VMUsuarioUpdate,
+  VMUsuarioUpdateForm,
+} from '../models/usuario.vm';
+import { ApiTipoUsuario } from '../models/usuario.api';
 import { UsuarioService } from '../services/usuario.service';
 
 import {
@@ -21,12 +25,11 @@ import { UsuarioHorarioListaUsuario } from 'src/app/pages/admin/usuario_horario/
 @Component({
   selector: 'app-usuario-detalle',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,UsuarioHorarioListaUsuario ],
+  imports: [CommonModule, ReactiveFormsModule, UsuarioHorarioListaUsuario],
   templateUrl: './usuario.detalle.html',
   styleUrl: './usuario.detalle.css',
 })
 export class UsuarioDetalle implements OnInit, OnDestroy {
-
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(FormBuilder);
@@ -44,7 +47,7 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
   estadoOpciones = ESTADO_USUARIO_OPCIONES;
 
   openHorarios = true;
-  
+
   originalData!: VMUsuarioUpdate;
 
   form = this.fb.group<ControlsOf<UsuarioDetalleForm>>({
@@ -67,7 +70,7 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
 
-    // Cargar lista de roles
+    // Cargar lista de tipos de usuario (roles)
     this.usuarioService.listAll().subscribe({
       next: (rows) => {
         this.tipos = rows ?? [];
@@ -103,9 +106,13 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
           rolId: u.rolId ?? null,
         };
 
+        // Estado y rol NO editables inicialmente
+        this.form.get('estado')?.disable({ emitEvent: false });
+        this.form.get('rolId')?.disable({ emitEvent: false });
+
         this.pageMeta.replace({
           titulo: `Usuario: ${u.apellidoPaterno ?? ''} ${u.apellidoMaterno ?? ''}, ${u.nombres ?? ''} - ${u.dni ?? ''}`,
-          ruta: ['/usuario'],
+          ruta: ['/admin/usuario/lista'],
         });
       },
       error: () => {
@@ -124,6 +131,10 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
     this.submittedEdit = false;
     this.isEditing = true;
     this.open = true;
+
+    // Habilitar solo los campos editables
+    this.form.get('estado')?.enable({ emitEvent: false });
+    this.form.get('rolId')?.enable({ emitEvent: false });
   }
 
   async onCancel(): Promise<void> {
@@ -155,6 +166,10 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
       });
     }
 
+    // Volver a deshabilitar los campos editables
+    this.form.get('estado')?.disable({ emitEvent: false });
+    this.form.get('rolId')?.disable({ emitEvent: false });
+
     this.isEditing = false;
     this.submittedEdit = false;
   }
@@ -167,7 +182,11 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
 
     const changes: VMUsuarioUpdateForm = {};
 
-    if (v.estado !== undefined && v.estado !== null && v.estado !== this.originalData.estado) {
+    if (
+      v.estado !== undefined &&
+      v.estado !== null &&
+      v.estado !== this.originalData.estado
+    ) {
       changes.estado = v.estado as EstadoUsuario;
     }
 
@@ -217,7 +236,7 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
           this.usuario.estadoTexto = estadoUsuarioToLabel(changes.estado);
         }
         if (changes.rolId !== undefined) {
-          const rol = this.tipos.find(t => t.tu_ID === changes.rolId);
+          const rol = this.tipos.find((t) => t.tu_ID === changes.rolId);
           this.usuario.rolId = changes.rolId ?? null;
           this.usuario.rolNombre = rol?.tu_nombre ?? this.usuario.rolNombre;
           this.usuario.rolNivel = rol?.tu_nivel ?? this.usuario.rolNivel;
@@ -230,6 +249,10 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
         message: 'La información del usuario se actualizó correctamente.',
         primaryText: 'Aceptar',
       });
+
+      // Bloquear de nuevo los campos editables
+      this.form.get('estado')?.disable({ emitEvent: false });
+      this.form.get('rolId')?.disable({ emitEvent: false });
 
       this.isEditing = false;
       this.submittedEdit = false;
@@ -268,10 +291,10 @@ function formatDateTime(dt: Date | string | null | undefined): string {
   if (!dt) return '';
   const d = dt instanceof Date ? dt : new Date(dt);
   if (Number.isNaN(d.getTime())) return '';
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth() + 1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2,'0');
-  const mi = String(d.getMinutes()).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mi = String(d.getMinutes()).padStart(2, '0');
   return `${dd}/${mm}/${yyyy} ${hh}:${mi}`;
 }

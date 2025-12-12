@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -22,7 +22,7 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   templateUrl: './usuario_horario.lista.usuario.html',
   styleUrl: './usuario_horario.lista.usuario.css',
 })
-export class UsuarioHorarioListaUsuario implements OnInit {
+export class UsuarioHorarioListaUsuario implements OnInit, OnChanges {
   private fb = inject(FormBuilder);
   private usuarioHorarioService = inject(UsuarioHorarioService);
   private horarioService = inject(HorarioService);
@@ -31,7 +31,8 @@ export class UsuarioHorarioListaUsuario implements OnInit {
   @Input() idUsuario?: number;
 
   asignarForm = this.fb.group({
-    horarioId: [null as number | null, [Validators.required]],
+    // arrancamos disabled si no hay usuario
+    horarioId: [{ value: null as number | null, disabled: true }, [Validators.required]],
     desde: [''],           // "YYYY-MM-DD"
     hasta: [''],           // "YYYY-MM-DD"
     cerrarAnterior: [true],
@@ -44,16 +45,46 @@ export class UsuarioHorarioListaUsuario implements OnInit {
 
   ngOnInit(): void {
     this.loadHorariosActivos();
+    this.updateHorarioControlState();   // sincronizamos según idUsuario inicial
+
     if (this.idUsuario != null) {
       this.loadAsignaciones();
     }
   }
 
-  ngOnChanges(): void {
-    if (this.idUsuario != null) {
-      this.loadAsignaciones();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['idUsuario']) {
+      this.updateHorarioControlState();
+
+      if (this.idUsuario != null) {
+        this.loadAsignaciones();
+      } else {
+        this.items = [];
+      }
     }
   }
+
+  // --- helpers de estado de carga / habilitado ---
+
+  private setLoading(value: boolean): void {
+    this.loading = value;
+    this.updateHorarioControlState();
+  }
+
+  private updateHorarioControlState(): void {
+    const ctrl = this.asignarForm.get('horarioId');
+    if (!ctrl) return;
+
+    const shouldDisable = this.loading || !this.idUsuario;
+
+    if (shouldDisable && ctrl.enabled) {
+      ctrl.disable({ emitEvent: false });
+    } else if (!shouldDisable && ctrl.disabled) {
+      ctrl.enable({ emitEvent: false });
+    }
+  }
+
+  // --- carga de datos ---
 
   private loadHorariosActivos(): void {
     const opts: VMHorarioListaOptions = {
@@ -73,20 +104,23 @@ export class UsuarioHorarioListaUsuario implements OnInit {
 
   private loadAsignaciones(): void {
     if (this.idUsuario == null) return;
-    this.loading = true;
+
+    this.setLoading(true);
     this.usuarioHorarioService
       .listByUsuario(this.idUsuario)
       .subscribe({
         next: (rows) => {
           this.items = rows ?? [];
-          this.loading = false;
+          this.setLoading(false);
         },
         error: () => {
           this.items = [];
-          this.loading = false;
+          this.setLoading(false);
         },
       });
   }
+
+  // --- acción Asignar ---
 
   async onAsignar(): Promise<void> {
     if (!this.idUsuario) {
@@ -110,7 +144,8 @@ export class UsuarioHorarioListaUsuario implements OnInit {
       return;
     }
 
-    const v = this.asignarForm.value;
+    // Usar getRawValue porque horarioId puede estar disabled en algún momento
+    const v = this.asignarForm.getRawValue();
     const vm: VMUsuarioHorarioCreate = {
       usuarioId: this.idUsuario,
       horarioId: v.horarioId as number,
@@ -119,7 +154,7 @@ export class UsuarioHorarioListaUsuario implements OnInit {
       cerrarAnterior: !!v.cerrarAnterior,
     };
 
-    // Validación simple de rango en cliente (el backend también valida)
+    // Validación simple de rango en cliente
     if (vm.desde && vm.hasta && vm.hasta < vm.desde) {
       await this.notify.ok({
         variant: 'warning',
@@ -131,7 +166,7 @@ export class UsuarioHorarioListaUsuario implements OnInit {
     }
 
     try {
-      this.loading = true;
+      this.setLoading(true);
       await this.usuarioHorarioService.create(vm);
 
       await this.notify.ok({
@@ -141,17 +176,22 @@ export class UsuarioHorarioListaUsuario implements OnInit {
         primaryText: 'Aceptar',
       });
 
-      // Reset del formulario y recarga de lista
+      // Reset del formulario
       this.asignarForm.reset({
         horarioId: null,
         desde: '',
         hasta: '',
         cerrarAnterior: true,
       });
+
+      // Reajustar estado enabled/disabled tras reset
+      this.updateHorarioControlState();
+
+      // Recargar asignaciones
       this.loadAsignaciones();
     } catch {
-      // El interceptor global maneja errores HTTP
-      this.loading = false;
+      this.setLoading(false);
+      // Errores HTTP ya los maneja el interceptor global
     }
   }
 }

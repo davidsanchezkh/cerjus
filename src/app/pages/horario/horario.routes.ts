@@ -18,9 +18,9 @@ export const horarioRoutes: Routes = [
     path: 'horario',
     canMatch: [accessGuardMatch],
     children: [
-        { path: '', component: HorarioLista, data: { minLevel: 3 }, pathMatch: 'full' },
-        { path: 'registrar', component: HorarioRegistrar, data: { minLevel: 3 }, pathMatch: 'full' },
-        { matcher: numericIdMatcherHorario, component: HorarioDetalle, data: { minLevel: 3 } },
+        { path: '', component: HorarioLista, data: { minLevel: 1 }, pathMatch: 'full' },
+        { path: 'registrar', component: HorarioRegistrar, data: { minLevel: 1 }, pathMatch: 'full' },
+        { matcher: numericIdMatcherHorario, component: HorarioDetalle, data: { minLevel: 1 } },
         { path: '**', component: PaginaNoEncontradaComponent },
     ],
   },

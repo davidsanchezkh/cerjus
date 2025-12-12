@@ -1,18 +1,26 @@
 <!-- registrar.html -->
 
-
-<div class="container min-vh-100 d-flex align-items-center">
+<!-- Contenedor raíz: cambia layout según modo -->
+<div
+  class="container"
+  [ngClass]="{
+    'min-vh-100 d-flex align-items-center': isPublicMode
+  }"
+>
   <div class="row justify-content-center w-100">
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm">
         <div class="card-body">
 
-          <h5 class="mb-4">Registrarse</h5>
+          <!-- Título dinámico -->
+          <h5 class="mb-4">
+            {{ isPublicMode ? 'Registrarse' : 'Registrar usuario' }}
+          </h5>
 
           <!-- Formulario reactivo -->
           <form [formGroup]="form" novalidate [class.was-validated]="submitting">
 
-            <!-- Fila 1: Nombres y Apellidos / DNI -->
+            <!-- Fila 1: Nombres y Apellidos / DNI (igual que ahora) -->
             <div class="row g-3 align-items-end">
               <div class="col-12 col-md-3">
                 <label class="form-label fw-semibold">Nombres</label>
@@ -57,10 +65,10 @@
             <!-- Botones -->
             <div class="d-flex justify-content-between mt-4">
               <button type="button" class="btn btn-warning" (click)="onBack()">
-                Regresar
+                {{ isPublicMode ? 'Regresar' : 'Regresar a la lista' }}
               </button>
               <button type="button" class="btn btn-success" (click)="onSubmit()">
-                Registrar
+                {{ isPublicMode ? 'Registrar' : 'Registrar usuario' }}
               </button>
             </div>
 

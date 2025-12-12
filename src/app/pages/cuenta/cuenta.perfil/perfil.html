@@ -1,0 +1,224 @@
+<div class="container">
+  <div class="row justify-content-center">
+
+    <!-- ====== PERFIL ====== -->
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+
+        <!-- Encabezado colapsable -->
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="openPerfil = !openPerfil"
+          role="button"
+          [attr.aria-expanded]="openPerfil">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+              Mi perfil
+            </span>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="onEditPerfil($event)">
+              {{ isEditingPerfil ? 'Dejar de editar' : 'Editar perfil' }}
+            </button>
+          </div>
+          <span class="caret">{{ openPerfil ? "▴" : "▾" }}</span>
+        </div>
+
+        <!-- Cuerpo -->
+        <form
+          class="card-body selectable-fix"
+          [hidden]="!openPerfil"
+          [formGroup]="formPerfil"
+          id="formPerfil"
+          name="formPerfil">
+
+          <!-- Identificación básica -->
+          <div class="row g-3">
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="pf_nombres">Nombres</label>
+              <input
+                id="pf_nombres"
+                type="text"
+                formControlName="nombres"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="pf_apellidoPaterno">Apellido paterno</label>
+              <input
+                id="pf_apellidoPaterno"
+                type="text"
+                formControlName="apellidoPaterno"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="pf_apellidoMaterno">Apellido materno</label>
+              <input
+                id="pf_apellidoMaterno"
+                type="text"
+                formControlName="apellidoMaterno"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label" for="pf_dni">DNI</label>
+              <input
+                id="pf_dni"
+                type="text"
+                formControlName="dni"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Contacto -->
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pf_correoE">Correo electrónico</label>
+              <input
+                id="pf_correoE"
+                type="email"
+                formControlName="correoE"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pf_telefono">Teléfono</label>
+              <input
+                id="pf_telefono"
+                type="tel"
+                formControlName="telefono"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pf_tz">Zona horaria</label>
+              <input
+                id="pf_tz"
+                type="text"
+                formControlName="tz"
+                [readonly]="!isEditingPerfil"
+                [class.value-box-noedit]="!isEditingPerfil"
+                [class.value-box-edit]="isEditingPerfil" />
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Metadatos -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="pf_fechaCreadoPorTexto">Cuenta creada el</label>
+              <input
+                id="pf_fechaCreadoPorTexto"
+                type="text"
+                formControlName="fechaCreadoPorTexto"
+                class="value-box-noedit"
+                readonly />
+            </div>
+          </div>
+
+          <!-- Botones -->
+          @if (isEditingPerfil) {
+            <div class="d-flex justify-content-between mt-4">
+              <button
+                type="button"
+                class="btn btn-warning"
+                (click)="onCancelPerfil()">
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="onSavePerfil()">
+                Guardar cambios
+              </button>
+            </div>
+          }
+        </form>
+      </div>
+    </div>
+
+    <!-- ====== CAMBIAR CONTRASEÑA ====== -->
+    <div class="col-12 col-lg-8 mb-4">
+      <div class="card shadow-sm">
+        <div
+          class="card-header d-flex justify-content-between align-items-center selectable-fix"
+          (click)="openPassword = !openPassword"
+          role="button"
+          [attr.aria-expanded]="openPassword">
+          <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+            Cambiar contraseña
+          </span>
+          <span class="caret">{{ openPassword ? "▴" : "▾" }}</span>
+        </div>
+
+        <form
+          class="card-body selectable-fix"
+          [hidden]="!openPassword"
+          [formGroup]="formPassword"
+          id="formPassword"
+          name="formPassword">
+
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pw_actual">Contraseña actual</label>
+              <input
+                id="pw_actual"
+                type="password"
+                formControlName="actual"
+                class="value-box-edit" />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pw_nueva">Nueva contraseña</label>
+              <input
+                id="pw_nueva"
+                type="password"
+                formControlName="nueva"
+                class="value-box-edit" />
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="pw_nuevaConfirm">Confirmar nueva contraseña</label>
+              <input
+                id="pw_nuevaConfirm"
+                type="password"
+                formControlName="nuevaConfirm"
+                class="value-box-edit" />
+            </div>
+          </div>
+
+          <div class="mt-3 text-danger" *ngIf="passwordMismatch">
+            Las nuevas contraseñas no coinciden.
+          </div>
+
+          <div class="d-flex justify-content-end mt-4">
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="onChangePassword()">
+              Actualizar contraseña
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

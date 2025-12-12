@@ -3,7 +3,7 @@ import { accessGuardMatch } from '@app/guard/guard.access';
 import { UsuarioLista } from './usuario.lista/usuario.lista';
 import { UsuarioDetalle } from './usuario.detalle/usuario.detalle';
 import { PaginaNoEncontradaComponent } from '@/app/components/paginanoencontrada/pagina';
-
+import { cuentaregistrarSuper} from '@/app/pages/cuenta/cuenta.routes';
 export const numericIdMatcher: UrlMatcher = (segments: UrlSegment[]) =>
   segments.length === 1 && /^\d+$/.test(segments[0].path)
     ? { consumed: segments, posParams: { id: segments[0] } }
@@ -21,7 +21,8 @@ export const usuarioRoutes: Routes = [
     path: 'usuario',
     canMatch: [accessGuardMatch],
     children: [
-      { path: 'lista', component: UsuarioLista, data: { minLevel: 1 }, pathMatch: 'full' },
+      ...cuentaregistrarSuper,
+      { path: 'lista', component: UsuarioLista, data: { minLevel: 2 }, pathMatch: 'full' },
       {matcher:numericIdMatcher, component: UsuarioDetalle,data:{minLevel:2}},
       {path:'**', component: PaginaNoEncontradaComponent },
     ],

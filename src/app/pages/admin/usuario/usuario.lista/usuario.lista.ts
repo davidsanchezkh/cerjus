@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 import { UsuarioService } from '../services/usuario.service';
 import { VMUsuarioListaSimple } from '../models/usuario.vm';
@@ -20,7 +21,7 @@ export class UsuarioLista implements OnInit {
   /* Inyección */
   private fb = inject(FormBuilder);
   private service = inject(UsuarioService);
-
+  private pageMeta = inject(PageMetaService);
   /* Formulario de filtros */
   form = this.fb.group({
     id: [null],
@@ -93,11 +94,16 @@ export class UsuarioLista implements OnInit {
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
+        
       )
       .subscribe(() => {
         this.page = 1;
         this.load();
+        
       });
+    this.pageMeta.replace({
+          titulo: `Lista de Usuarios`,
+    });  
   }
 
   /* Acciones */

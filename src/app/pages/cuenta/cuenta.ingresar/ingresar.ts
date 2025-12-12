@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
-import { AuthService } from '../../../auth/auth.service';
+import { AuthService } from '@/app/auth/auth.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-cuenta-ingresar',
   standalone: true,
   imports: [CommonModule, FormsModule,RouterLink],
   templateUrl: './ingresar.html',

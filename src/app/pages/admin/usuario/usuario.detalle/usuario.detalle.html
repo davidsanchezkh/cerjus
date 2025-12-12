@@ -2,27 +2,35 @@
   <div class="row justify-content-center">
     <div class="col-12 col-lg-8 mb-4">
       <div class="card shadow-sm">
-
         <!-- Encabezado colapsable -->
         <div
           class="card-header d-flex justify-content-between align-items-center selectable-fix"
           (click)="open = !open"
           role="button"
-          [attr.aria-expanded]="open">
+          [attr.aria-expanded]="open"
+        >
           <div class="d-flex align-items-center gap-2">
-            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+            <span
+              class="fw-semibold"
+              style="min-width: 220px; display: inline-block;"
+            >
               Información del usuario
             </span>
             <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
               Editar
             </button>
           </div>
-          <span class="caret">{{ open ? "▴" : "▾" }}</span>
+          <span class="caret">{{ open ? '▴' : '▾' }}</span>
         </div>
 
         <!-- Cuerpo -->
-        <form class="card-body selectable-fix" [hidden]="!open" [formGroup]="form" id="formUsuario" name="formUsuario">
-
+        <form
+          class="card-body selectable-fix"
+          [hidden]="!open"
+          [formGroup]="form"
+          id="formUsuario"
+          name="formUsuario"
+        >
           <!-- Identificación básica -->
           <div class="row g-3">
             <div class="col-12 col-md-3">
@@ -32,7 +40,8 @@
                 type="text"
                 formControlName="nombres"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
 
             <div class="col-12 col-md-3">
@@ -42,7 +51,8 @@
                 type="text"
                 formControlName="apellidoPaterno"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
 
             <div class="col-12 col-md-3">
@@ -52,7 +62,8 @@
                 type="text"
                 formControlName="apellidoMaterno"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
 
             <div class="col-12 col-md-3">
@@ -62,7 +73,8 @@
                 type="text"
                 formControlName="dni"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
           </div>
 
@@ -77,7 +89,8 @@
                 type="email"
                 formControlName="correoE"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
 
             <div class="col-12 col-md-4">
@@ -87,7 +100,8 @@
                 type="tel"
                 formControlName="telefono"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
 
             <div class="col-12 col-md-4">
@@ -97,7 +111,8 @@
                 type="text"
                 formControlName="tz"
                 class="value-box-noedit"
-                readonly />
+                readonly
+              />
             </div>
           </div>
 
@@ -111,14 +126,12 @@
                 id="udf1campo8"
                 class="form-select"
                 formControlName="rolId"
-                [disabled]="!isEditing"
                 [class.value-box-edit]="isEditing"
-                [class.value-box-noedit]="!isEditing">
+                [class.value-box-noedit]="!isEditing"
+              >
                 <option [ngValue]="null" disabled>Seleccione un rol</option>
                 @for (t of tipos; track t.tu_ID) {
-                  <option [ngValue]="t.tu_ID">
-                    {{ t.tu_nombre }}
-                  </option>
+                  <option [ngValue]="t.tu_ID">{{ t.tu_nombre }}</option>
                 }
               </select>
             </div>
@@ -129,9 +142,9 @@
                 id="udf1campo9"
                 class="form-select"
                 formControlName="estado"
-                [disabled]="!isEditing"
                 [class.value-box-edit]="isEditing"
-                [class.value-box-noedit]="!isEditing">
+                [class.value-box-noedit]="!isEditing"
+              >
                 @for (opt of estadoOpciones; track opt.value) {
                   <option [value]="opt.value">{{ opt.label }}</option>
                 }
@@ -150,14 +163,8 @@
                 type="text"
                 formControlName="fechaCreadoPorTexto"
                 class="value-box-noedit"
-                readonly />
-            </div>
-
-            <div class="col-12 col-md-6">
-              <label class="form-label">Estado actual</label>
-              <div class="value-box-noedit">
-                {{ usuario?.estadoTexto || '—' }}
-              </div>
+                readonly
+              />
             </div>
           </div>
 
@@ -175,6 +182,7 @@
         </form>
       </div>
     </div>
+
     <!-- Panel de horarios asignados -->
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm">
@@ -182,18 +190,23 @@
           class="card-header d-flex justify-content-between align-items-center selectable-fix"
           (click)="openHorarios = !openHorarios"
           role="button"
-          [attr.aria-expanded]="openHorarios">
+          [attr.aria-expanded]="openHorarios"
+        >
           <div class="d-flex align-items-center gap-2">
-            <span class="fw-semibold" style="min-width: 220px; display: inline-block;">
+            <span
+              class="fw-semibold"
+              style="min-width: 220px; display: inline-block;"
+            >
               Horarios asignados
             </span>
           </div>
-          <span class="caret">{{ openHorarios ? "▴" : "▾" }}</span>
+          <span class="caret">{{ openHorarios ? '▴' : '▾' }}</span>
         </div>
 
         <app-usuario-horario-lista-usuario
           [idUsuario]="usuario?.id"
-          [hidden]="!openHorarios">
+          [hidden]="!openHorarios"
+        >
         </app-usuario-horario-lista-usuario>
       </div>
     </div>
