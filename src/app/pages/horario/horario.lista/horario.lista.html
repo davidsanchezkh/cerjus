@@ -26,12 +26,10 @@
         <tr class="filters-row" style="user-select: none;">
           <th>
             <input class="form-control form-control-sm no-spinner"
-                   formControlName="id"
-                   placeholder="ID"
-                   type="number"
-                   min="0"
-                   step="1"
-                   (wheel)="$event.preventDefault()">
+            formControlName="id"
+            placeholder="ID"
+            inputmode="numeric"
+            pattern="[0-9]*">
           </th>
           <th>
             <input class="form-control form-control-sm"
@@ -80,10 +78,8 @@
                 <td>{{ h.nombre }}</td>
                 <td style="width: 12rem;">{{ h.tz }}</td>
                 <td style="width: 8rem;">
-                  <span class="badge"
-                        [class.bg-success]="h.estado === 1"
-                        [class.bg-secondary]="h.estado !== 1">
-                    {{ h.estado === 1 ? 'ACTIVO' : 'INACTIVO' }}
+                  <span class="badge" [ngClass]="estadoBadgeClass(h.estado)">
+                    {{ estadoLabel(h.estado) }}
                   </span>
                 </td>
                 <td style="width: 10rem;">

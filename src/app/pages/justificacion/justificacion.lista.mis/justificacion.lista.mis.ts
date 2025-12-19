@@ -1,47 +1,42 @@
-// src/app/features/horario/horario.lista/horario.lista.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormControl } from '@angular/forms';
+import { RouterLink, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { HorarioService } from '../services/horario.service';
-import { VMHorarioListaSimple } from '../models/horario.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { JustificacionService } from '../services/justificacion.service';
+
+import { VMAsistenciaJustificacionItem } from '../models/justificacion.vm';
+import { AJ_ESTADO_OPCIONES,AJ_TIPO_OPCIONES, AsistenciaJustificacionEstadoFiltro,AsistenciaJustificacionTipoFiltro } from '../models/justificacion.dominio';
 
 @Component({
-  selector: 'app-horario-lista',
+  selector: 'app-justificacion-lista-mis',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './horario.lista.html',
-  styleUrl: './horario.lista.css',
+  templateUrl: './justificacion.lista.mis.html',
+  styleUrl: './justificacion.lista.mis.css',
 })
-export class HorarioLista implements OnInit {
+export class JustificacionListaMis implements OnInit {
   private fb = inject(FormBuilder);
-  private service = inject(HorarioService);
+  private service = inject(JustificacionService);
   private notify = inject(NotificacionesService);
+  private router = inject(Router);
+
+  readonly estadoOpciones = AJ_ESTADO_OPCIONES;
+  readonly tipoOpciones = AJ_TIPO_OPCIONES; 
 
   form = this.fb.group({
-    id: [null],
-    nombre: [''],
+    desde: new FormControl<string>(''),
+    hasta: new FormControl<string>(''),
+    tipo: new FormControl<AsistenciaJustificacionTipoFiltro>(''),  
+    estado: new FormControl<AsistenciaJustificacionEstadoFiltro>(''),
   });
-    estadoLabel(v: number): string {
-    if (v === 1) return 'ACTIVO';
-    if (v === 2) return 'INACTIVO';
-    if (v === 0) return 'ELIMINADO';
-    return `ESTADO ${v}`;
-  }
 
-  estadoBadgeClass(v: number): string {
-    if (v === 1) return 'bg-success';
-    if (v === 2) return 'bg-secondary';
-    if (v === 0) return 'bg-danger';
-    return 'bg-secondary';
-  }
-  items: VMHorarioListaSimple[] = [];
+  items: VMAsistenciaJustificacionItem[] = [];
   total = 0;
   page = 1;
-  pageSize = 10;
+  pageSize = 9;
 
   loading = false;
   showOverlay = false;
@@ -55,7 +50,7 @@ export class HorarioLista implements OnInit {
   shownLastPage = 1;
   shownTotal = 0;
 
-  private pendItems: VMHorarioListaSimple[] = [];
+  private pendItems: VMAsistenciaJustificacionItem[] = [];
   private pendTotal = 0;
   private pendFrom = 0;
   private pendTo = 0;
@@ -64,7 +59,6 @@ export class HorarioLista implements OnInit {
 
   private reqSeq = 0;
   private overlayTimer: any;
-  private emptyTimer: any;
   private overlayShownAt = 0;
   private firstPaintStart = 0;
 
@@ -82,7 +76,6 @@ export class HorarioLista implements OnInit {
   get lastPage(): number {
     return this.pageSize ? Math.max(1, Math.ceil(this.total / this.pageSize)) : 1;
   }
-
   rangeReserveCh = 9;
   totalReserveCh = 7;
 
@@ -100,16 +93,13 @@ export class HorarioLista implements OnInit {
       });
   }
 
-  clear() {
-    this.form.reset({
-      id: null,
-      nombre: '',
-    });
+  clear(): void {
+    this.form.reset({ desde: '', hasta: '', estado: '' });
     this.page = 1;
     this.load();
   }
 
-  goTo(page: number) {
+  goTo(page: number): void {
     if (page < 1) return;
     const last = this.lastPage;
     if (last && page > last) return;
@@ -119,7 +109,6 @@ export class HorarioLista implements OnInit {
 
   private cancelTimers(): void {
     clearTimeout(this.overlayTimer);
-    clearTimeout(this.emptyTimer);
   }
 
   load(): void {
@@ -142,12 +131,15 @@ export class HorarioLista implements OnInit {
     }
 
     const v = this.form.value;
+
     this.service
-      .list({
+      .listMis({
         page: this.page,
         pageSize: this.pageSize,
-        id: v.id ?? undefined,
-        nombre: v.nombre ?? undefined,
+        desde: v.desde || undefined,
+        hasta: v.hasta || undefined,
+        tipo: (v.tipo ?? '') as any,  
+        estado: (v.estado ?? '') as any,
       })
       .subscribe({
         next: (res) => {
@@ -158,9 +150,7 @@ export class HorarioLista implements OnInit {
 
           const from = incoming.length > 0 ? (this.page - 1) * this.pageSize + 1 : 0;
           const to = (this.page - 1) * this.pageSize + incoming.length;
-          const last = this.pageSize
-            ? Math.max(1, Math.ceil(total / this.pageSize))
-            : 1;
+          const last = this.pageSize ? Math.max(1, Math.ceil(total / this.pageSize)) : 1;
 
           this.pendItems = incoming;
           this.pendTotal = total;
@@ -209,9 +199,7 @@ export class HorarioLista implements OnInit {
 
       this.showEmpty = this.items.length === 0;
 
-      if (this.firstLoad) {
-        this.firstLoad = false;
-      }
+      if (this.firstLoad) this.firstLoad = false;
     };
 
     if (this.firstLoad) {
@@ -221,5 +209,23 @@ export class HorarioLista implements OnInit {
     } else {
       complete();
     }
+  }
+
+  estadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'PENDIENTE': return 'bg-warning text-dark';
+      case 'APROBADA': return 'bg-success';
+      case 'RECHAZADA': return 'bg-danger';
+      default: return 'bg-secondary';
+    }
+  }
+
+  trackById(_i: number, item: VMAsistenciaJustificacionItem) {
+    return item.aj_ID;
+  }
+
+  async irRegistrar() {
+    // Ajuste la ruta si la suya es distinta
+    this.router.navigate(['/justificacion/registrar']);
   }
 }

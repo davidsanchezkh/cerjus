@@ -24,7 +24,7 @@ import {
 } from '../mappers/horario.mapper';
 import {
   DTOHorarioListaOptions,
-  DTOHorarioCreate,
+  DTOHorarioCreate,DTOHorarioBloqueCreate 
 } from '../models/horario.dto';
 import { toHttpParams } from '@/app/components/utils/http.utils';
 
@@ -66,15 +66,23 @@ export class HorarioService {
       .get<ApiHorarioDetalle>(`${this.base}/${id}`)
       .pipe(map(api => MapHorarioDetalleVM(api)));
   }
-    async update(id: number, changes: Partial<{ ho_nombre: string; ho_tz: string }>): Promise<number> {
-        const response = await firstValueFrom(
-            this.http.patch<{ ho_ID: number }>(`${this.base}/${id}`, {
-            ho_ID: id,
-            ...changes,
-            }),
-        );
-        return response.ho_ID;
-    }
 
-  // Posteriormente podrá añadir update(), softDelete(), etc.
+  async update(
+    id: number,
+    changes: Partial<{
+      ho_nombre: string;
+      ho_tz: string;
+      ho_estado: number;
+      bloques: DTOHorarioBloqueCreate[];
+    }>,
+  ): Promise<VMHorarioDetalle> {
+    const api = await firstValueFrom(
+      this.http.patch<ApiHorarioDetalle>(`${this.base}/${id}`, {
+        ho_ID: id,
+        ...changes,
+      }),
+    );
+    return MapHorarioDetalleVM(api);
+  }
+
 }

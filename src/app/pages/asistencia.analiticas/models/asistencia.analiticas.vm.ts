@@ -1,16 +1,11 @@
-// src/app/pages/asistencia.analiticas/models/asistencia.analiticas.vm.ts
-
-// Periodos que puede elegir en el dashboard
 export type AsistenciaPeriodKind = 'week' | 'month' | 'year';
 export type AsistenciaPeriodRange = 'this' | 'last';
 
-// Query que enviamos desde el formulario Angular al servicio
 export interface VMAsistenciaQuery {
   kind?: AsistenciaPeriodKind;
   range?: AsistenciaPeriodRange;
 }
 
-// Cards superiores
 export interface VMAsistenciaCards {
   totalProgramadosHoy: number;
   asistenciasHoy: number;
@@ -19,17 +14,17 @@ export interface VMAsistenciaCards {
   incompletosAyer: number;
 }
 
-// Barras apiladas por día
 export interface VMBarrasAsistencia {
-  categories: string[]; // etiquetas X (días)
+  categories: string[];
   series: {
-    name: 'A tiempo' | 'Tarde' | 'Ausente' | 'Incompleto';
+    name: 'A tiempo' | 'Tarde' | 'Ausente' | 'Incompleto'| 'Programado';
     data: number[];
   }[];
+  granularity: 'DAY' | 'MONTH';
 }
 
-// Estado actual (tabla)
 export type VMEstadoAsistencia =
+  | 'PENDIENTE'
   | 'A_TIEMPO'
   | 'TARDE'
   | 'AUSENTE'
@@ -39,22 +34,41 @@ export type VMEstadoAsistencia =
   | 'FUERA_HORARIO';
 
 export interface VMEstadoActualRow {
+  fechaYmd: string;     // para segmentación/orden
+  fechaLabel: string;   // “jue, 18 dic.”
   usId: number;
   nombre: string;
-  horario: string;
-  horaInicio: string | null;
-  primeraMarca: string | null;
+
+  horario: string;      // “Con horario”
+  horaInicio: string | null;    // "HH:mm"
+  primeraMarca: string | null;  // "HH:mm"
+
   estado: VMEstadoAsistencia;
-  estadoLabel: string;      // Texto legible
-  estadoBadgeClass: string; // Clase CSS para badge
+  estadoLabel: string;
+  estadoBadgeClass: string;
 }
 
-// VM global del dashboard
 export interface VMAsistenciaDashboard {
   cards: VMAsistenciaCards;
   barras: VMBarrasAsistencia;
-  estadoActual: VMEstadoActualRow[];
 
-  fechaDesde: string;  // ISO
-  fechaHasta: string;  // ISO
+  fechaDesde: string;
+  fechaHasta: string;
+
+  countHoy: number;
+  countAnteriores: number;
+  countProximos: number;
+}
+
+export interface VMAsistenciaPeriodoPage {
+  segment: 'anteriores' | 'hoy' | 'proximos';
+  page: number;
+  pageSize: number;
+  total: number;
+
+  countHoy: number;
+  countAnteriores: number;
+  countProximos: number;
+
+  items: VMEstadoActualRow[];
 }

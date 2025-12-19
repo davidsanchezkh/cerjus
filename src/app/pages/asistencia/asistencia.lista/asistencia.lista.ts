@@ -5,6 +5,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { AsistenciaService } from '../services/asistencia.service';
 import { VMAsistenciaListaSimple } from '../models/asistencia.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-asistencia-lista',
@@ -14,6 +15,7 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   styleUrl: './asistencia.lista.css'
 })
 export class AsistenciaLista implements OnInit {
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   private service = inject(AsistenciaService);
   private notify = inject(NotificacionesService);
@@ -258,5 +260,8 @@ export class AsistenciaLista implements OnInit {
 
   get lastPageCalc(): number {
     return this.lastPage;
+  }
+  goJustificaciones() {
+    this.router.navigate(['/justificacion/mis']);
   }
 }

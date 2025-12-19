@@ -9,70 +9,49 @@
         </div>
       </div>
 
-      <div
-        class="ms-auto d-flex flex-column flex-sm-row gap-2 align-items-sm-center asist-header-meta"
-      >
+      <div class="ms-auto d-flex flex-column flex-sm-row gap-2 align-items-sm-center asist-header-meta">
         <span class="badge asist-period-badge">
           {{ periodBadge || 'Semana actual' }}
         </span>
 
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-light asist-refresh-btn"
-          (click)="actualizar()"
-        >
+        <button type="button" class="btn btn-sm btn-outline-light asist-refresh-btn" (click)="actualizar()">
           Actualizar
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ===== Toolbar de filtros (solo periodo) ===== -->
+  <!-- ===== Toolbar filtros ===== -->
   <div class="card mb-3 shadow-sm">
     <div class="card-body d-flex flex-wrap align-items-center gap-3">
       <div class="d-flex flex-wrap gap-2">
         <div class="btn-group btn-group-sm" role="group" aria-label="Periodo">
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="filtros.value.kind === 'week'"
-            (click)="filtros.patchValue({ kind: 'week' }, { emitEvent: true })"
-          >
+          <button type="button" class="btn btn-filter"
+                  [class.active]="filtros.value.kind === 'week'"
+                  (click)="filtros.patchValue({ kind: 'week' }, { emitEvent: true })">
             Semana
           </button>
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="filtros.value.kind === 'month'"
-            (click)="filtros.patchValue({ kind: 'month' }, { emitEvent: true })"
-          >
+          <button type="button" class="btn btn-filter"
+                  [class.active]="filtros.value.kind === 'month'"
+                  (click)="filtros.patchValue({ kind: 'month' }, { emitEvent: true })">
             Mes
           </button>
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="filtros.value.kind === 'year'"
-            (click)="filtros.patchValue({ kind: 'year' }, { emitEvent: true })"
-          >
+          <button type="button" class="btn btn-filter"
+                  [class.active]="filtros.value.kind === 'year'"
+                  (click)="filtros.patchValue({ kind: 'year' }, { emitEvent: true })">
             Año
           </button>
         </div>
 
         <div class="btn-group btn-group-sm" role="group" aria-label="Rango">
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="filtros.value.range === 'this'"
-            (click)="filtros.patchValue({ range: 'this' }, { emitEvent: true })"
-          >
+          <button type="button" class="btn btn-filter"
+                  [class.active]="filtros.value.range === 'this'"
+                  (click)="filtros.patchValue({ range: 'this' }, { emitEvent: true })">
             Este
           </button>
-          <button
-            type="button"
-            class="btn btn-filter"
-            [class.active]="filtros.value.range === 'last'"
-            (click)="filtros.patchValue({ range: 'last' }, { emitEvent: true })"
-          >
+          <button type="button" class="btn btn-filter"
+                  [class.active]="filtros.value.range === 'last'"
+                  (click)="filtros.patchValue({ range: 'last' }, { emitEvent: true })">
             Pasado
           </button>
         </div>
@@ -84,67 +63,62 @@
     </div>
   </div>
 
-  <!-- ===== Cards de resumen ===== -->
-  <div class="row g-3 mb-3" *ngIf="cards as c">
-    <div class="col-6 col-md-3">
-      <div class="card card-kpi shadow-sm">
-        <div class="card-body">
-          <div class="kpi-label">Asistencias hoy</div>
-          <div class="kpi-value">
-            {{ c.asistenciasHoy }} / {{ c.totalProgramadosHoy }}
-          </div>
-          <div class="kpi-sub">
-            Programados con horario activo hoy
+  <!-- ===== Cards ===== -->
+  @if (cards; as c) {
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-3">
+        <div class="card card-kpi shadow-sm">
+          <div class="card-body">
+            <div class="kpi-label">Asistencias hoy</div>
+            <div class="kpi-value">{{ c.asistenciasHoy }} / {{ c.totalProgramadosHoy }}</div>
+            <div class="kpi-sub">Programados con horario activo hoy</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="col-6 col-md-3">
-      <div class="card card-kpi shadow-sm">
-        <div class="card-body">
-          <div class="kpi-label">Tardanzas hoy</div>
-          <div class="kpi-value">{{ c.tardanzasHoy }}</div>
-          <div class="kpi-sub">Entrada después de la tolerancia</div>
+      <div class="col-6 col-md-3">
+        <div class="card card-kpi shadow-sm">
+          <div class="card-body">
+            <div class="kpi-label">Tardanzas hoy</div>
+            <div class="kpi-value">{{ c.tardanzasHoy }}</div>
+            <div class="kpi-sub">Entrada después de la tolerancia</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card card-kpi shadow-sm">
+          <div class="card-body">
+            <div class="kpi-label">Ausentes hoy</div>
+            <div class="kpi-value">{{ c.ausentesHoy }}</div>
+            <div class="kpi-sub">Sin entrada en la ventana del horario</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-6 col-md-3">
+        <div class="card card-kpi shadow-sm">
+          <div class="card-body">
+            <div class="kpi-label">Incompletos ayer</div>
+            <div class="kpi-value">{{ c.incompletosAyer }}</div>
+            <div class="kpi-sub">Entrada sin salida en el día anterior</div>
+          </div>
         </div>
       </div>
     </div>
+  }
 
-    <div class="col-6 col-md-3">
-      <div class="card card-kpi shadow-sm">
-        <div class="card-body">
-          <div class="kpi-label">Ausentes hoy</div>
-          <div class="kpi-value">{{ c.ausentesHoy }}</div>
-          <div class="kpi-sub">Sin entrada en la ventana del horario</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="card card-kpi shadow-sm">
-        <div class="card-body">
-          <div class="kpi-label">Incompletos ayer</div>
-          <div class="kpi-value">{{ c.incompletosAyer }}</div>
-          <div class="kpi-sub">Entrada sin salida en el día anterior</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== Zona gráfica + tabla ===== -->
+  <!-- ===== Gráfico + Tabla ===== -->
   <div class="row g-3">
-    <!-- Barras apiladas -->
+    <!-- Gráfico -->
     <div class="col-lg-6">
       <div class="card asist-card shadow-sm h-100">
-        <div
-          class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
-        >
-          <h6 class="mb-0 asist-card-title">
-            Asistencia por día (A tiempo / Tarde / Ausente / Incompleto)
-          </h6>
+        <div class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0">
+          <h6 class="mb-0 asist-card-title">Asistencia</h6>
         </div>
+
         <div class="card-body">
-          <ng-container *ngIf="!firstLoad || !loading; else skeletonChart">
+          @if (!firstLoad || !loadingDashboard) {
             <apx-chart
               #chartBar
               [series]="optBar.series"
@@ -155,78 +129,141 @@
               [legend]="optBar.legend"
               [tooltip]="optBar.tooltip"
               [title]="optBar.title"
-              [subtitle]="optBar.subtitle"
-            >
+              [subtitle]="optBar.subtitle">
             </apx-chart>
-          </ng-container>
-
-          <ng-template #skeletonChart>
+          } @else {
             <div class="chart-skeleton">
               <div class="sk-bar sk-bar-1"></div>
               <div class="sk-bar sk-bar-2"></div>
               <div class="sk-bar sk-bar-3"></div>
             </div>
-          </ng-template>
+          }
         </div>
       </div>
     </div>
 
-    <!-- Tabla de estado actual -->
+    <!-- Tabla -->
     <div class="col-lg-6">
       <div class="card asist-card shadow-sm h-100">
-        <div
-          class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0"
-        >
-          <h6 class="mb-0 asist-card-title">Estado actual de la asistencia</h6>
+        <div class="card-header border-0 bg-transparent d-flex justify-content-between align-items-center pb-0">
+          <div>
+            <h6 class="mb-0 asist-card-title">Asistencias del periodo</h6>
+
+            <div class="btn-group btn-group-sm mt-2" role="group" aria-label="Segmento tabla">
+              <button type="button" class="btn btn-filter"
+                      [class.active]="tablaSegmento === 'anteriores'"
+                      (click)="setSegment('anteriores')">
+                Anteriores ({{ countAnteriores }})
+              </button>
+
+              <button type="button" class="btn btn-filter"
+                      [class.active]="tablaSegmento === 'hoy'"
+                      (click)="setSegment('hoy')">
+                Hoy ({{ countHoy }})
+              </button>
+
+              <button type="button" class="btn btn-filter"
+                      [class.active]="tablaSegmento === 'proximos'"
+                      (click)="setSegment('proximos')">
+                Próximos ({{ countProximos }})
+              </button>
+            </div>
+          </div>
+
+          <div class="ms-auto d-flex align-items-center gap-2">
+            <button type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="descargarTodoPeriodo()"
+                  [disabled]="downloading || loadingDashboard || !dashboard">
+            Descargar (todo el periodo)
+          </button>
+            <div class="small text-muted">Filas/página:</div>
+            
+            <div class="btn-group btn-group-sm" role="group" aria-label="Page size">
+              <button type="button" class="btn btn-outline-secondary"
+                      [class.active]="pageSize === 10"
+                      (click)="setPageSize(10)">10</button>
+              <button type="button" class="btn btn-outline-secondary"
+                      [class.active]="pageSize === 25"
+                      (click)="setPageSize(25)">25</button>
+              <button type="button" class="btn btn-outline-secondary"
+                      [class.active]="pageSize === 50"
+                      (click)="setPageSize(50)">50</button>
+            </div>
+          </div>
         </div>
+
         <div class="card-body table-responsive">
-          <ng-container *ngIf="estadoRows.length > 0; else noData">
+          @if (estadoRows.length > 0) {
             <table class="table table-sm align-middle mb-0 table-asist">
               <thead>
                 <tr>
+                  <th>Fecha</th>
                   <th>Usuario</th>
-                  <th>Horario de hoy</th>
+                  <th>Horario</th>
                   <th>Primera marca</th>
                   <th>Estado</th>
                 </tr>
               </thead>
+
               <tbody>
-                <tr *ngFor="let r of estadoRows">
-                  <td>{{ r.nombre }}</td>
-                  <td>
-                    <div class="small text-muted">{{ r.horario }}</div>
-                    <div class="small" *ngIf="r.horaInicio">
-                      Inicio: {{ r.horaInicio }}
-                    </div>
-                  </td>
-                  <td>
-                    <span *ngIf="r.primeraMarca; else sinMarca">
-                      {{ r.primeraMarca }}
-                    </span>
-                    <ng-template #sinMarca>—</ng-template>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="r.estadoBadgeClass">
-                      {{ r.estadoLabel }}
-                    </span>
-                  </td>
-                </tr>
+                @for (r of estadoRows; track r.usId + '-' + r.fechaYmd) {
+                  <tr>
+                    <td>{{ r.fechaLabel }}</td>
+                    <td>{{ r.nombre }}</td>
+                    <td>
+                      <div class="small text-muted">{{ r.horario }}</div>
+                      @if (r.horaInicio) {
+                        <div class="small">Inicio: {{ r.horaInicio }}</div>
+                      }
+                    </td>
+                    <td>
+                      @if (r.primeraMarca) {
+                        <span>{{ r.primeraMarca }}</span>
+                      } @else {
+                        <span>—</span>
+                      }
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="r.estadoBadgeClass">{{ r.estadoLabel }}</span>
+                    </td>
+                  </tr>
+                }
               </tbody>
             </table>
-          </ng-container>
 
-          <ng-template #noData>
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <div class="small text-muted">
+                Mostrando {{ pageFrom }}–{{ pageTo }} de {{ estadoTotal }}
+              </div>
+
+              <div class="btn-group btn-group-sm" role="group" aria-label="Paginación">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="prevPage()" [disabled]="page <= 1 || loadingPeriodo">
+                  «
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary" disabled>
+                  Pág. {{ page }} / {{ totalPages }}
+                </button>
+
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="nextPage()" [disabled]="page >= totalPages || loadingPeriodo">
+                  »
+                </button>
+              </div>
+            </div>
+          } @else {
             <div class="text-muted small">
               No hay datos de asistencia para el periodo seleccionado.
             </div>
-          </ng-template>
+          }
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Indicador de carga sencillo -->
-  <div *ngIf="loading" class="asist-loading-hint">
-    Actualizando datos de asistencia…
-  </div>
+  @if (loadingDashboard || loadingPeriodo) {
+    <div class="asist-loading-hint">Actualizando datos de asistencia…</div>
+  }
 </div>

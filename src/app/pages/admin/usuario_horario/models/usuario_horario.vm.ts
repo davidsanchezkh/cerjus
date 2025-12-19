@@ -24,7 +24,8 @@ export interface VMUsuarioHorarioCreate {
 
 export interface VMUsuarioHorarioListaOptions {
   usuarioId: number;
-  estado?: number;
+  estado?: number;              // 1 o 0 si filtra
+  incluirEliminados?: boolean;  // NUEVO: true para “Todos”
   page?: number;
   pageSize?: number;
 }

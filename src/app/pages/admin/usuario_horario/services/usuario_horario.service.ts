@@ -1,3 +1,4 @@
+// src/app/features/usuario_horario/services/usuario_horario.service.ts
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, map, Observable } from 'rxjs';
@@ -6,6 +7,7 @@ import { API_URL } from '@/app/app.token';
 import {
   ApiUsuarioHorarioPageSimple,
   ApiUsuarioHorarioListaItem,
+  ApiUsuarioHorarioDetail,
 } from '../models/usuario_horario.api';
 import {
   VMUsuarioHorarioListaItem,
@@ -22,6 +24,7 @@ import {
 import {
   DTOUsuarioHorarioListaOptions,
   DTOUsuarioHorarioCreate,
+  DTOUsuarioHorarioUpdate,
 } from '../models/usuario_horario.dto';
 import { toHttpParams } from '@/app/components/utils/http.utils';
 
@@ -29,11 +32,12 @@ import { toHttpParams } from '@/app/components/utils/http.utils';
 export class UsuarioHorarioService {
   private http = inject(HttpClient);
   private apiUrl = inject(API_URL);
-  private readonly base = `${this.apiUrl}/usuario-horario`; // ajuste si su ruta difiere
+  private readonly base = `${this.apiUrl}/usuario-horario`;
 
   list(opts: VMUsuarioHorarioListaOptions): Observable<VMPage<VMUsuarioHorarioListaItem>> {
     const dto: DTOUsuarioHorarioListaOptions = MapUsuarioHorarioListaOpciones(opts);
     const params = toHttpParams(dto);
+
     return this.http
       .get<ApiUsuarioHorarioPageSimple>(this.base, { params })
       .pipe(
@@ -46,17 +50,29 @@ export class UsuarioHorarioService {
       );
   }
 
-  /** Lista simple de asignaciones activas para un usuario concreto */
-  listByUsuario(usuarioId: number): Observable<VMUsuarioHorarioListaItem[]> {
+  /** Asignaciones activas (estado=1) */
+  listAllByUsuario(usuarioId: number): Observable<VMUsuarioHorarioListaItem[]> {
     return this.list({
       usuarioId,
-      estado: 1,
+      incluirEliminados: true,
       page: 1,
       pageSize: 50,
-    }).pipe(map(page => page.items));
+      // estado: undefined => no filtra
+    }).pipe(map(page => page.items ?? []));
   }
 
-  /** Crear nueva asignación de horario a usuario */
+  /** Reactivar: PATCH /usuario-horario/:id con uh_estado=1 */
+  async deactivate(id: number): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.base}/${id}/desactivar`, {}),
+    );
+  }
+
+  async reactivate(id: number): Promise<void> {
+    await this.update(id, { uh_ID: id, uh_estado: 1 });
+  }
+
+  /** Crear nueva asignación */
   async create(vm: VMUsuarioHorarioCreate): Promise<number> {
     const dto: DTOUsuarioHorarioCreate = MapUsuarioHorarioCreate(vm);
     const response = await firstValueFrom(
@@ -64,4 +80,13 @@ export class UsuarioHorarioService {
     );
     return response.uh_ID;
   }
+
+  /** Actualizar rango/estado (PATCH /usuario-horario/:id) */
+  async update(id: number, patch: DTOUsuarioHorarioUpdate): Promise<void> {
+    await firstValueFrom(
+      this.http.patch(`${this.base}/${id}`, patch),
+    );
+  }
+
+
 }

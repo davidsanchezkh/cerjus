@@ -26,15 +26,11 @@
         <!-- Filtros -->
         <tr class="filters-row" style="user-select: none;">
           <th>
-            <input
-              class="form-control form-control-sm no-spinner"
-              formControlName="id"
-              placeholder="ID"
-              type="number"
-              min="0"
-              step="1"
-              (wheel)="$event.preventDefault()"
-            />
+            <input class="form-control form-control-sm no-spinner"
+            formControlName="id"
+            placeholder="ID"
+            inputmode="numeric"
+            pattern="[0-9]*">
           </th>
           <th>
             <input

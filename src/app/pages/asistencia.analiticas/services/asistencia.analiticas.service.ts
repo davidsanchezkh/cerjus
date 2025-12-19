@@ -1,17 +1,23 @@
-// src/app/pages/asistencia.analiticas/services/asistencia.analiticas.service.ts
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams,HttpResponse  } from '@angular/common/http';
 import { API_URL } from '@app/app.token';
 import { map, Observable } from 'rxjs';
 
 import {
   VMAsistenciaDashboard,
+  VMAsistenciaPeriodoPage,
   VMAsistenciaQuery,
   AsistenciaPeriodKind,
   AsistenciaPeriodRange,
 } from '../models/asistencia.analiticas.vm';
-import { ApiAsistenciaDashboardResponse } from '../models/asistencia.analiticas.api';
-import { mapAsistenciaDashboard } from '../mappers/asistencia.analiticas.mapper';
+
+import {
+  ApiAsistenciaDashboardResponse,
+  ApiAsistenciaPeriodoPageResponse,
+  ApiTablaSegmento,
+} from '../models/asistencia.analiticas.api';
+
+import { mapAsistenciaDashboard, mapAsistenciaPeriodoPage } from '../mappers/asistencia.analiticas.mapper';
 
 function toHttpParams<T extends object>(obj: T): HttpParams {
   let p = new HttpParams();
@@ -28,7 +34,6 @@ export class AsistenciasDashboardService {
   private apiUrl = inject(API_URL);
   private base = `${this.apiUrl}/asistencia-analytics`;
 
-  /** Calcula {desde, hasta} en YYYY-MM-DD según kind/range (tomando hoy como referencia). */
   private computeRange(
     kind: AsistenciaPeriodKind = 'week',
     range: AsistenciaPeriodRange = 'this',
@@ -55,9 +60,7 @@ export class AsistenciasDashboardService {
 
     if (kind === 'week') {
       const base = mondayOfWeek(now);
-      if (range === 'last') {
-        base.setDate(base.getDate() - 7);
-      }
+      if (range === 'last') base.setDate(base.getDate() - 7);
       start = base;
       end = new Date(base);
       end.setDate(end.getDate() + 6);
@@ -66,7 +69,6 @@ export class AsistenciasDashboardService {
       start = new Date(year, 0, 1);
       end = new Date(year, 11, 31);
     } else {
-      // month (por defecto)
       const monthOffset = range === 'last' ? -1 : 0;
       const year = now.getFullYear();
       const month = now.getMonth() + monthOffset;
@@ -83,14 +85,47 @@ export class AsistenciasDashboardService {
 
     const { desde, hasta } = this.computeRange(kind, range);
 
-    const params = toHttpParams({
-      desde,
-      hasta,
-      // en el futuro: us_id: q.us_id,
-    });
+    const params = toHttpParams({ desde, hasta, kind });
 
     return this.http
       .get<ApiAsistenciaDashboardResponse>(`${this.base}/dashboard-rango`, { params })
       .pipe(map(mapAsistenciaDashboard));
   }
+
+  getPeriodoPage(
+    q: VMAsistenciaQuery,
+    segment: ApiTablaSegmento,
+    page: number,
+    pageSize: number,
+  ): Observable<VMAsistenciaPeriodoPage> {
+    const kind = q.kind ?? 'week';
+    const range = q.range ?? 'this';
+
+    const { desde, hasta } = this.computeRange(kind, range);
+
+    const params = toHttpParams({
+      desde,
+      hasta,
+      segment,
+      page,
+      pageSize,
+    });
+
+    return this.http
+      .get<ApiAsistenciaPeriodoPageResponse>(`${this.base}/periodo-page`, { params })
+      .pipe(map(mapAsistenciaPeriodoPage));
+  }
+  exportPeriodoAllCsv(desde: string, hasta: string, us_id?: number): Observable<HttpResponse<Blob>> {
+  let params = new HttpParams()
+    .set('desde', desde)
+    .set('hasta', hasta);
+
+  if (us_id != null) params = params.set('us_id', String(us_id));
+
+  return this.http.get(`${this.base}/periodo-export-all`, {
+    params,
+    observe: 'response',
+    responseType: 'blob',
+  });
+}
 }

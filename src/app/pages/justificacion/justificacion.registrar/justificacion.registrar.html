@@ -1,0 +1,78 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar justificación</h5>
+
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
+
+            <!-- Fecha -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Fecha</label>
+              <input type="date" class="form-control" formControlName="fecha_ymd" required />
+              <div class="form-text">
+                Solo se permite justificar fechas pasadas o el día de hoy.
+              </div>
+            </div>
+
+            <!-- Tipo -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Tipo de justificación</label>
+              <select class="form-select" formControlName="tipo" required>
+                <option value="" disabled>Seleccione un tipo</option>
+                @for (opt of tipoOpciones; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+
+              @if (tipoHelp) {
+                <div class="alert alert-info mt-3 mb-0">
+                  {{ tipoHelp }}
+                </div>
+              }
+            </div>
+
+            <!-- Motivo -->
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Motivo (obligatorio)</label>
+              <input
+                type="text"
+                maxlength="120"
+                class="form-control"
+                formControlName="motivo"
+                placeholder="Ej.: Cita médica / comisión / error de marca"
+                required
+              />
+            </div>
+
+            <!-- Detalle -->
+            <div class="mb-3">
+              <label class="form-label">Detalle (opcional)</label>
+              <textarea
+                class="form-control"
+                formControlName="detalle"
+                rows="3"
+                placeholder="Explique brevemente el contexto y cualquier evidencia relevante."
+              ></textarea>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-warning" (click)="onBack()">
+                Regresar
+              </button>
+
+              <button type="button" class="btn btn-success" (click)="onSubmit()">
+                Registrar
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

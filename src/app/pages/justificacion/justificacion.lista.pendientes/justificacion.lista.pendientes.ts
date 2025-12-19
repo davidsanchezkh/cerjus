@@ -1,47 +1,45 @@
-// src/app/features/horario/horario.lista/horario.lista.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-import { HorarioService } from '../services/horario.service';
-import { VMHorarioListaSimple } from '../models/horario.vm';
+import { JustificacionService } from '../services/justificacion.service';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { VMAsistenciaJustificacionItem } from '../models/justificacion.vm';
+import {
+  AJ_ESTADO_OPCIONES,
+  AJ_TIPO_OPCIONES,
+  AsistenciaJustificacionEstadoFiltro,
+  AsistenciaJustificacionTipoFiltro,
+} from '../models/justificacion.dominio';
 
 @Component({
-  selector: 'app-horario-lista',
+  selector: 'app-justificacion-lista-pendientes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
-  templateUrl: './horario.lista.html',
-  styleUrl: './horario.lista.css',
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './justificacion.lista.pendientes.html',
+  styleUrl: './justificacion.lista.pendientes.css',
 })
-export class HorarioLista implements OnInit {
+export class JustificacionListaPendientes implements OnInit {
   private fb = inject(FormBuilder);
-  private service = inject(HorarioService);
+  private service = inject(JustificacionService);
   private notify = inject(NotificacionesService);
 
-  form = this.fb.group({
-    id: [null],
-    nombre: [''],
-  });
-    estadoLabel(v: number): string {
-    if (v === 1) return 'ACTIVO';
-    if (v === 2) return 'INACTIVO';
-    if (v === 0) return 'ELIMINADO';
-    return `ESTADO ${v}`;
-  }
+  readonly estadoOpciones = AJ_ESTADO_OPCIONES;
+  readonly tipoOpciones = AJ_TIPO_OPCIONES;
 
-  estadoBadgeClass(v: number): string {
-    if (v === 1) return 'bg-success';
-    if (v === 2) return 'bg-secondary';
-    if (v === 0) return 'bg-danger';
-    return 'bg-secondary';
-  }
-  items: VMHorarioListaSimple[] = [];
+  form = this.fb.group({
+    us_id: new FormControl<number | null>(null),
+    desde: new FormControl<string>(''),
+    hasta: new FormControl<string>(''),
+    tipo: new FormControl<AsistenciaJustificacionTipoFiltro>(''),
+    estado: new FormControl<AsistenciaJustificacionEstadoFiltro>('PENDIENTE'),
+  });
+
+  items: VMAsistenciaJustificacionItem[] = [];
   total = 0;
   page = 1;
-  pageSize = 10;
+  pageSize = 9;
 
   loading = false;
   showOverlay = false;
@@ -55,7 +53,7 @@ export class HorarioLista implements OnInit {
   shownLastPage = 1;
   shownTotal = 0;
 
-  private pendItems: VMHorarioListaSimple[] = [];
+  private pendItems: VMAsistenciaJustificacionItem[] = [];
   private pendTotal = 0;
   private pendFrom = 0;
   private pendTo = 0;
@@ -64,7 +62,6 @@ export class HorarioLista implements OnInit {
 
   private reqSeq = 0;
   private overlayTimer: any;
-  private emptyTimer: any;
   private overlayShownAt = 0;
   private firstPaintStart = 0;
 
@@ -72,7 +69,9 @@ export class HorarioLista implements OnInit {
   private readonly minOverlayMs = 220;
   private readonly firstSkeletonMinMs = 200;
 
-  headerBlockPx = 96;
+  // Ajuste sugerido si el overlay queda “alto” por el thead más grande:
+  headerBlockPx = 120;
+
   get listMinHeight(): number {
     return this.headerBlockPx + this.pageSize * 48;
   }
@@ -82,9 +81,20 @@ export class HorarioLista implements OnInit {
   get lastPage(): number {
     return this.pageSize ? Math.max(1, Math.ceil(this.total / this.pageSize)) : 1;
   }
-
   rangeReserveCh = 9;
   totalReserveCh = 7;
+
+  // ===== Modal de decisión =====
+  decisionOpen = false;
+  decisionMode: 'APROBAR' | 'RECHAZAR' = 'APROBAR';
+  decisionItem: VMAsistenciaJustificacionItem | null = null;
+
+  decisionForm = this.fb.group({
+    motivo: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(255)],
+    }),
+  });
 
   ngOnInit(): void {
     this.load();
@@ -100,16 +110,19 @@ export class HorarioLista implements OnInit {
       });
   }
 
-  clear() {
+  clear(): void {
     this.form.reset({
-      id: null,
-      nombre: '',
+      us_id: null,
+      desde: '',
+      hasta: '',
+      tipo: '',
+      estado: 'PENDIENTE',
     });
     this.page = 1;
     this.load();
   }
 
-  goTo(page: number) {
+  goTo(page: number): void {
     if (page < 1) return;
     const last = this.lastPage;
     if (last && page > last) return;
@@ -119,7 +132,6 @@ export class HorarioLista implements OnInit {
 
   private cancelTimers(): void {
     clearTimeout(this.overlayTimer);
-    clearTimeout(this.emptyTimer);
   }
 
   load(): void {
@@ -142,12 +154,16 @@ export class HorarioLista implements OnInit {
     }
 
     const v = this.form.value;
+
     this.service
-      .list({
+      .listPendientes({
         page: this.page,
         pageSize: this.pageSize,
-        id: v.id ?? undefined,
-        nombre: v.nombre ?? undefined,
+        us_id: v.us_id ?? undefined,
+        desde: v.desde || undefined,
+        hasta: v.hasta || undefined,
+        tipo: v.tipo || undefined,
+        estado: v.estado || undefined, // default PENDIENTE
       })
       .subscribe({
         next: (res) => {
@@ -158,9 +174,7 @@ export class HorarioLista implements OnInit {
 
           const from = incoming.length > 0 ? (this.page - 1) * this.pageSize + 1 : 0;
           const to = (this.page - 1) * this.pageSize + incoming.length;
-          const last = this.pageSize
-            ? Math.max(1, Math.ceil(total / this.pageSize))
-            : 1;
+          const last = this.pageSize ? Math.max(1, Math.ceil(total / this.pageSize)) : 1;
 
           this.pendItems = incoming;
           this.pendTotal = total;
@@ -209,9 +223,7 @@ export class HorarioLista implements OnInit {
 
       this.showEmpty = this.items.length === 0;
 
-      if (this.firstLoad) {
-        this.firstLoad = false;
-      }
+      if (this.firstLoad) this.firstLoad = false;
     };
 
     if (this.firstLoad) {
@@ -221,5 +233,72 @@ export class HorarioLista implements OnInit {
     } else {
       complete();
     }
+  }
+
+  estadoBadgeClass(estado: string): string {
+    switch (estado) {
+      case 'PENDIENTE': return 'bg-warning text-dark';
+      case 'APROBADA': return 'bg-success';
+      case 'RECHAZADA': return 'bg-danger';
+      default: return 'bg-secondary';
+    }
+  }
+
+  abrirDecision(mode: 'APROBAR' | 'RECHAZAR', item: VMAsistenciaJustificacionItem) {
+    this.decisionMode = mode;
+    this.decisionItem = item;
+    this.decisionForm.reset({ motivo: '' });
+    this.decisionOpen = true;
+  }
+
+  cerrarDecision() {
+    this.decisionOpen = false;
+    this.decisionItem = null;
+  }
+
+  async confirmarDecision() {
+    if (!this.decisionItem) return;
+
+    if (this.decisionForm.invalid) {
+      this.decisionForm.markAllAsTouched();
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Falta el motivo',
+        message: 'Ingrese un motivo de decisión (obligatorio).',
+        primaryText: 'Aceptar',
+      });
+      return;
+    }
+
+    const motivo = this.decisionForm.getRawValue().motivo;
+
+    try {
+      if (this.decisionMode === 'APROBAR') {
+        await this.service.aprobar(this.decisionItem.aj_ID, motivo);
+        await this.notify.ok({
+          variant: 'success',
+          title: 'Justificación aprobada',
+          message: 'Se aprobó correctamente.',
+          primaryText: 'Aceptar',
+        });
+      } else {
+        await this.service.rechazar(this.decisionItem.aj_ID, motivo);
+        await this.notify.ok({
+          variant: 'success',
+          title: 'Justificación rechazada',
+          message: 'Se rechazó correctamente.',
+          primaryText: 'Aceptar',
+        });
+      }
+
+      this.cerrarDecision();
+      this.load();
+    } catch {
+      // interceptor ya muestra el error
+    }
+  }
+
+  trackById(_i: number, item: VMAsistenciaJustificacionItem) {
+    return item.aj_ID;
   }
 }

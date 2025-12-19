@@ -75,6 +75,12 @@
              [routerLinkActiveOptions]="{ exact: false }">
             Asistencia
           </a>
+          <a class="nav-link sidebar-item-link"
+             [routerLink]="['/justificacion/lista']"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: false }">
+            Justificación
+          </a>
           }
         </div>
       </li>
@@ -104,14 +110,12 @@
              [routerLinkActiveOptions]="{ exact: false }">
              Usuarios
           </a>
-          @if (canSee(1)) {
           <a class="nav-link sidebar-item-link"
              [routerLink]="['/horario']"
              routerLinkActive="active"
              [routerLinkActiveOptions]="{ exact: false }">
              Horario
           </a>
-          }
         </div>
       </li>
     }

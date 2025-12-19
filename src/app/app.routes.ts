@@ -12,6 +12,7 @@ import { loginRoutes ,cuentaRoutes} from './pages/cuenta/cuenta.routes';
 import { analiticasRoutes } from './pages/analiticas/analiticas.routes';
 import { horarioRoutes} from './pages/horario/horario.routes'
 import { asistenciaanaliticasRoutes} from './pages/asistencia.analiticas/asistencia.analiticas.routes'
+import { justificacionRoutes} from './pages/justificacion/justificacion.routes'
 import { adminRoutes } from './pages/admin/admin.router'
 import { PaginaNoEncontradaComponent } from './components/paginanoencontrada/pagina';
 
@@ -34,6 +35,7 @@ export const routes: Routes = [
             ...asistenciaanaliticasRoutes,
             ...cuentaRoutes,
             ...adminRoutes,
+            ...justificacionRoutes,
         ]
     },
     {path:'**', component: PaginaNoEncontradaComponent },

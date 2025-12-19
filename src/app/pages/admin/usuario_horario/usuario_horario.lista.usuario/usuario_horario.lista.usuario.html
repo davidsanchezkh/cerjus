@@ -3,11 +3,10 @@
   <!-- Formulario de asignación -->
   <div class="mb-3">
     <div class="row g-2 align-items-end">
+
       <div class="col-12 col-md-5">
         <label class="form-label fw-semibold">Horario</label>
-        <select
-          class="form-select"
-          formControlName="horarioId">
+        <select class="form-select" formControlName="horarioId">
           <option [ngValue]="null" disabled>Seleccione un horario</option>
           @for (h of horarios; track h.id) {
             <option [ngValue]="h.id">
@@ -19,84 +18,169 @@
 
       <div class="col-6 col-md-3 col-lg-2">
         <label class="form-label fw-semibold">Desde</label>
-        <input
-          type="date"
-          class="form-control"
-          formControlName="desde" />
+        <input type="date" class="form-control" formControlName="desde" />
       </div>
 
       <div class="col-6 col-md-3 col-lg-2">
         <label class="form-label fw-semibold">Hasta</label>
-        <input
-          type="date"
-          class="form-control"
-          formControlName="hasta" />
+        <input type="date" class="form-control" formControlName="hasta" />
       </div>
 
       <div class="col-12 col-md-2">
         <div class="form-check mt-4 pt-1">
-          <input
-            id="cerrarAnteriorChk"
-            type="checkbox"
-            class="form-check-input"
-            formControlName="cerrarAnterior" />
+          <input id="cerrarAnteriorChk"
+                 type="checkbox"
+                 class="form-check-input"
+                 formControlName="cerrarAnterior" />
           <label class="form-check-label small" for="cerrarAnteriorChk">
-            Cerrar horario anterior si se solapa
+            Cerrar horario anterior si esta abierto
           </label>
         </div>
       </div>
 
       <div class="col-12 col-md-2 text-md-end">
-        <button
-          type="button"
-          class="btn btn-sm btn-success mt-3 mt-md-0"
-          (click)="onAsignar()"
-          [disabled]="loading || !idUsuario">
+        <button type="button"
+                class="btn btn-sm btn-success mt-3 mt-md-0"
+                (click)="onAsignar()"
+                [disabled]="loading || !idUsuario">
           Asignar
         </button>
       </div>
+
     </div>
   </div>
 
   <hr class="my-3" />
 
-  <!-- Tabla de asignaciones -->
+  <!-- Tabla: SIEMPRE muestra TODO (activos + eliminados) -->
   <div class="tabla-wrap">
     <table class="table table-striped table-hover m-0">
       <thead class="table-light">
         <tr>
           <th style="width: 4rem;">ID</th>
-          <th>Horario</th>
-          <th style="width: 20rem;">Vigencia</th>
-          <th style="width: 7rem;">Estado</th>
-          <th style="width: 8rem;">Opciones</th>
+          <th style="width: 10rem;">Horario</th>
+          <th style="width: 11rem;">Vigencia</th>
+          <th style="width: 5rem;">Estado</th>
+          <th style="width: 15rem;">Opciones</th>
         </tr>
       </thead>
+
       <tbody>
         @if (loading) {
           <tr>
-            <td colspan="5" class="text-center text-muted py-3">
-              Cargando…
-            </td>
+            <td colspan="5" class="text-center text-muted py-3">Cargando…</td>
           </tr>
         } @else if (items.length > 0) {
           @for (row of items; track row.id) {
             <tr>
               <td>{{ row.id }}</td>
+
               <td>
                 <div class="fw-semibold">{{ row.horarioNombre }}</div>
                 <div class="text-muted small">{{ row.horarioTz }}</div>
               </td>
+
               <td>{{ row.vigenciaTexto }}</td>
-              <td>{{ row.estadoTexto }}</td>
+
               <td>
-                <a
-                  class="btn btn-sm btn-outline-primary"
-                  [routerLink]="['/horario', row.horarioId]">
-                  Ver horario
-                </a>
+                <span class="badge"
+                      [class.bg-success]="row.estado === 1"
+                      [class.bg-danger]="row.estado === 0"
+                      [class.bg-secondary]="row.estado !== 1 && row.estado !== 0">
+                  {{ row.estadoTexto }}
+                </span>
+              </td>
+
+              <td>
+                <div class="btn-group btn-group-sm" role="group">
+                  <a class="btn btn-outline-primary"
+                     [routerLink]="['/horario', row.horarioId]">
+                    Ver horario
+                  </a>
+
+                  <button type="button"
+                          class="btn btn-outline-secondary"
+                          (click)="startEdit(row)"
+                          [disabled]="loading">
+                    Editar
+                  </button>
+
+                  @if (row.estado === 1) {
+                    <button type="button"
+                            class="btn btn-outline-danger"
+                            (click)="onDesactivar(row)"
+                            [disabled]="loading">
+                      Desactivar
+                    </button>
+                  } @else {
+                    <button type="button"
+                            class="btn btn-success"
+                            (click)="onReactivar(row)"
+                            [disabled]="loading">
+                      Reactivar
+                    </button>
+                  }
+                </div>
               </td>
             </tr>
+
+            @if (editingId === row.id) {
+              <tr class="table-secondary">
+                <td colspan="5">
+                  <div class="p-2" [formGroup]="editForm">
+                    <div class="row g-2 align-items-end">
+
+                      <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Desde</label>
+                        <input type="date"
+                               class="form-control form-control-sm"
+                               formControlName="desde" />
+                      </div>
+
+                      <div class="col-12 col-md-3">
+                        <label class="form-label small fw-semibold">Hasta</label>
+                        <input type="date"
+                               class="form-control form-control-sm"
+                               formControlName="hasta" />
+                      </div>
+
+                      <div class="col-12 col-md-6 text-md-end">
+                        <div class="btn-group btn-group-sm" role="group">
+                          <button type="button"
+                                  class="btn btn-outline-dark"
+                                  (click)="clearHastaEdit()"
+                                  [disabled]="loading">
+                            Limpiar “Hasta”
+                          </button>
+
+                          <button type="button"
+                                  class="btn btn-success"
+                                  (click)="saveEdit(row)"
+                                  [disabled]="loading">
+                            Guardar
+                          </button>
+
+                          <button type="button"
+                                  class="btn btn-warning"
+                                  (click)="cancelEdit()"
+                                  [disabled]="loading">
+                            Cancelar
+                          </button>
+                        </div>
+
+                        @if (row.estado === 0) {
+                          <div class="form-text mt-1">
+                            Nota: si la asignación está eliminada, puede ajustar fechas y luego “Reactivar”.
+                            La reactivación validará solapamientos.
+                          </div>
+                        }
+                      </div>
+
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            }
           }
         } @else {
           <tr>
@@ -108,4 +192,5 @@
       </tbody>
     </table>
   </div>
+
 </div>

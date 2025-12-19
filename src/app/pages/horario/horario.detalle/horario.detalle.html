@@ -21,19 +21,40 @@
         <!-- Cuerpo -->
         <form class="card-body" [hidden]="!open" [formGroup]="form">
           <div class="row g-3">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-4">
               <label class="form-label">Nombre del horario</label>
               <input type="text"
                      formControlName="nombre"
                      [class.value-box-edit]="isEditing"
                      [class.value-box-noedit]="!isEditing"/>
             </div>
-            <div class="col-12 col-md-6">
+
+            <div class="col-12 col-md-4">
               <label class="form-label">Zona horaria</label>
               <input type="text"
                      formControlName="tz"
                      [class.value-box-edit]="isEditing"
                      [class.value-box-noedit]="!isEditing"/>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">Estado</label>
+
+              @if (!isEditing) {
+                <div class="mt-1">
+                  <span class="badge" [ngClass]="estadoBadgeClass(form.controls.estado.value)">
+                    {{ estadoLabel(form.controls.estado.value) }}
+                  </span>
+                </div>
+              }
+
+              @if (isEditing) {
+                <select class="form-control" formControlName="estado">
+                  <option [ngValue]="1">Activo</option>
+                  <option [ngValue]="2">Inactivo</option>
+                  <option [ngValue]="0">Eliminado</option>
+                </select>
+              }
             </div>
           </div>
 
@@ -41,39 +62,117 @@
 
           <!-- Sección: Bloques -->
           <div>
-            <div class="section-title mb-2">Bloques de días y horas</div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <div class="section-title">Bloques de días y horas</div>
 
-            <div class="table-responsive">
-              <table class="table table-bordered table-sm align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th class="text-center">Día</th>
-                    <th class="text-center">Hora inicio</th>
-                    <th class="text-center">Hora fin</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (b of bloques; track b.id) {
-                    <tr>
-                      <td class="text-center">{{ b.dia }}</td>
-                      <td class="text-center">{{ b.horaInicio }}</td>
-                      <td class="text-center">{{ b.horaFin }}</td>
-                    </tr>
-                  }
-                  @if (bloques.length === 0) {
-                    <tr><td colspan="3" class="text-center text-muted">Sin bloques registrados</td></tr>
-                  }
-                </tbody>
-              </table>
+              @if (isEditing) {
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="addBloque()">
+                  Añadir bloque
+                </button>
+              }
             </div>
+
+            <!-- Modo lectura: tabla plana -->
+            @if (!isEditing) {
+              <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="text-center">Día</th>
+                      <th class="text-center">Hora inicio</th>
+                      <th class="text-center">Hora fin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (b of bloquesPlano; track b.id) {
+                      <tr>
+                        <td class="text-center">{{ b.dia }}</td>
+                        <td class="text-center">{{ b.horaInicio }}</td>
+                        <td class="text-center">{{ b.horaFin }}</td>
+                      </tr>
+                    }
+                    @if (bloquesPlano.length === 0) {
+                      <tr>
+                        <td colspan="3" class="text-center text-muted">
+                          Sin bloques registrados
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+
+            <!-- Modo edición: editor agrupado -->
+            @if (isEditing) {
+              <div formArrayName="bloques">
+                @for (bloque of bloquesFA.controls; let i = $index; track i) {
+                  <div [formGroupName]="i" class="border rounded p-3 mb-2">
+                    <div class="row g-3 align-items-end">
+
+                      <div class="col-12 col-md-6">
+                        <label class="form-label fw-semibold">Días</label>
+                        <div class="d-flex flex-wrap gap-2">
+                          @for (d of diasSemana; track d.value) {
+                            <div class="form-check form-check-inline">
+                              <input class="form-check-input"
+                                     type="checkbox"
+                                     [value]="d.value"
+                                     (change)="onDiaChange(i, d.value, $event.target.checked)"
+                                     [checked]="bloquesFA.at(i).controls.dias.value.includes(d.value)">
+                              <label class="form-check-label">{{ d.label }}</label>
+                            </div>
+                          }
+                        </div>
+                      </div>
+
+                      <div class="col-12 col-md-3 col-lg-2">
+                        <label class="form-label fw-semibold">Hora inicio</label>
+                        <input type="time"
+                               class="form-control"
+                               formControlName="horaInicio">
+                      </div>
+
+                      <div class="col-12 col-md-3 col-lg-2">
+                        <label class="form-label fw-semibold">Hora fin</label>
+                        <input type="time"
+                               class="form-control"
+                               formControlName="horaFin">
+                      </div>
+
+                      <div class="col-12 col-md-3 col-lg-2 text-md-end mt-2 mt-md-0">
+                        @if (bloquesFA.length > 1) {
+                          <button type="button"
+                                  class="btn btn-sm btn-outline-danger"
+                                  (click)="removeBloque(i)">
+                            Eliminar
+                          </button>
+                        }
+                      </div>
+
+                    </div>
+                  </div>
+                }
+              </div>
+
+              @if (bloquesFA.length === 0) {
+                <div class="text-center text-muted">Sin bloques registrados</div>
+              }
+            }
           </div>
 
           <div style="height: 1rem;"></div>
 
           @if (isEditing) {
             <div class="d-flex justify-content-between mt-4">
-              <button type="button" class="btn btn-warning" (click)="onCancel()">Cancelar</button>
-              <button type="button" class="btn btn-success" (click)="onSave()">Guardar</button>
+              <button type="button" class="btn btn-warning" (click)="onCancel()" [disabled]="submitting">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-success" (click)="onSave()" [disabled]="submitting">
+                Guardar
+              </button>
             </div>
           }
         </form>

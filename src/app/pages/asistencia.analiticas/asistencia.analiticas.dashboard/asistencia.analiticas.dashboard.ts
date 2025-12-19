@@ -13,13 +13,14 @@ import {
   ApexTitleSubtitle,
 } from 'ng-apexcharts';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Subscription, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import {
   AsistenciaPeriodKind,
   AsistenciaPeriodRange,
   VMAsistenciaDashboard,
+  VMAsistenciaPeriodoPage,
   VMAsistenciaQuery,
 } from '@app/pages/asistencia.analiticas/models/asistencia.analiticas.vm';
 import { AsistenciasDashboardService } from '@app/pages/asistencia.analiticas/services/asistencia.analiticas.service';
@@ -46,76 +47,59 @@ type ChartOptionsBar = {
 export class AsistenciasDashboard implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private svc = inject(AsistenciasDashboardService);
-
-  // ====== filtros básicos: periodo ======
+  downloading = false;
   filtros = this.fb.group({
-    kind: ['week' as AsistenciaPeriodKind],  // semana por defecto
-    range: ['this' as AsistenciaPeriodRange], // esta semana
+    kind: ['week' as AsistenciaPeriodKind],
+    range: ['this' as AsistenciaPeriodRange],
   });
 
-  vm: VMAsistenciaDashboard | null = null;
+  dashboard: VMAsistenciaDashboard | null = null;
+  periodo: VMAsistenciaPeriodoPage | null = null;
 
-  // Texto del encabezado
   headerTitle = 'Panel de asistencia';
   headerSubtitle = '';
   periodBadge = '';
 
-  // Chart de barras apiladas
   @ViewChild('chartBar') chartBar?: ChartComponent;
 
   optBar: ChartOptionsBar = {
     series: [],
-    chart: {
-      type: 'bar',
-      height: 320,
-      stacked: true,
-      toolbar: {
-        show: true,
-      },
-    },
+    chart: { type: 'bar', height: 320, stacked: true, toolbar: { show: true } },
     xaxis: { categories: [] },
     plotOptions: { bar: { horizontal: false, columnWidth: '55%' } },
     dataLabels: { enabled: false },
     legend: { position: 'top' },
     tooltip: { shared: true, intersect: false },
-    title: {
-      text: '',
-      align: 'left',
-      margin: 8,
-      style: { fontSize: '14px', fontWeight: '600' },
-    },
-    subtitle: {
-      text: '',
-      align: 'left',
-      margin: 0,
-      offsetY: 6,
-      style: { fontSize: '11px', color: '#6c757d' },
-    },
+    title: { text: '', align: 'left', margin: 8, style: { fontSize: '14px', fontWeight: '600' } },
+    subtitle: { text: '', align: 'left', margin: 0, offsetY: 6, style: { fontSize: '11px', color: '#6c757d' } },
   };
 
-  loading = false;
+  loadingDashboard = false;
+  loadingPeriodo = false;
   firstLoad = true;
 
   private sub?: Subscription;
 
-  ngOnInit(): void {
-    // Primera carga
-    this.loadAll();
+  // Tabla (server-side)
+  tablaSegmento: 'anteriores' | 'hoy' | 'proximos' = 'hoy';
+  page = 1;
+  pageSize = 10;
 
-    // Reactividad de filtros
+  ngOnInit(): void {
+    this.loadAll(true);
+
     this.sub = this.filtros.valueChanges
       .pipe(
         debounceTime(200),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
       )
-      .subscribe(() => this.loadAll());
+      .subscribe(() => this.loadAll(true));
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
   }
 
-  // ===== Helper query =====
   private currentQuery(): VMAsistenciaQuery {
     const f = this.filtros.value;
     return {
@@ -124,86 +108,185 @@ export class AsistenciasDashboard implements OnInit, OnDestroy {
     };
   }
 
-  // ===== Encabezado legible =====
   private buildHeaderMeta(q: VMAsistenciaQuery, vm: VMAsistenciaDashboard): void {
     const kind = q.kind ?? 'week';
     const range = q.range ?? 'this';
 
-    const fmtDay = new Intl.DateTimeFormat('es-PE', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-    });
-    const fmtMonthYear = new Intl.DateTimeFormat('es-PE', {
-      month: 'long',
-      year: 'numeric',
-    });
+    const fmtDay = new Intl.DateTimeFormat('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+    const fmtMonthYear = new Intl.DateTimeFormat('es-PE', { month: 'long', year: 'numeric' });
 
     const d0 = new Date(vm.fechaDesde);
     const d1 = new Date(vm.fechaHasta);
 
-    let labelPeriodo: string;
-    if (kind === 'week') {
-      labelPeriodo = range === 'last' ? 'Semana pasada' : 'Semana actual';
-    } else if (kind === 'year') {
-      labelPeriodo = range === 'last' ? 'Año anterior' : 'Año actual';
-    } else {
-      labelPeriodo = range === 'last' ? 'Mes pasado' : 'Mes actual';
-    }
+    let labelPeriodo = 'Semana actual';
+    if (kind === 'week') labelPeriodo = range === 'last' ? 'Semana pasada' : 'Semana actual';
+    else if (kind === 'month') labelPeriodo = range === 'last' ? 'Mes pasado' : 'Mes actual';
+    else labelPeriodo = range === 'last' ? 'Año anterior' : 'Año actual';
 
     this.periodBadge = labelPeriodo;
+
     const rango = `Rango: ${fmtDay.format(d0)} – ${fmtDay.format(d1)}`;
-
-    // Para mes/año tiene sentido resaltar el mes inicial
-    const periodoTexto = fmtMonthYear.format(d0);
-
+    const periodoTexto = kind === 'year' ? String(d0.getFullYear()) : fmtMonthYear.format(d0);
     this.headerSubtitle = `${rango} · ${periodoTexto}`;
   }
 
-  // ===== Acción "Actualizar" (botón) =====
   actualizar(): void {
-    this.loadAll();
+    this.loadAll(false);
   }
 
-  // ===== Carga de datos =====
-  private loadAll(): void {
+  setSegment(seg: 'anteriores' | 'hoy' | 'proximos'): void {
+    this.tablaSegmento = seg;
+    this.page = 1;
+    this.loadPeriodo();
+  }
+
+  setPageSize(n: number): void {
+    this.pageSize = n;
+    this.page = 1;
+    this.loadPeriodo();
+  }
+
+  prevPage(): void {
+    if (this.page > 1) {
+      this.page -= 1;
+      this.loadPeriodo();
+    }
+  }
+  nextPage(): void {
+    if (this.page < this.totalPages) {
+      this.page += 1;
+      this.loadPeriodo();
+    }
+  }
+
+  private loadAll(resetTable: boolean): void {
     const q = this.currentQuery();
-    this.loading = true;
 
-    this.svc.getDashboard(q).subscribe({
-      next: (vm) => {
-        this.vm = vm;
+    if (resetTable) {
+      this.tablaSegmento = 'hoy';
+      this.page = 1;
+      this.pageSize = 10;
+    }
 
-        // Actualizar gráfico
+    this.loadingDashboard = true;
+    this.loadingPeriodo = true;
+
+    forkJoin({
+      dash: this.svc.getDashboard(q),
+      page: this.svc.getPeriodoPage(q, this.tablaSegmento, this.page, this.pageSize),
+    }).subscribe({
+      next: ({ dash, page }) => {
+        this.dashboard = dash;
+        this.periodo = page;
+
+        // Chart
+        const kind = q.kind ?? 'week';
+        const titulo = kind === 'year' ? 'Asistencia por mes' : 'Asistencia por día';
+
         this.optBar = {
           ...this.optBar,
-          series: vm.barras.series,
-          xaxis: { categories: vm.barras.categories },
-          title: {
-            ...this.optBar.title,
-            text: 'Asistencia por día (A tiempo / Tarde / Ausente / Incompleto)',
-          },
+          series: dash.barras.series,
+          xaxis: { categories: dash.barras.categories },
+          title: { ...this.optBar.title, text: titulo },
         };
 
-        // Encabezado
-        this.buildHeaderMeta(q, vm);
+        this.buildHeaderMeta(q, dash);
 
-        this.loading = false;
+        this.loadingDashboard = false;
+        this.loadingPeriodo = false;
         this.firstLoad = false;
       },
       error: () => {
-        this.loading = false;
-        // En caso de error mantenemos datos previos (si hubiera)
+        this.loadingDashboard = false;
+        this.loadingPeriodo = false;
+        this.firstLoad = false;
       },
     });
   }
 
-  // Helpers para template
+  private loadPeriodo(): void {
+    const q = this.currentQuery();
+    this.loadingPeriodo = true;
+
+    this.svc.getPeriodoPage(q, this.tablaSegmento, this.page, this.pageSize).subscribe({
+      next: (pageVm) => {
+        this.periodo = pageVm;
+        // Ajuste defensivo: el backend devuelve page/pageSize reales
+        this.page = pageVm.page;
+        this.pageSize = pageVm.pageSize;
+        this.loadingPeriodo = false;
+      },
+      error: () => {
+        this.loadingPeriodo = false;
+      },
+    });
+  }
+  descargarTodoPeriodo(): void {
+  // Usar el rango real que ya está aplicado por filtros Semana/Mes/Año + Este/Pasado
+  if (!this.dashboard) return;
+
+  const desde = this.dashboard.fechaDesde;
+  const hasta = this.dashboard.fechaHasta;
+
+  this.downloading = true;
+
+  this.svc.exportPeriodoAllCsv(desde, hasta).subscribe({
+    next: (resp) => {
+      const blob = resp.body as Blob;
+
+      // filename desde header si viene, si no fallback
+      const cd = resp.headers.get('content-disposition') ?? '';
+      const match = /filename="([^"]+)"/i.exec(cd);
+      const filename = match?.[1] ?? `asistencias_periodo_${desde}_${hasta}.csv`;
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      this.downloading = false;
+    },
+    error: () => {
+      this.downloading = false;
+    },
+  });
+}
+  // ===== Getters para template =====
+
   get cards() {
-    return this.vm?.cards ?? null;
+    return this.dashboard?.cards ?? null;
   }
 
   get estadoRows() {
-    return this.vm?.estadoActual ?? [];
+    return this.periodo?.items ?? [];
+  }
+
+  get countHoy(): number {
+    return this.periodo?.countHoy ?? this.dashboard?.countHoy ?? 0;
+  }
+  get countAnteriores(): number {
+    return this.periodo?.countAnteriores ?? this.dashboard?.countAnteriores ?? 0;
+  }
+  get countProximos(): number {
+    return this.periodo?.countProximos ?? this.dashboard?.countProximos ?? 0;
+  }
+
+  get estadoTotal(): number {
+    return this.periodo?.total ?? 0;
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.estadoTotal / this.pageSize));
+  }
+
+  get pageFrom(): number {
+    if (this.estadoTotal === 0) return 0;
+    return (this.page - 1) * this.pageSize + 1;
+  }
+
+  get pageTo(): number {
+    return Math.min(this.estadoTotal, this.page * this.pageSize);
   }
 }

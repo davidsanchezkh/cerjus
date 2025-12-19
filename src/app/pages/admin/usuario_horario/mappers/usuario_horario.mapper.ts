@@ -72,7 +72,8 @@ export function MapUsuarioHorarioListaOpciones(
     page: vm.page ?? 1,
     pageSize: vm.pageSize ?? 50,
     uh_us_ID: vm.usuarioId,
-    uh_estado: vm.estado,
+    uh_estado: vm.estado, // normalmente undefined si quieres TODO
+    incluirEliminados: vm.incluirEliminados ?? false,
   };
 }
 
