@@ -8,7 +8,7 @@ import {
   VMUsuarioUpdate,
   VMUsuarioUpdateForm,
 } from '../models/usuario.vm';
-import { ApiTipoUsuario } from '../models/usuario.api';
+import { ApiTipoUsuario  } from '../models/usuario.api';
 import { UsuarioService } from '../services/usuario.service';
 
 import {
@@ -36,6 +36,7 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
   private notify = inject(NotificacionesService);
   private pageMeta = inject(PageMetaService);
   private usuarioService = inject(UsuarioService);
+  resettingPass = false;
 
   usuario?: VMUsuarioDetalle;
   tipos: ApiTipoUsuario[] = [];
@@ -268,6 +269,87 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
     if ((v.rolId ?? null) !== (this.originalData.rolId ?? null)) return true;
     return false;
   }
+  async onResetContrasenaProvisional(ev: Event): Promise<void> {
+    ev.stopPropagation();
+
+    const id = this.usuario?.id ?? this.originalData?.id;
+    if (!id) {
+      await this.notify.ok({
+        variant: 'error',
+        title: 'Operación inválida',
+        message: 'No se encontró el ID del usuario.',
+        primaryText: 'Aceptar',
+      });
+      return;
+    }
+
+    // (Opcional) Bloquear reset si está eliminado (ya está en disabled del botón)
+    if (this.usuario?.estado === 0) {
+      await this.notify.ok({
+        variant: 'warning',
+        title: 'Acción no permitida',
+        message: 'No se puede generar contraseña provisional para un usuario eliminado.',
+        primaryText: 'Aceptar',
+      });
+      return;
+    }
+
+    const ok = await this.notify.confirm({
+      variant: 'warning',
+      title: 'Generar contraseña provisional',
+      message:
+        'Esto reemplazará la contraseña actual del usuario por una contraseña temporal.\n\n' +
+        'Comparta la contraseña temporal con el usuario para que ingrese y luego la cambie en "Mi contraseña".\n\n' +
+        '¿Desea continuar?',
+      confirmText: 'Generar',
+      cancelText: 'Cancelar',
+    });
+
+    if (!ok) return;
+
+    this.resettingPass = true;
+    try {
+      // length opcional: puede cambiarlo a 8, 10, 12, etc.
+      const resp = await this.usuarioService.resetContrasenaProvisional(id, 10);
+
+      const copy = await this.notify.confirm({
+        variant: 'info',
+        title: 'Contraseña provisional generada',
+        message:
+          `Contraseña provisional:\n${resp.provisional}\n\n` +
+          'Recomendación: Indique al usuario que la cambie apenas ingrese.',
+        confirmText: 'Copiar',
+        cancelText: 'Cerrar',
+      });
+
+      if (copy) {
+        try {
+          await navigator.clipboard.writeText(resp.provisional);
+          await this.notify.ok({
+            variant: 'success',
+            title: 'Copiado',
+            message: 'La contraseña provisional fue copiada al portapapeles.',
+            primaryText: 'Aceptar',
+          });
+        } catch {
+          // En algunos contextos el clipboard puede fallar (HTTP, permisos, etc.)
+          await this.notify.ok({
+            variant: 'warning',
+            title: 'No se pudo copiar automáticamente',
+            message:
+              'No se pudo copiar al portapapeles (por permisos del navegador).\n' +
+              'Copie manualmente la contraseña mostrada.',
+            primaryText: 'Aceptar',
+          });
+        }
+      }
+    } catch {
+      // El interceptor global debería mostrar el error (403/404/400/etc.)
+    } finally {
+      this.resettingPass = false;
+    }
+  }
+  
 }
 
 interface UsuarioDetalleForm {

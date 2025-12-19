@@ -52,3 +52,7 @@ export interface ApiTipoUsuario {
   tu_nombre: string;
   tu_nivel: number;
 }
+export interface ApiResetContrasenaProvisionalResponse {
+  us_ID: number;
+  provisional: string;
+}

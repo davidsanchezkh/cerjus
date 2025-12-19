@@ -5,7 +5,7 @@ import { map, Observable,firstValueFrom} from 'rxjs';
 import { API_URL } from '@app/app.token';
 
 import {VMUsuarioListaSimple,VMUsuarioListaOptions,VMUsuarioDetalle,VMPage,VMUsuarioUpdateForm,} from '../models/usuario.vm';
-import {ApiUsuarioListaSimple,ApiUsuarioPageSimple,ApiUsuarioDetalle,ApiTipoUsuario} from '../models/usuario.api';
+import {ApiUsuarioListaSimple,ApiUsuarioPageSimple,ApiUsuarioDetalle,ApiTipoUsuario,ApiResetContrasenaProvisionalResponse} from '../models/usuario.api';
 import {MapUsuarioListaItemVM,MapPageToVM,MapUsuarioListaOpciones,MapUsuarioDetalleVM,MapUsuarioUpdateParcial,} from '../mappers/usuario.mapper';
 import { DTOUsuarioListaOptions, DTOUsuarioUpdate } from '../models/usuario.dtos';
 import { toHttpParams } from '@app/components/utils/http.utils';
@@ -51,6 +51,18 @@ export class UsuarioService {
     );
     
   }
+  async resetContrasenaProvisional(id: number,length: number = 10,): Promise<{ us_ID: number; provisional: string }> {
+    const body = { length };
 
+    const resp = await firstValueFrom(
+      this.http.patch<ApiResetContrasenaProvisionalResponse>(
+        `${this.base}/${id}/contrasena-provisional`,
+        body,
+      ),
+    );
+
+    return { us_ID: resp.us_ID, provisional: resp.provisional };
+  }
+  
 }
 

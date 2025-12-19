@@ -19,6 +19,15 @@
             <button type="button" class="btn btn-secondary" (click)="onEdit($event)">
               Editar
             </button>
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              (click)="onResetContrasenaProvisional($event)"
+              [disabled]="resettingPass || usuario?.estado === 0"
+              title="Generar contraseña provisional"
+            >
+              Contraseña provisional
+            </button>
           </div>
           <span class="caret">{{ open ? '▴' : '▾' }}</span>
         </div>
