@@ -37,9 +37,9 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build Angular (prod)
+      - name: Build Angular (staging)
         run: |
-          npm run build -- --configuration production --base-href "/${REPO_NAME}/"
+          npm run build -- --configuration staging --base-href "/${REPO_NAME}/"
 
       - name: Locate publish directory (robusto)
         id: locate
