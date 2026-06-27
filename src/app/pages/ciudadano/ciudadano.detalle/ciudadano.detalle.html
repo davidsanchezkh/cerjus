@@ -64,7 +64,7 @@
           <!-- Sección: Domicilio -->
           <div class="row g-3">
             <div class="col-12">
-              <label class="form-label" for="cdf1campo5">Dirección</label>
+              <label class="form-label" for="cdf1campo5">Domicilio</label>
               <input type="text"
                 name="cdf1campo5" id="cdf1campo5"
                 formControlName="domicilio"
@@ -73,9 +73,42 @@
             </div>
           </div>
 
-          <div style="height: 1rem; "></div>
+          <div style="height: 1rem;"></div>
 
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label" for="cdf1campo5b">Dirección actual</label>
+              <input type="text"
+                name="cdf1campo5b" id="cdf1campo5b"
+                formControlName="direccionActual"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
+
+          <div style="height: 1rem;"></div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-5">
+              <label class="form-label" for="cdf1campo5c">Nacionalidad</label>
+              <input type="text"
+                name="cdf1campo5c" id="cdf1campo5c"
+                formControlName="nacionalidad"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+
+            <div class="col-12 col-md-7">
+              <label class="form-label" for="cdf1campo5d">Detalle de discapacidad</label>
+              <input type="text"
+                name="cdf1campo5d" id="cdf1campo5d"
+                formControlName="detalleDiscapacidad"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
           <!-- Sección: Datos complementarios -->
+           <div style="height: 1rem;"></div>
           <div class="row g-3">
             <div class="col-12 col-md-5">
               <label class="form-label" for="cdf1campo6">Ocupación</label>
@@ -102,7 +135,16 @@
                 [class.value-box-noedit]="!isEditing"/>
             </div>
           </div>
-
+          <div class="row g-3 mt-0 mt-md-3">
+            <div class="col-12 col-md-4">
+              <label class="form-label" for="cdf1campoFechaReg">Fecha registrada</label>
+              <input type="date"
+                name="cdf1campoFechaReg" id="cdf1campoFechaReg"
+                formControlName="fechaRegistrada"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"/>
+            </div>
+          </div>
           <div class="row g-3 mt-0 mt-md-3">
             <div class="col-12 col-md-6">
               <label class="form-label" for="cdf1campo9">Número de contacto</label>
@@ -154,7 +196,67 @@
               />
             </div>
           </div>
+          @if (canSeeControl) {
+          <div style="height: 1rem;"></div>
+
+          <hr class="my-3">
+
+          <div class="section-title">Información de registro</div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Registrado por</label>
+              <input type="text"
+                [value]="creadoPorNombre || '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">DNI</label>
+              <input type="text"
+                [value]="creadoPorDni || '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Fecha sistema</label>
+              <input type="text"
+                [value]="fechaCreadoPor ? (fechaCreadoPor | date:'yyyy-MM-dd HH:mm') : '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+          </div>
           
+          <div style="height: 1rem;"></div>
+
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Última actualización por</label>
+              <input type="text"
+                [value]="modificadoPorNombre || '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">DNI</label>
+              <input type="text"
+                [value]="modificadoPorDni || '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Fecha sistema</label>
+              <input type="text"
+                [value]="fechaModificadoPor ? (fechaModificadoPor | date:'yyyy-MM-dd HH:mm') : '—'"
+                class="value-box-noedit"
+                readonly>
+            </div>
+          </div>
+          }
           <div style="height: 1rem; "></div>
             <!-- Botones -->
           @if (isEditing) {

@@ -24,6 +24,7 @@ import {
   VMAsistenciaQuery,
 } from '@app/pages/asistencia.analiticas/models/asistencia.analiticas.vm';
 import { AsistenciasDashboardService } from '@app/pages/asistencia.analiticas/services/asistencia.analiticas.service';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 type ChartOptionsBar = {
   series: ApexAxisChartSeries;
@@ -47,6 +48,8 @@ type ChartOptionsBar = {
 export class AsistenciasDashboard implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private svc = inject(AsistenciasDashboardService);
+  private pageMeta = inject(PageMetaService);
+
   downloading = false;
   filtros = this.fb.group({
     kind: ['week' as AsistenciaPeriodKind],
@@ -86,6 +89,10 @@ export class AsistenciasDashboard implements OnInit, OnDestroy {
   pageSize = 10;
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Analíticas de asistencia',
+    });
+
     this.loadAll(true);
 
     this.sub = this.filtros.valueChanges
@@ -98,6 +105,7 @@ export class AsistenciasDashboard implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.pageMeta.clear();
   }
 
   private currentQuery(): VMAsistenciaQuery {

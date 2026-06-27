@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import {
   FormArray,
   FormBuilder,
@@ -20,6 +20,7 @@ import {
   VMHorarioBloqueForm,
 } from '../models/horario.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 type BloqueFormGroup = FormGroup<{
   dias: FormControl<DiaSemana[]>;
@@ -34,11 +35,12 @@ type BloqueFormGroup = FormGroup<{
   templateUrl: './horario.registrar.html',
   styleUrl: './horario.registrar.css',
 })
-export class HorarioRegistrar {
+export class HorarioRegistrar implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private service = inject(HorarioService);
   private notify = inject(NotificacionesService);
+  private pageMeta = inject(PageMetaService);
 
   diasSemana = DIAS_SEMANA;
 
@@ -64,7 +66,15 @@ export class HorarioRegistrar {
     // Bloque inicial por defecto
     this.addBloque();
   }
-
+  ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Registrar Nuevo Horario',
+      ruta: ['/horario'],
+    });
+  }
+  ngOnDestroy(): void {
+    this.pageMeta.clear();
+  }
   addBloque() {
     const grupo: BloqueFormGroup = this.fb.group({
       dias: new FormControl<DiaSemana[]>([], { nonNullable: true }),

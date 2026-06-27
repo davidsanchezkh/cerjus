@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -15,6 +15,7 @@ import { JustificacionService } from '../services/justificacion.service';
 
 import { VMAsistenciaJustificacionCreate } from '../models/justificacion.vm';
 import { ASISTENCIA_JUSTIFICACION_TIPO_OPCIONES, AsistenciaJustificacionTipo, tipoHelpText } from '../models/justificacion.dominio';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 const noInicialTipo: ValidatorFn = (c: AbstractControl) => (c.value === '' ? { placeholder: true } : null);
 
@@ -25,11 +26,12 @@ const noInicialTipo: ValidatorFn = (c: AbstractControl) => (c.value === '' ? { p
   templateUrl: './justificacion.registrar.html',
   styleUrl: './justificacion.registrar.css',
 })
-export class JustificacionRegistrar {
+export class JustificacionRegistrar implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private service = inject(JustificacionService);
   private notify = inject(NotificacionesService);
+  private pageMeta = inject(PageMetaService);
 
   readonly tipoOpciones = ASISTENCIA_JUSTIFICACION_TIPO_OPCIONES;
 
@@ -45,7 +47,15 @@ export class JustificacionRegistrar {
   get tipoHelp(): string {
     return tipoHelpText(this.form.get('tipo')!.value);
   }
-
+  ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Registrar Justificación',
+      ruta: ['/asistencia/justificacion/mis'],
+    });
+  }
+  ngOnDestroy(): void {
+    this.pageMeta.clear();
+  }
   private todayYmdPeru(): string {
     const dt = new Date();
     const fmt = new Intl.DateTimeFormat('en-CA', {
@@ -101,7 +111,7 @@ export class JustificacionRegistrar {
       });
 
       // Navegación sugerida: a “Mis justificaciones” (si aún no existe, cambie al destino que prefiera)
-      this.router.navigate(['/justificacion/mis']);
+      this.router.navigate(['/asistencia/justificacion/mis']);
     } catch {
       // Interceptor ya muestra el error del backend (title/message)
     } finally {
@@ -121,7 +131,7 @@ export class JustificacionRegistrar {
       if (!ok) return;
     }
     // Si prefiere, reemplazar por una ruta fija
-    this.router.navigate(['/justificacion/mis']);
+    this.router.navigate(['/asistencia/justificacion/mis']);
   }
 }
 

@@ -15,7 +15,7 @@ import { asistenciaanaliticasRoutes} from './pages/asistencia.analiticas/asisten
 import { justificacionRoutes} from './pages/justificacion/justificacion.routes'
 import { adminRoutes } from './pages/admin/admin.router'
 import { PaginaNoEncontradaComponent } from './components/paginanoencontrada/pagina';
-
+import { procesoRoutes } from './pages/proceso/proceso.routes';
 
 export const routes: Routes = [
     {path:'', component: Simple_layout,
@@ -36,6 +36,7 @@ export const routes: Routes = [
             ...cuentaRoutes,
             ...adminRoutes,
             ...justificacionRoutes,
+            ...procesoRoutes,
         ]
     },
     {path:'**', component: PaginaNoEncontradaComponent },

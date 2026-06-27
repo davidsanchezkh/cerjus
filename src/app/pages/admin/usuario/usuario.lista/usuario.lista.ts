@@ -88,22 +88,21 @@ export class UsuarioLista implements OnInit {
 
   /* Ciclo de vida */
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Lista de Usuarios',
+    });
+
     this.load();
 
     this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
-        
       )
       .subscribe(() => {
         this.page = 1;
         this.load();
-        
       });
-    this.pageMeta.replace({
-          titulo: `Lista de Usuarios`,
-    });  
   }
 
   /* Acciones */
@@ -245,4 +244,5 @@ export class UsuarioLista implements OnInit {
   trackById(_index: number, item: VMUsuarioListaSimple) {
     return item.id;
   }
+  
 }

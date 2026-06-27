@@ -12,24 +12,55 @@
           <th style="width: 4rem;">ID</th>
           <th>Resumen</th>
           <th style="width: 9rem;">Fecha</th>
-          <th style="width: 7rem;">Estado</th>
+          <th style="width: 9rem;">Lleva caso</th>
           <th style="width: 7rem;">Opciones</th>
         </tr>
 
         <!-- Filtros -->
         <tr class="filters-row" style="user-select: none;">
-          <th><input class="form-control form-control-sm no-spinner" formControlName="id" placeholder="ID" type="number" min="0" step="1" (wheel)="$event.preventDefault()" ></th>
-          <th><input class="form-control form-control-sm" formControlName="resumen" placeholder="Resumen"></th>
-          <th><input type="date" class="form-control form-control-sm" formControlName="fecha" placeholder="Fecha"></th>
           <th>
-            <select class="form-select form-select-sm" formControlName="estado">
+            <input
+              class="form-control form-control-sm no-spinner"
+              formControlName="id"
+              placeholder="ID"
+              type="number"
+              min="0"
+              step="1"
+              (wheel)="$event.preventDefault()">
+          </th>
+
+          <th>
+            <input
+              class="form-control form-control-sm"
+              formControlName="resumen"
+              placeholder="Resumen">
+          </th>
+
+          <th>
+            <input
+              type="date"
+              class="form-control form-control-sm"
+              formControlName="fecha"
+              placeholder="Fecha">
+          </th>
+
+          <th>
+            <select class="form-select form-select-sm" formControlName="llevaCaso">
               <option value="">Todos</option>
-              @for (opt of estadoOpciones; track opt.value) {
+              @for (opt of llevaCasoOpciones; track opt.value) {
                 <option [value]="opt.value">{{ opt.label }}</option>
               }
             </select>
           </th>
-          <th><button type="button" class="btn btn-sm btn-outline-secondary" (click)="clear()">Limpiar</button></th>
+
+          <th>
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-secondary"
+              (click)="clear()">
+              Limpiar
+            </button>
+          </th>
         </tr>
       </thead>
 
@@ -38,11 +69,21 @@
         @if (firstLoad) {
           @for (_ of skeletonRows; track $index) {
             <tr class="tbody-skeleton">
-              <td style="width: 4rem;"><div class="sk-wrap"><div class="sk-cell sk-id"></div></div></td>
-              <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
-              <td style="width: 9rem;"><div class="sk-wrap"><div class="sk-cell sk-date"></div></div></td>
-              <td style="width: 7rem;"><div class="sk-wrap"><div class="sk-cell sk-badge"></div></div></td>
-              <td style="width: 7rem;"><div class="sk-wrap"><div class="sk-cell sk-btn"></div></div></td>
+              <td style="width: 4rem;">
+                <div class="sk-wrap"><div class="sk-cell sk-id"></div></div>
+              </td>
+              <td>
+                <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
+              </td>
+              <td style="width: 9rem;">
+                <div class="sk-wrap"><div class="sk-cell sk-date"></div></div>
+              </td>
+              <td style="width: 9rem;">
+                <div class="sk-wrap"><div class="sk-cell sk-badge"></div></div>
+              </td>
+              <td style="width: 7rem;">
+                <div class="sk-wrap"><div class="sk-cell sk-btn"></div></div>
+              </td>
             </tr>
           }
         } @else {
@@ -50,11 +91,15 @@
             @for (c of items; track c.id) {
               <tr>
                 <td style="width: 4rem;">{{ c.id }}</td>
-                <td>{{ c.resumen }}</td>
+                <td>{{ c.resumen || '—' }}</td>
                 <td style="width: 9rem;">{{ c.fecha_formato }}</td>
-                <td style="width: 7rem;">{{ c.estadotexto }}</td>
+                <td style="width: 9rem;">{{ c.llevaCasoTexto }}</td>
                 <td style="width: 7rem;">
-                  <a class="btn btn-sm btn-outline-primary" [routerLink]="['/consulta', c.id]">Ver</a>
+                  <a
+                    class="btn btn-sm btn-outline-primary"
+                    [routerLink]="['/ciudadano', idciudadano, 'consulta', c.id]">
+                    Ver
+                  </a>
                 </td>
               </tr>
             }
@@ -96,10 +141,21 @@
 
   <ul class="pagination m-0" style="user-select: none;">
     <li class="page-item" [class.disabled]="page === 1 || loading">
-      <button class="page-link" (click)="goTo(page - 1)" [disabled]="page === 1 || loading">Anterior</button>
+      <button
+        class="page-link"
+        (click)="goTo(page - 1)"
+        [disabled]="page === 1 || loading">
+        Anterior
+      </button>
     </li>
+
     <li class="page-item" [class.disabled]="page >= lastPage || loading">
-      <button class="page-link" (click)="goTo(page + 1)" [disabled]="page >= lastPage || loading">Siguiente</button>
+      <button
+        class="page-link"
+        (click)="goTo(page + 1)"
+        [disabled]="page >= lastPage || loading">
+        Siguiente
+      </button>
     </li>
   </ul>
 </div>

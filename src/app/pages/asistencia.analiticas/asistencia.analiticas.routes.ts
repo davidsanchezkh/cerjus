@@ -5,7 +5,7 @@ import { PaginaNoEncontradaComponent } from '../../components/paginanoencontrada
 
 export const asistenciaanaliticasRoutes: Routes = [
   {
-    path: 'controlususario',
+    path: 'controlusuario',
     canMatch: [accessGuardMatch],
     children: [
       { path:'', component: AsistenciasDashboard, data: { minLevel: 2 }, pathMatch: 'full' },

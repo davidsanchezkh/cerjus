@@ -1,0 +1,151 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <a class="btn btn-primary" routerLink="/consulta/registrar">Registrar consulta</a>
+</div>
+
+<div [formGroup]="form" class="card card--flat">
+  <div class="card-body p-0 tabla-wrap"
+       [class.is-loading]="loading"
+       [class.skeleton-mode]="firstLoad || (loading && items.length === 0)"
+       [style.minHeight.px]="listMinHeight"
+       [style.--thead-h.px]="headerBlockPx"
+       style="position: relative;">
+
+    <table class="table table-striped table-hover m-0">
+      <thead class="table-light">
+        <tr>
+            <th style="width: 8rem;">ID</th>
+            <th style="width: 10rem;">DNI</th>
+            <th>Materia</th>
+            <th style="width: 11rem;">Fecha</th>
+            <th style="width: 10rem;">Lleva caso</th>
+            <th style="width: 10rem;">Opciones</th>
+        </tr>
+
+        <tr class="filters-row" style="user-select: none;">
+            <th>
+                <input class="form-control form-control-sm no-spinner"
+                formControlName="id"
+                placeholder="ID"
+                type="number"
+                min="0"
+                step="1"
+                (wheel)="$event.preventDefault()">
+            </th>
+
+            <th>
+                <input class="form-control form-control-sm" formControlName="dni" placeholder="DNI">
+            </th>
+
+            <th>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" formControlName="materias">
+                    <option value="">Todas</option>
+                    @for (opt of materiaOpciones; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                    </select>
+
+                    <input
+                    class="form-control form-control-sm"
+                    formControlName="materiaOtros"
+                    placeholder="Especifique">
+                </div>
+            </th>
+
+            <th></th>
+
+            <th>
+                <select class="form-select form-select-sm" formControlName="llevaCaso">
+                <option value="">Todos</option>
+                @for (opt of llevaCasoOpciones; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                }
+                </select>
+            </th>
+
+            <th>
+                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="clear()">Limpiar</button>
+            </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (firstLoad) {
+          @for (_ of skeletonRows; track $index) {
+                <tr class="tbody-skeleton">
+                    <td style="width: 8rem;"><div class="sk-wrap"><div class="sk-cell sk-id"></div></div></td>
+                    <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+                    <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+                    <td style="width: 11rem;"><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+                    <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+                    <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-btn"></div></div></td>
+                </tr>
+          }
+        } @else {
+          @if (items.length > 0) {
+            @for (c of items; track c.id) {
+                <tr>
+                    <td style="width: 8rem;">{{ c.id }}</td>
+                    <td style="width: 10rem;">{{ c.dni || '—' }}</td>
+                    <td>{{ c.materiaTexto }}</td>
+                    <td style="width: 11rem;">{{ c.fecha_formato }}</td>
+                    <td style="width: 10rem;">{{ c.llevaCasoTexto }}</td>
+                    <td style="width: 10rem;">
+                        <a class="btn btn-sm btn-outline-primary" [routerLink]="['/consulta', c.id]">Ver</a>
+                    </td>
+                </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+
+    @if (showEmpty && !loading) {
+      <div class="empty-overlay">
+        <div class="text-center text-muted estado-vacio fullheight">
+          No se encontraron resultados.
+        </div>
+      </div>
+    }
+
+    @if (showOverlay && items.length > 0) {
+      <div class="loading-overlay d-flex align-items-center justify-content-center">
+        Cargando…
+      </div>
+    }
+  </div>
+</div>
+
+<div class="d-flex align-items-center justify-content-between mt-3 pager-wrap"
+     [class.is-loading]="loading"
+     [style.--range-min.ch]="rangeReserveCh"
+     [style.--total-min.ch]="totalReserveCh"
+     style="user-select: none;">
+  <div class="text-muted small">
+    Página
+    <span class="num-range">{{ shownPage }}</span>
+    de
+    <span class="num-range">{{ shownLastPage }}</span>
+    —
+    Mostrando
+    <span class="num-range">
+      @if (shownFrom > 0) { {{ shownFrom }}&ndash;{{ shownTo }} } @else { 0 }
+    </span>
+    de
+    <span class="total-num">{{ shownTotal }}</span>
+  </div>
+
+  <ul class="pagination m-0" style="user-select: none;">
+    <li class="page-item" [class.disabled]="page === 1 || loading">
+      <button class="page-link" (click)="goTo(page - 1)" [disabled]="page === 1 || loading">
+        Anterior
+      </button>
+    </li>
+
+    <li class="page-item" [class.disabled]="page >= lastPage || loading">
+      <button class="page-link" (click)="goTo(page + 1)" [disabled]="page >= lastPage || loading">
+        Siguiente
+      </button>
+    </li>
+  </ul>
+</div>

@@ -19,14 +19,14 @@
           <span class="caret">{{ open ? "▴" : "▾" }}</span>
         </div>
 
-        <!-- Cuerpo (colapsable, NO destructivo) -->
+        <!-- Cuerpo -->
         <form class="card-body selectable-fix"
           [formGroup]="form"
           id="form1"
           name="form1"
           [hidden]="!open">
 
-          <!-- Sección: Datos principales -->
+          <!-- Resumen -->
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Resumen</label>
@@ -40,7 +40,7 @@
 
           <div style="height: 1rem;"></div>
 
-          <!-- Sección: Hechos -->
+          <!-- Hechos -->
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Hechos</label>
@@ -54,7 +54,7 @@
 
           <div style="height: 1rem;"></div>
 
-          <!-- Sección: Materia -->
+          <!-- Materia -->
           <div class="row g-3">
             <div class="col-12 col-md-6">
               <label class="form-label">Materia</label>
@@ -77,31 +77,45 @@
                 formControlName="materiaOtros"
                 placeholder="Especifique la materia"
                 class="form-control w-100"
-                [readonly]="!isOtros || !isEditing"                
+                [readonly]="!isOtros || !isEditing"
                 [attr.tabindex]="(!isOtros || !isEditing) ? -1 : 0"
-                [class.value-box-edit]="isOtros && isEditing"      
-                [class.value-box-noedit]="!(isOtros && isEditing)" 
+                [class.value-box-edit]="isOtros && isEditing"
+                [class.value-box-noedit]="!(isOtros && isEditing)"
               />
             </div>
           </div>
+
           <div style="height: 1rem;"></div>
-          
-          <!--Sección: Estado-->
-          <div class="row g-3">
+
+          <!-- Lleva caso / Fecha registrada -->
+          <div class="row g-3 align-items-end">
             <div class="col-12 col-md-6">
-              <label class="form-label">Estado</label>
-              <select class="form-select"  formControlName="estado" 
+              <label class="form-label">¿Lleva el caso con nosotros?</label>
+              <select class="form-select"
+                formControlName="llevaCaso"
                 [class.value-box-edit]="isEditing"
                 [class.value-box-noedit]="!isEditing">
-                @for (opt of estadoOpciones; track opt.value) {
+                @for (opt of llevaCasoOpciones; track opt.value) {
                   <option [value]="opt.value">{{ opt.label }}</option>
                 }
               </select>
             </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label" for="coFechaRegistrada">Fecha registrada</label>
+              <input
+                type="date"
+                id="coFechaRegistrada"
+                class="form-control"
+                formControlName="fechaRegistrada"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing">
+            </div>
           </div>
+
           <div style="height: 1rem;"></div>
 
-          <!-- Sección: Absolución -->
+          <!-- Absolución -->
           <div class="row g-3">
             <div class="col-12">
               <label class="form-label">Absolución</label>
@@ -112,6 +126,82 @@
                 [class.value-box-noedit]="!isEditing"></textarea>
             </div>
           </div>
+
+          <div style="height: 1rem;"></div>
+
+          <!-- Observaciones -->
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Observaciones</label>
+              <textarea formControlName="observaciones"
+                rows="2"
+                maxlength="600"
+                [class.value-box-edit]="isEditing"
+                [class.value-box-noedit]="!isEditing"></textarea>
+            </div>
+          </div>
+
+          @if (canSeeControl) {
+            <div style="height: 1rem;"></div>
+
+            <hr class="my-3">
+
+            <div class="section-title">Información de registro</div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Registrado por</label>
+                <input type="text"
+                  [value]="creadoPorNombre || '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label class="form-label">DNI</label>
+                <input type="text"
+                  [value]="creadoPorDni || '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label class="form-label">Fecha sistema</label>
+                <input type="text"
+                  [value]="fechaCreadoPor ? (fechaCreadoPor | date:'yyyy-MM-dd HH:mm') : '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+            </div>
+
+            <div style="height: 1rem;"></div>
+
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label">Última actualización por</label>
+                <input type="text"
+                  [value]="modificadoPorNombre || '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label class="form-label">DNI</label>
+                <input type="text"
+                  [value]="modificadoPorDni || '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+
+              <div class="col-12 col-md-3">
+                <label class="form-label">Fecha sistema</label>
+                <input type="text"
+                  [value]="fechaModificadoPor ? (fechaModificadoPor | date:'yyyy-MM-dd HH:mm') : '—'"
+                  class="value-box-noedit"
+                  readonly>
+              </div>
+            </div>
+          }
 
           <div style="height: 1rem;"></div>
 
@@ -133,7 +223,6 @@
     <!-- PANEL 2: Seguimiento -->
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm">
-        <!-- Encabezado colapsable -->
         <div
           class="card-header d-flex justify-content-between align-items-center selectable-fix"
           (click)="open2 = !open2"
@@ -147,9 +236,7 @@
           <span class="caret">{{ open2 ? "▴" : "▾" }}</span>
         </div>
 
-        <!-- Contenido (persistente, NO destructivo) -->
         <div class="card-body p-0 no-fouc" [hidden]="!open2">
-          <!-- El child se instancia desde el inicio y carga con el @Input -->
           <app-seguimiento-lista-consulta [idconsulta]="idconsulta"></app-seguimiento-lista-consulta>
         </div>
       </div>

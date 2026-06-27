@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -6,6 +6,8 @@ import { AsistenciaService } from '../services/asistencia.service';
 import { VMAsistenciaListaSimple } from '../models/asistencia.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
 import { Router } from '@angular/router';
+import { PageMetaService } from '@/app/services/page_meta.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-asistencia-lista',
@@ -14,12 +16,12 @@ import { Router } from '@angular/router';
   templateUrl: './asistencia.lista.html',
   styleUrl: './asistencia.lista.css'
 })
-export class AsistenciaLista implements OnInit {
+export class AsistenciaLista implements OnInit, OnDestroy {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private service = inject(AsistenciaService);
   private notify = inject(NotificacionesService);
-
+  private pageMeta = inject(PageMetaService);
   // Form de filtros (si luego agregas campos, se activará el valueChanges)
   form = this.fb.group({});
 
@@ -55,11 +57,12 @@ export class AsistenciaLista implements OnInit {
   private overlayShownAt = 0;
   private firstPaintStart = 0;
 
+  private subForm?: Subscription;
   private readonly overlayDelay = 180;
   private readonly minOverlayMs = 220;
   private readonly emptyDelay = 220;
   private readonly firstSkeletonMinMs = 200;
-
+ 
   // Layout helpers
   headerBlockPx = 96;
   get listMinHeight(): number { return this.headerBlockPx + 9 * 48; }
@@ -71,10 +74,13 @@ export class AsistenciaLista implements OnInit {
   totalReserveCh = 7;
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Asistencia',
+    });
+
     this.load();
 
-    // Si en el futuro agregas filtros, quita el comentario a this.load()
-    this.form.valueChanges
+    this.subForm = this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
@@ -84,7 +90,11 @@ export class AsistenciaLista implements OnInit {
         // this.load();
       });
   }
-
+  ngOnDestroy(): void {
+    this.subForm?.unsubscribe();
+    this.cancelTimers();
+    this.pageMeta.clear();
+  }
   clear() {
     this.form.reset({});
     this.page = 1;
@@ -261,7 +271,7 @@ export class AsistenciaLista implements OnInit {
   get lastPageCalc(): number {
     return this.lastPage;
   }
-  goJustificaciones() {
-    this.router.navigate(['/justificacion/mis']);
+  goJustificaciones(): void {
+    this.router.navigate(['/asistencia/justificacion/mis']);
   }
 }

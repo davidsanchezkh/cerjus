@@ -1,0 +1,230 @@
+/* =========================
+   Estilos ordenados A–Z
+   ========================= */
+
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.card--flat {
+  background: transparent;
+}
+
+.empty-message {
+  font-size: .95rem;
+  text-align: center;
+}
+
+.empty-overlay {
+  align-items: center;
+  display: flex;
+  inset: var(--thead-h) 0 0 0;
+  justify-content: center;
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity .18s ease;
+}
+
+html,
+body {
+  scrollbar-gutter: stable both-edges;
+}
+
+input[type="number"].no-spinner::-webkit-inner-spin-button,
+input[type="number"].no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.is-loading .table-hover tbody tr:hover {
+  background-color: inherit;
+}
+
+.loading-overlay {
+  backdrop-filter: blur(1px);
+  background: rgba(255,255,255,0.6);
+  font-weight: 600;
+  inset: 0;
+  position: absolute;
+}
+
+.pager-wrap {
+  min-height: 2rem;
+  padding: 0 1rem .5rem;
+}
+
+.pager-wrap.invisible {
+  min-height: 40px;
+  visibility: hidden;
+}
+
+.pager-wrap .num-range,
+.pager-wrap .total-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  min-width: 9ch;
+  text-align: right;
+  transition: opacity .15s ease;
+}
+
+.pager-wrap.is-loading .num-range,
+.pager-wrap.is-loading .total-num {
+  opacity: .75;
+}
+
+.prewrap {
+  white-space: pre-wrap;
+}
+
+.proceso-card {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.proceso-scroll-body {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none;
+  width: 100%;
+}
+
+.proceso-scroll-body::-webkit-scrollbar {
+  display: none;
+}
+
+.proceso-scroll-spacer {
+  height: 1px;
+  min-width: var(--proceso-table-w);
+  width: var(--proceso-table-w);
+}
+
+.proceso-scroll-top {
+  display: block;
+  height: 16px;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+}
+
+.proceso-table {
+  min-width: var(--proceso-table-w);
+  table-layout: fixed;
+  white-space: nowrap;
+  width: var(--proceso-table-w);
+}
+/*Modificar en caso de agrandar*/
+.proceso-table-shell {
+  --proceso-table-w: 148rem;
+
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.sk-badge {
+  height: .85rem;
+  width: 70%;
+}
+
+.sk-btn {
+  border-radius: .375rem;
+  height: 1.4rem;
+  width: 60%;
+}
+
+.sk-cell {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: .25rem;
+  height: .9rem;
+}
+
+.sk-date {
+  height: .85rem;
+  width: 80%;
+}
+
+.sk-id {
+  width: 2.5rem;
+}
+
+.sk-text {
+  width: 60%;
+}
+
+.sk-wrap {
+  align-items: center;
+  display: flex;
+  height: var(--row-h);
+  padding: 0;
+  width: 100%;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.tabla-wrap {
+  --cell-px: var(--bs-table-cell-padding-x, .75rem);
+  --row-h: 30.7px;
+  --thead-h: 96px;
+
+  contain: paint;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.table > :not(caption) > * > td,
+.table > :not(caption) > * > th {
+  height: var(--row-h);
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  vertical-align: middle;
+}
+
+td,
+th {
+  height: var(--row-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.tbody-skeleton {
+  background: transparent !important;
+  height: var(--row-h);
+}
+
+.table-striped tbody tr.tbody-skeleton:nth-of-type(even),
+.table-striped tbody tr.tbody-skeleton:nth-of-type(odd) {
+  --bs-table-accent-bg: transparent;
+  background-color: transparent !important;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: 0 0;
+  }
+}

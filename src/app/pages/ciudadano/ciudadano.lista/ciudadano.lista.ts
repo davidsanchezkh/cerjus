@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, OnDestroy} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder,FormControl} from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -6,6 +6,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CiudadanoService } from '../services/ciudadano.service';
 import { VMCiudadanoListaSimple } from '../models/ciudadano.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { Subscription } from 'rxjs';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-ciudadano-lista',
@@ -13,12 +15,13 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   templateUrl: './ciudadano.lista.html',
   styleUrl: './ciudadano.lista.css'
 })
-export class CiudadanoLista implements OnInit {
+export class CiudadanoLista implements OnInit, OnDestroy {
   /* Inyección */
   private fb = inject(FormBuilder);
   private service = inject(CiudadanoService);
   private notify = inject(NotificacionesService);
-  
+  private pageMeta = inject(PageMetaService);
+  private subForm?: Subscription;
   /* Formulario de búsqueda */
   form = this.fb.group({
     id: [null],
@@ -26,7 +29,8 @@ export class CiudadanoLista implements OnInit {
     apellidoPaterno: [''],
     apellidoMaterno: [''],
     nombres: [''],
-  });
+    nacionalidad: [''],
+  })
 
   /* Estado de datos / UI visibles */
   items: VMCiudadanoListaSimple[] = [];
@@ -85,10 +89,13 @@ export class CiudadanoLista implements OnInit {
 
   /* Ciclo de vida */
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Lista de Ciudadanos',
+    });
+
     this.load();
 
-    // Refiltrar dinámicamente
-    this.form.valueChanges
+    this.subForm = this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b))
@@ -98,7 +105,11 @@ export class CiudadanoLista implements OnInit {
         this.load();
       });
   }
-
+  ngOnDestroy(): void {
+    this.subForm?.unsubscribe();
+    this.cancelTimers();
+    this.pageMeta.clear();
+  }
   /* Acciones */
   clear() {
     this.form.reset({
@@ -106,7 +117,8 @@ export class CiudadanoLista implements OnInit {
       dni: '',
       apellidoPaterno: '',
       apellidoMaterno: '',
-      nombres: ''
+      nombres: '',
+      nacionalidad: '',
     });
     this.page = 1;
     this.load();
@@ -156,6 +168,7 @@ export class CiudadanoLista implements OnInit {
       apellidoPaterno: v.apellidoPaterno || undefined,
       apellidoMaterno: v.apellidoMaterno || undefined,
       nombres: v.nombres || undefined,
+      nacionalidad: v.nacionalidad || undefined,
     })
     .subscribe({
       next: (res) => {

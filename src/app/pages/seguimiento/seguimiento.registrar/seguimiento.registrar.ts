@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,8 +6,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { VMSeguimientoCreate } from '../models/seguimiento.vm';
 import { SeguimientoService } from '../services/seguimiento.service';
 
-// Notificaciones centralizadas (loading/errores vía interceptor; aquí sólo éxito/guards)
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-seguimiento-registrar',
@@ -16,12 +16,13 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   templateUrl: './seguimiento.registrar.html',
   styleUrl: './seguimiento.registrar.css'
 })
-export class SeguimientoRegistar {
+export class SeguimientoRegistar implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private service = inject(SeguimientoService);
   private notify = inject(NotificacionesService);
+  private pageMeta = inject(PageMetaService);
 
   submitting = false;
 
@@ -30,40 +31,69 @@ export class SeguimientoRegistar {
     cuerposeguimiento: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
   });
 
-  ngOnInit() {
-    // Pre-cargar el id de la consulta desde la ruta
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!isNaN(id) && id > 0) {
-      this.form.patchValue({ idconsulta: id });
+  ngOnInit(): void {
+    const idconsulta = Number(
+      this.route.snapshot.paramMap.get('idconsulta') ??
+      this.route.snapshot.paramMap.get('id')
+    );
+
+    if (!isNaN(idconsulta) && idconsulta > 0) {
+      this.form.patchValue({ idconsulta });
     }
+
+    this.pageMeta.replace({
+      titulo: 'Registrar Seguimiento',
+      ruta: this.backRoute(),
+    });
   }
 
-  /** Guard en cliente simple: ambos campos son obligatorios */
+  ngOnDestroy(): void {
+    this.pageMeta.clear();
+  }
+
+  private backRoute(): any[] {
+    const idciudadano = Number(this.route.snapshot.paramMap.get('idciudadano'));
+
+    const idconsulta = Number(
+      this.route.snapshot.paramMap.get('idconsulta') ??
+      this.route.snapshot.paramMap.get('id')
+    );
+
+    if (!isNaN(idciudadano) && idciudadano > 0 && !isNaN(idconsulta) && idconsulta > 0) {
+      return ['/ciudadano', idciudadano, 'consulta', idconsulta];
+    }
+
+    if (!isNaN(idconsulta) && idconsulta > 0) {
+      return ['/consulta', idconsulta];
+    }
+
+    return ['/consulta'];
+  }
+
   private hasClientErrors(): boolean {
     return this.form.invalid;
   }
 
   async onSubmit() {
-    // 1) Validación local (evita mandar “basura” y mostrar 400 del backend)
     if (this.hasClientErrors()) {
       this.form.markAllAsTouched();
+
       await this.notify.ok({
         variant: 'warning',
         title: 'Datos incompletos',
         message: 'Revisa los campos obligatorios e inténtalo nuevamente.',
         primaryText: 'Aceptar'
       });
+
       return;
     }
 
     this.submitting = true;
 
     try {
-      // 2) Envío (timeouts/red/5xx/400: los maneja el interceptor con title/message del backend)
       const vm: VMSeguimientoCreate = this.form.getRawValue();
       await this.service.create(vm);
 
-      // 3) Éxito: OK bloqueante y navegar
       await this.notify.ok({
         variant: 'success',
         title: 'Seguimiento registrado',
@@ -73,7 +103,7 @@ export class SeguimientoRegistar {
 
       this.navergar();
     } catch {
-      // Nada aquí: el interceptor ya mostró el diálogo de error adecuado
+      // El interceptor ya mostró el error.
     } finally {
       this.submitting = false;
     }
@@ -88,18 +118,15 @@ export class SeguimientoRegistar {
         confirmText: 'Descartar',
         cancelText: 'Seguir aquí'
       });
+
       if (!ok) return;
     }
+
     this.navergar();
   }
 
-  private navergar() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!isNaN(id)) {
-      this.router.navigate(['/consulta', id]); // vuelve al detalle de la consulta
-    } else {
-      this.router.navigate(['/seguimiento']);  // fallback
-    }
+  private navergar(): void {
+    this.router.navigate(this.backRoute());
   }
 }
 

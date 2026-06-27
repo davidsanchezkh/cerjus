@@ -1,5 +1,5 @@
 // src/app/features/horario/horario.lista/horario.lista.ts
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -8,6 +8,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { HorarioService } from '../services/horario.service';
 import { VMHorarioListaSimple } from '../models/horario.vm';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { Subscription } from 'rxjs';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-horario-lista',
@@ -16,10 +18,12 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   templateUrl: './horario.lista.html',
   styleUrl: './horario.lista.css',
 })
-export class HorarioLista implements OnInit {
+export class HorarioLista implements OnInit, OnDestroy  {
   private fb = inject(FormBuilder);
   private service = inject(HorarioService);
   private notify = inject(NotificacionesService);
+  private pageMeta = inject(PageMetaService);
+  private subForm?: Subscription;
 
   form = this.fb.group({
     id: [null],
@@ -87,9 +91,13 @@ export class HorarioLista implements OnInit {
   totalReserveCh = 7;
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Lista de Horarios',
+    });
+
     this.load();
 
-    this.form.valueChanges
+    this.subForm = this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
@@ -99,7 +107,11 @@ export class HorarioLista implements OnInit {
         this.load();
       });
   }
-
+  ngOnDestroy(): void {
+    this.subForm?.unsubscribe();
+    this.cancelTimers();
+    this.pageMeta.clear();
+  }
   clear() {
     this.form.reset({
       id: null,

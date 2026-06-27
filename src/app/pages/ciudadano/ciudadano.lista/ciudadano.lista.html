@@ -18,6 +18,7 @@
           <th>Apellido paterno</th>
           <th>Apellido materno</th>
           <th>Nombres</th>
+          <th style="width: 10rem;">Nacionalidad</th>
           <th style="width: 10rem;">Opciones</th>
         </tr>
 
@@ -28,6 +29,7 @@
           <th><input class="form-control form-control-sm" formControlName="apellidoPaterno" placeholder="Apellido paterno"></th>
           <th><input class="form-control form-control-sm" formControlName="apellidoMaterno" placeholder="Apellido materno"></th>
           <th><input class="form-control form-control-sm" formControlName="nombres" placeholder="Nombres"></th>
+          <th><input class="form-control form-control-sm" formControlName="nacionalidad" placeholder="Nacionalidad"></th>
           <th><button type="button" class="btn btn-sm btn-outline-secondary" (click)="clear()">Limpiar</button></th>
         </tr>
       </thead>
@@ -42,6 +44,7 @@
               <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
               <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
               <td><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
+              <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-text"></div></div></td>
               <td style="width: 10rem;"><div class="sk-wrap"><div class="sk-cell sk-btn"></div></div></td>
             </tr>
           }
@@ -55,6 +58,7 @@
                 <td>{{ c.apellidoPaterno }}</td>
                 <td>{{ c.apellidoMaterno }}</td>
                 <td>{{ c.nombres }}</td>
+                <td style="width: 10rem;">{{ c.nacionalidad || '—' }}</td>
                 <td style="width: 10rem;">
                   <a class="btn btn-sm btn-outline-primary" [routerLink]="['/ciudadano', c.id]">Ver</a>
                 </td>

@@ -1,0 +1,138 @@
+.card--flat {
+  background: transparent;
+  border: 1;
+  border-radius: 0;
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+}
+
+.tabla-wrap {
+  contain: paint;
+  overflow: auto;
+  position: relative;
+
+  --row-h: 30.7px;
+  --thead-h: 40px;
+  --cell-px: var(--bs-table-cell-padding-x, .75rem);
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+td,
+th {
+  height: var(--row-h);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.table > :not(caption) > * > td,
+.table > :not(caption) > * > th {
+  height: var(--row-h);
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  vertical-align: middle;
+}
+
+.tbody-skeleton {
+  background: transparent !important;
+  height: var(--row-h);
+}
+
+.table-striped tbody tr.tbody-skeleton:nth-of-type(odd),
+.table-striped tbody tr.tbody-skeleton:nth-of-type(even) {
+  --bs-table-accent-bg: transparent;
+  background-color: transparent !important;
+}
+
+.sk-wrap {
+  align-items: center;
+  display: flex;
+  height: var(--row-h);
+  padding: 0;
+  width: 100%;
+}
+
+.sk-cell {
+  animation: shimmer 1.4s ease-in-out infinite;
+  background: linear-gradient(90deg, #e7ebee 25%, #dfe4e8 37%, #e7ebee 63%);
+  background-size: 400% 100%;
+  border-radius: .25rem;
+  height: .9rem;
+}
+
+.sk-id { width: 2.5rem; }
+.sk-text { width: 60%; }
+.sk-date { width: 80%; height: .85rem; }
+.sk-badge { width: 70%; height: .85rem; }
+.sk-btn { width: 80%; height: 1.4rem; border-radius: .375rem; }
+
+.empty-overlay {
+  align-items: center;
+  display: flex;
+  inset: var(--thead-h) 0 0 0;
+  justify-content: center;
+  opacity: 1;
+  pointer-events: none;
+  position: absolute;
+  transition: opacity .18s ease;
+}
+
+.loading-overlay {
+  backdrop-filter: blur(1px);
+  background: rgba(255,255,255,0.6);
+  font-weight: 600;
+  inset: 0;
+  position: absolute;
+}
+
+.pager-wrap {
+  border-bottom: 1px solid var(--bs-border-color, #dee2e6);
+  min-height: 2rem;
+  padding: 0 1rem .5rem;
+}
+
+.pager-wrap .num-range,
+.pager-wrap .total-num {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  min-width: 9ch;
+  text-align: right;
+  transition: opacity .15s ease;
+}
+
+.pager-wrap.is-loading .num-range,
+.pager-wrap.is-loading .total-num {
+  opacity: .75;
+}
+
+.consulta-seleccionada > td {
+  background-color: rgba(25, 135, 84, 0.12) !important;
+  border-bottom: 1px solid rgba(25, 135, 84, 0.35);
+  border-top: 1px solid rgba(25, 135, 84, 0.35);
+}
+
+.consulta-seleccionada:hover > td {
+  background-color: rgba(25, 135, 84, 0.18) !important;
+}
+
+.form-control.ng-invalid.ng-touched {
+  border-color: #dc3545;
+  box-shadow: none;
+}
+
+.was-validated .form-control.ng-invalid {
+  border-color: #dc3545;
+  box-shadow: none;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0% 0; }
+}
+.consulta-help-text {
+  min-height: 1.25rem;
+}

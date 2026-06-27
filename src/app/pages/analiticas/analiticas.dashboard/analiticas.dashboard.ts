@@ -33,6 +33,7 @@ import {
 import { Subscription, forkJoin } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import html2canvas from 'html2canvas'; // npm i html2canvas
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 type ChartOptionsBar = {
   series: ApexAxisChartSeries;
@@ -78,7 +79,7 @@ type ChartOptionsDonut = {
 export class AnaliticasDashboard implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private svc = inject(AnaliticasService);
-
+  private pageMeta = inject(PageMetaService);
   // ====== filtros ======
   filtros = this.fb.group({
     kind: ['month' as PeriodKind],
@@ -220,6 +221,9 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
   private sub?: Subscription;
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Analíticas',
+    });
     // Cargamos meta + dimensiones + datos iniciales
     this.loadEtlStatus();
     this.loadDims();
@@ -237,6 +241,7 @@ export class AnaliticasDashboard implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.cancelTimers();
+    this.pageMeta.clear();
   }
 
   // =======================

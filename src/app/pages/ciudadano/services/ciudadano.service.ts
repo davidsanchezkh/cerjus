@@ -5,9 +5,11 @@ import { API_URL } from '../../../app.token'; // su token ya existente
 import {firstValueFrom} from 'rxjs';
 
 import { DTOCiudadanoCreate,DTOCiudadanoListaOptions, DTOCiudadanoUpdate } from '../models/ciudadano.dtos';
-import { ApiCiudadanoListaSimple, ApiCiudadanoPageSimple,ApiCiudadanoDetalleSimple } from '../models/ciudadano.api';
-import { VMPage, VMCiudadanoListaSimple,VMCiudadanoListaOptions,VMCiudadanoCreate,VMCiudadanoDetalleSimple, VMCiudadanoUpdate } from '../models/ciudadano.vm';
-import { MapCiudadanoListaItemVM, MapPageToVM,MapCiudadanoListaOpciones,MapCiudadanoCreate,MapCiudadanoDetalleListaSimple, MapCiudadanoUpdateParcial } from '../mappers/ciudadano.mapper';
+import { ApiCiudadanoListaSimple, ApiCiudadanoPageSimple,ApiCiudadanoDetalleSimple,ApiCiudadanoControl } from '../models/ciudadano.api';
+import { VMPage, VMCiudadanoListaSimple,VMCiudadanoListaOptions,VMCiudadanoCreate,VMCiudadanoDetalleSimple, VMCiudadanoUpdate, 
+  VMCiudadanoControl } from '../models/ciudadano.vm';
+import { MapCiudadanoListaItemVM, MapPageToVM,MapCiudadanoListaOpciones,MapCiudadanoCreate,MapCiudadanoDetalleListaSimple, 
+  MapCiudadanoUpdateParcial,MapCiudadanoControl } from '../mappers/ciudadano.mapper';
 import {toHttpParams} from '@app/components/utils/http.utils';
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +43,12 @@ export class CiudadanoService {
     return this.http
       .get<ApiCiudadanoDetalleSimple>(`${this.base}/${id}`)
       .pipe(map(apiItem => MapCiudadanoDetalleListaSimple(apiItem)));
+  }
+
+  getControlById(id: number): Observable<VMCiudadanoControl> {
+    return this.http
+      .get<ApiCiudadanoControl>(`${this.base}/${id}/control`)
+      .pipe(map(apiItem => MapCiudadanoControl(apiItem)));
   }
   async update(id: number, changes: Partial<VMCiudadanoUpdate>): Promise<number> {
     const dto: DTOCiudadanoUpdate = MapCiudadanoUpdateParcial(id, changes);

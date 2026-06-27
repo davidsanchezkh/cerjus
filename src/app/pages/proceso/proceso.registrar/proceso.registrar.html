@@ -1,0 +1,368 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+
+          <h5 class="mb-4">Registrar proceso</h5>
+
+          <form [formGroup]="form" novalidate [class.was-validated]="submitting">
+
+            @if (requiereConsulta) {
+                <div class="card border mb-3">
+                    <div class="card-body">
+                    <div class="form-label fw-semibold mb-2">Seleccionar consulta vinculada</div>
+
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-8">
+                        <label class="form-label">DNI del ciudadano</label>
+                        <input
+                            type="text"
+                            maxlength="11"
+                            class="form-control"
+                            formControlName="dniBusqueda"
+                            placeholder="Ingrese DNI">
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                        <button
+                            type="button"
+                            class="btn btn-outline-secondary w-100"
+                            (click)="limpiarConsulta()">
+                            Limpiar
+                        </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 mb-2 consulta-help-text">
+                        @if (consultas.length > 0) {
+                            <div class="text-success small">Seleccione una consulta de la lista.</div>
+                        } @else if (consultaBuscada) {
+                            <div class="text-muted small">No se encontraron consultas con ese DNI.</div>
+                        } @else if (buscandoConsultas) {
+                            <div class="text-muted small">Buscando consultas…</div>
+                        } @else {
+                            <div class="text-muted small">Ingrese al menos 8 dígitos para buscar.</div>
+                        }
+                    </div>
+
+                    <div class="card card--flat">
+                        <div
+                        class="card-body p-0 tabla-wrap"
+                        [class.is-loading]="showConsultaOverlay"
+                        [style.minHeight.px]="consultaListMinHeight"
+                        [style.--thead-h.px]="headerBlockPx"
+                        style="position: relative;">
+
+                        <table class="table table-striped table-hover m-0">
+                            <thead class="table-light">
+                            <tr>
+                                <th style="width: 5rem;">ID</th>
+                                <th style="width: 9rem;">DNI</th>
+                                <th>Materia</th>
+                                <th style="width: 10rem;">Fecha</th>
+                                <th style="width: 9rem;">Lleva caso</th>
+                                <th style="width: 9rem;">Opción</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            @if (buscandoConsultas && consultas.length === 0 && !consultaBuscada) {
+                                @for (_ of consultaSkeletonRows; track $index) {
+                                <tr class="tbody-skeleton">
+                                    <td style="width: 5rem;">
+                                    <div class="sk-wrap"><div class="sk-cell sk-id"></div></div>
+                                    </td>
+                                    <td style="width: 9rem;">
+                                    <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
+                                    </td>
+                                    <td>
+                                    <div class="sk-wrap"><div class="sk-cell sk-text"></div></div>
+                                    </td>
+                                    <td style="width: 10rem;">
+                                    <div class="sk-wrap"><div class="sk-cell sk-date"></div></div>
+                                    </td>
+                                    <td style="width: 9rem;">
+                                    <div class="sk-wrap"><div class="sk-cell sk-badge"></div></div>
+                                    </td>
+                                    <td style="width: 9rem;">
+                                    <div class="sk-wrap"><div class="sk-cell sk-btn"></div></div>
+                                    </td>
+                                </tr>
+                                }
+                            } @else {
+                                @if (consultas.length > 0) {
+                                @for (c of consultas; track c.id) {
+                                    <tr [class.consulta-seleccionada]="isConsultaSeleccionada(c)">
+                                    <td style="width: 5rem;">{{ c.id }}</td>
+                                    <td style="width: 9rem;">{{ c.dni || '—' }}</td>
+                                    <td>{{ c.materiaTexto || '—' }}</td>
+                                    <td style="width: 10rem;">{{ c.fecha_formato || '—' }}</td>
+                                    <td style="width: 9rem;">{{ c.llevaCasoTexto || '—' }}</td>
+                                    <td style="width: 9rem;">
+                                        <button
+                                        type="button"
+                                        class="btn btn-sm"
+                                        [class.btn-outline-primary]="!isConsultaSeleccionada(c)"
+                                        [class.btn-outline-danger]="isConsultaSeleccionada(c)"
+                                        (click)="toggleConsulta(c)">
+                                        @if (isConsultaSeleccionada(c)) {
+                                            Deseleccionar
+                                        } @else {
+                                            Seleccionar
+                                        }
+                                        </button>
+                                    </td>
+                                    </tr>
+                                }
+                                }
+                            }
+                            </tbody>
+                        </table>
+
+                        @if (consultas.length === 0 && (!buscandoConsultas || consultaBuscada)) {
+                            <div class="empty-overlay">
+                            <div class="text-center text-muted estado-vacio fullheight">
+                                @if (consultaBuscada) {
+                                No se encontraron consultas.
+                                } @else {
+                                Sin búsqueda realizada.
+                                }
+                            </div>
+                            </div>
+                        }
+
+                        @if (showConsultaOverlay && consultas.length > 0) {
+                            <div class="loading-overlay d-flex align-items-center justify-content-center">
+                            Cargando…
+                            </div>
+                        }
+                        </div>
+                    </div>
+
+                    <div
+                        class="d-flex align-items-center justify-content-between mt-2 pager-wrap"
+                        [class.is-loading]="showConsultaOverlay"
+                        style="user-select: none;">
+
+                        <div class="text-muted small">
+                            Página {{ consultaShownPage }} de {{ consultaShownLastPage }} —
+                            Mostrando
+                            <span class="num-range">
+                                @if (consultaShownFrom > 0) {
+                                {{ consultaShownFrom }}&ndash;{{ consultaShownTo }}
+                                } @else {
+                                0
+                                }
+                            </span>
+                                de 
+                            <span class="total-num">{{ consultaShownTotal }}</span>
+                        </div>
+
+                        <ul class="pagination pagination-sm m-0">
+                        <li class="page-item" [class.disabled]="consultaPage === 1 || buscandoConsultas">
+                            <button
+                            type="button"
+                            class="page-link"
+                            (click)="goToConsultaPage(consultaPage - 1)"
+                            [disabled]="consultaPage === 1 || buscandoConsultas">
+                            Anterior
+                            </button>
+                        </li>
+
+                        <li class="page-item" [class.disabled]="consultaPage >= consultaLastPage || buscandoConsultas">
+                            <button
+                            type="button"
+                            class="page-link"
+                            (click)="goToConsultaPage(consultaPage + 1)"
+                            [disabled]="consultaPage >= consultaLastPage || buscandoConsultas">
+                            Siguiente
+                            </button>
+                        </li>
+                        </ul>
+                    </div>
+                    </div>
+                </div>
+            }
+
+            <div class="card border mb-3">
+                <div class="card-body">
+                    <div class="form-label fw-semibold mb-2">Consulta vinculada</div>
+
+                    <div class="row g-3">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Consulta Nº</label>
+                        <input type="text"
+                        class="form-control"
+                        [value]="consultaSeleccionada?.id ?? '—'"
+                        readonly>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">DNI</label>
+                        <input
+                        type="text"
+                        class="form-control"
+                        [value]="consultaSeleccionada?.dni || '—'"
+                        readonly>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Ciudadano</label>
+                        <input
+                        type="text"
+                        class="form-control"
+                        [value]="consultaSeleccionada ? nombreCiudadano(consultaSeleccionada) : '—'"
+                        readonly>
+                    </div>
+                    </div>
+
+                    <div class="row g-3 mt-1">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Materia</label>
+                        <input
+                        type="text"
+                        class="form-control"
+                        [value]="consultaSeleccionada
+                            ? (consultaSeleccionada.materias === 'OTROS'
+                                ? consultaSeleccionada.materiaOtros
+                                : consultaSeleccionada.materias)
+                            : '—'"
+                        readonly>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="form-label">Resumen</label>
+                        <input
+                        type="text"
+                        class="form-control"
+                        [value]="consultaSeleccionada?.resumen || '—'"
+                        readonly>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Número de expediente</label>
+              <input
+                type="text"
+                maxlength="50"
+                class="form-control"
+                formControlName="numeroExpediente"
+                required>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Sede</label>
+                <input
+                  type="text"
+                  maxlength="100"
+                  class="form-control"
+                  formControlName="sede">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Parte</label>
+                <input
+                  type="text"
+                  maxlength="150"
+                  class="form-control"
+                  formControlName="parte">
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Materia</label>
+                <input
+                  type="text"
+                  maxlength="150"
+                  class="form-control"
+                  formControlName="materia">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label fw-semibold">Demandado</label>
+                <input
+                  type="text"
+                  maxlength="150"
+                  class="form-control"
+                  formControlName="demandado">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Estado procesal</label>
+              <input
+                type="text"
+                maxlength="80"
+                class="form-control"
+                formControlName="estadoProcesal">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Observación</label>
+              <textarea
+                class="form-control"
+                formControlName="observacion"
+                rows="3"
+                maxlength="600">
+              </textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 col-md-5">
+                <label class="form-label fw-semibold d-block">Fecha registrada</label>
+
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <input
+                      class="form-check-input mt-0"
+                      type="checkbox"
+                      formControlName="usarFechaRegistrada"
+                      id="usarFechaRegistrada">
+                  </span>
+
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="fechaRegistrada">
+                </div>
+
+                <div class="form-text">
+                  Marcar solo si se desea registrar una fecha histórica.
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button
+                type="button"
+                class="btn btn-warning"
+                (click)="onBack()"
+                [disabled]="submitting">
+                Regresar
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="onSubmit()"
+                [disabled]="submitting">
+                @if (submitting) {
+                  Registrando…
+                } @else {
+                  Registrar
+                }
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

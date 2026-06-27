@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormControl } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -9,6 +9,8 @@ import { JustificacionService } from '../services/justificacion.service';
 
 import { VMAsistenciaJustificacionItem } from '../models/justificacion.vm';
 import { AJ_ESTADO_OPCIONES,AJ_TIPO_OPCIONES, AsistenciaJustificacionEstadoFiltro,AsistenciaJustificacionTipoFiltro } from '../models/justificacion.dominio';
+import { Subscription } from 'rxjs';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-justificacion-lista-mis',
@@ -17,12 +19,13 @@ import { AJ_ESTADO_OPCIONES,AJ_TIPO_OPCIONES, AsistenciaJustificacionEstadoFiltr
   templateUrl: './justificacion.lista.mis.html',
   styleUrl: './justificacion.lista.mis.css',
 })
-export class JustificacionListaMis implements OnInit {
+export class JustificacionListaMis implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private service = inject(JustificacionService);
   private notify = inject(NotificacionesService);
   private router = inject(Router);
-
+  private pageMeta = inject(PageMetaService);
+  private subForm?: Subscription;
   readonly estadoOpciones = AJ_ESTADO_OPCIONES;
   readonly tipoOpciones = AJ_TIPO_OPCIONES; 
 
@@ -80,9 +83,14 @@ export class JustificacionListaMis implements OnInit {
   totalReserveCh = 7;
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Mis Justificaciones',
+      ruta: ['/asistencia'],
+    });
+
     this.load();
 
-    this.form.valueChanges
+    this.subForm = this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
@@ -92,9 +100,13 @@ export class JustificacionListaMis implements OnInit {
         this.load();
       });
   }
-
+  ngOnDestroy(): void {
+    this.subForm?.unsubscribe();
+    this.cancelTimers();
+    this.pageMeta.clear();
+  }
   clear(): void {
-    this.form.reset({ desde: '', hasta: '', estado: '' });
+    this.form.reset({ desde: '', hasta: '' , tipo: '', estado: '' });
     this.page = 1;
     this.load();
   }
@@ -225,7 +237,6 @@ export class JustificacionListaMis implements OnInit {
   }
 
   async irRegistrar() {
-    // Ajuste la ruta si la suya es distinta
-    this.router.navigate(['/justificacion/registrar']);
+    this.router.navigate(['/asistencia/justificacion/registrar']);
   }
 }

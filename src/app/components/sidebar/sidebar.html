@@ -1,50 +1,64 @@
 <div class="d-flex flex-column flex-shrink-0 p-3 text-white color_azul min-vh-100" style="width: 280px; user-select: none;">
   <a class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-    <span class="fs-4">Cerjus</span>
+    <span class="fs-4">CERJUS</span>
   </a>
+
   <hr>
 
   <ul class="nav flex-column mb-auto sidebar-nav">
 
-    <!-- GRUPO ASESORÍA (lvl 3+) -->
+    <!-- GRUPO ASESORÍA -->
     @if (canSee(3)) {
       <li class="sidebar-group">
-        <!-- Cabecera del grupo -->
         <button
           class="w-100 d-flex justify-content-between align-items-center sidebar-group-toggle"
           type="button"
           (click)="toggleGroup('asesoria')">
           <span class="sidebar-group-title">Asesoría</span>
-          <span class="sidebar-chevron"
-                [class.sidebar-chevron-open]="openGroups.asesoria">
+          <span
+            class="sidebar-chevron"
+            [class.sidebar-chevron-open]="openGroups.asesoria">
             &#9662;
           </span>
         </button>
 
-        <!-- Contenido del grupo -->
-        <div class="sidebar-submenu"
-             [class.show]="openGroups.asesoria"
-             [class.collapse]="true">
+        <div
+          class="sidebar-submenu"
+          [class.show]="openGroups.asesoria"
+          [class.collapse]="true">
 
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/asistencia']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: true }">
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAsesoriaActive('asistencia')"
+            [routerLink]="['/asistencia']">
             Asistencia
           </a>
 
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/ciudadano']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAsesoriaActive('ciudadano')"
+            [routerLink]="['/ciudadano']">
             Ciudadano
           </a>
 
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAsesoriaActive('consulta')"
+            [routerLink]="['/consulta']">
+            Consulta
+          </a>
+
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAsesoriaActive('proceso')"
+            [routerLink]="['/proceso']">
+            Proceso
+          </a>
         </div>
       </li>
     }
 
-    <!-- GRUPO SUPERVISIÓN (lvl 2+) -->
+    <!-- GRUPO SUPERVISIÓN -->
     @if (canSee(3)) {
       <li class="sidebar-group">
         <button
@@ -52,41 +66,45 @@
           type="button"
           (click)="toggleGroup('supervision')">
           <span class="sidebar-group-title">Supervisión</span>
-          <span class="sidebar-chevron"
-                [class.sidebar-chevron-open]="openGroups.supervision">
+          <span
+            class="sidebar-chevron"
+            [class.sidebar-chevron-open]="openGroups.supervision">
             &#9662;
           </span>
         </button>
 
-        <div class="sidebar-submenu"
-             [class.show]="openGroups.supervision"
-             [class.collapse]="true">
+        <div
+          class="sidebar-submenu"
+          [class.show]="openGroups.supervision"
+          [class.collapse]="true">
 
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/analiticas']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isSupervisionActive('analiticas')"
+            [routerLink]="['/analiticas']">
             Analíticas
           </a>
+
           @if (canSee(2)) {
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/controlususario']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
-            Asistencia
-          </a>
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/justificacion/lista']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
-            Justificación
-          </a>
+            <a
+              class="nav-link sidebar-item-link"
+              [class.active]="isSupervisionActive('controlusuario')"
+              [routerLink]="['/controlusuario']">
+              Asistencia
+            </a>
+
+            <a
+              class="nav-link sidebar-item-link"
+              [class.active]="isSupervisionActive('justificacion')"
+              [routerLink]="['/justificacion/lista']">
+              Justificación
+            </a>
           }
         </div>
       </li>
     }
 
-    <!-- GRUPO ADMIN (solo lvl 1, opcional) -->
+    <!-- GRUPO ADMINISTRACIÓN -->
     @if (canSee(2)) {
       <li class="sidebar-group">
         <button
@@ -94,27 +112,30 @@
           type="button"
           (click)="toggleGroup('admin')">
           <span class="sidebar-group-title">Administración</span>
-          <span class="sidebar-chevron"
-                [class.sidebar-chevron-open]="openGroups.admin">
+          <span
+            class="sidebar-chevron"
+            [class.sidebar-chevron-open]="openGroups.admin">
             &#9662;
           </span>
         </button>
 
-        <div class="sidebar-submenu"
-             [class.show]="openGroups.admin"
-             [class.collapse]="true">
+        <div
+          class="sidebar-submenu"
+          [class.show]="openGroups.admin"
+          [class.collapse]="true">
 
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/admin/usuario/lista']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
-             Usuarios
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAdminActive('usuarios')"
+            [routerLink]="['/admin/usuario/lista']">
+            Usuarios
           </a>
-          <a class="nav-link sidebar-item-link"
-             [routerLink]="['/horario']"
-             routerLinkActive="active"
-             [routerLinkActiveOptions]="{ exact: false }">
-             Horario
+
+          <a
+            class="nav-link sidebar-item-link"
+            [class.active]="isAdminActive('horario')"
+            [routerLink]="['/horario']">
+            Horario
           </a>
         </div>
       </li>
@@ -123,10 +144,11 @@
   </ul>
 
   <hr>
-  <a class="nav-link sidebar-item-link"
-    [routerLink]="['/cuenta/perfil']"
-    routerLinkActive="active"
-    [routerLinkActiveOptions]="{ exact: false }">
+
+  <a
+    class="nav-link sidebar-item-link"
+    [class.active]="isPerfilActive()"
+    [routerLink]="['/cuenta/perfil']">
     Perfil
   </a>
 </div>

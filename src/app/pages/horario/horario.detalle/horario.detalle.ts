@@ -85,9 +85,16 @@ export class HorarioDetalle implements OnInit, OnDestroy {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) return;
 
+    this.idhorario = id;
+
+    this.pageMeta.replace({
+      titulo: 'Horario:',
+      ruta: ['/horario'],
+    });
+
     this.service.getById(id).subscribe({
       next: (data: VMHorarioDetalle) => {
-        this.idhorario = id;
+
         this.originalData = data;
 
         this.form.patchValue({
@@ -99,9 +106,8 @@ export class HorarioDetalle implements OnInit, OnDestroy {
         this.bloquesPlano = data.bloques ?? [];
         this.resetBloquesForm(this.groupByHoras(this.bloquesPlano));
 
-        this.pageMeta.replace({
+        this.pageMeta.set({
           titulo: `Horario: ${data.nombre}`,
-          ruta: ['/horario'],
         });
 
         this.form.disable();

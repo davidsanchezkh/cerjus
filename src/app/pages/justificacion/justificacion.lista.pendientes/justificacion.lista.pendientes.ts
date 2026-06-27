@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormControl, Validators } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -12,6 +12,8 @@ import {
   AsistenciaJustificacionEstadoFiltro,
   AsistenciaJustificacionTipoFiltro,
 } from '../models/justificacion.dominio';
+import { Subscription } from 'rxjs';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-justificacion-lista-pendientes',
@@ -20,11 +22,12 @@ import {
   templateUrl: './justificacion.lista.pendientes.html',
   styleUrl: './justificacion.lista.pendientes.css',
 })
-export class JustificacionListaPendientes implements OnInit {
+export class JustificacionListaPendientes implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private service = inject(JustificacionService);
   private notify = inject(NotificacionesService);
-
+  private pageMeta = inject(PageMetaService);
+  private subForm?: Subscription
   readonly estadoOpciones = AJ_ESTADO_OPCIONES;
   readonly tipoOpciones = AJ_TIPO_OPCIONES;
 
@@ -97,9 +100,13 @@ export class JustificacionListaPendientes implements OnInit {
   });
 
   ngOnInit(): void {
+    this.pageMeta.replace({
+      titulo: 'Justificaciones Pendientes',
+    });
+
     this.load();
 
-    this.form.valueChanges
+    this.subForm = this.form.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
@@ -108,6 +115,11 @@ export class JustificacionListaPendientes implements OnInit {
         this.page = 1;
         this.load();
       });
+  }
+  ngOnDestroy(): void {
+    this.subForm?.unsubscribe();
+    this.cancelTimers();
+    this.pageMeta.clear();
   }
 
   clear(): void {

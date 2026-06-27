@@ -8,3 +8,28 @@
   border-color: #dc3545;
   box-shadow: none;
 }
+.value-box-noedit {
+  display: block;
+  width: 100%;
+  padding: .475rem .75rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: .375rem;
+  min-height: calc(1.5em + .95rem + 2px);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+
+.value-box-edit {
+  display: block;
+  width: 100%;
+  padding: .475rem .75rem;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: .375rem;
+  min-height: calc(1.5em + .95rem + 2px);
+  line-height: 1.5;
+}

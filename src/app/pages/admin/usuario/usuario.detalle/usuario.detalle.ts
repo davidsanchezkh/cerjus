@@ -87,7 +87,10 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
         this.usuario = u;
 
         const fechaTxt = formatDateTime(u.fechaCreadoPor);
-
+        this.pageMeta.replace({
+          titulo: 'Usuario:',
+          ruta: ['/admin/usuario/lista'],
+        });
         this.form.patchValue({
           nombres: u.nombres,
           apellidoPaterno: u.apellidoPaterno,
@@ -111,9 +114,8 @@ export class UsuarioDetalle implements OnInit, OnDestroy {
         this.form.get('estado')?.disable({ emitEvent: false });
         this.form.get('rolId')?.disable({ emitEvent: false });
 
-        this.pageMeta.replace({
-          titulo: `Usuario: ${u.apellidoPaterno ?? ''} ${u.apellidoMaterno ?? ''}, ${u.nombres ?? ''} - ${u.dni ?? ''}`,
-          ruta: ['/admin/usuario/lista'],
+        this.pageMeta.set({
+          titulo: `Usuario: ${u.apellidoPaterno ?? ''} ${u.apellidoMaterno ?? ''}, ${u.nombres ?? ''} - DNI: ${u.dni ?? ''}`,
         });
       },
       error: () => {

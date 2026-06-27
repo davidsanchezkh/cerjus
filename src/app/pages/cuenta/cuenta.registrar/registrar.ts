@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -11,6 +11,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { VMCuentaCreate } from '../models/cuenta.vm';
 import { CuentaService } from '../services/cuenta.service';
 import { NotificacionesService } from '@/app/components/notificaciones/services/notificaciones.service';
+import { PageMetaService } from '@/app/services/page_meta.service';
 
 @Component({
   selector: 'app-cuenta-registrar',
@@ -19,13 +20,14 @@ import { NotificacionesService } from '@/app/components/notificaciones/services/
   templateUrl: './registrar.html',
   styleUrl: './registrar.css'
 })
-export class Registar implements OnInit {
+export class Registar implements OnInit, OnDestroy {
 
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private service = inject(CuentaService);
   private notify = inject(NotificacionesService);
   private route = inject(ActivatedRoute);
+  private pageMeta = inject(PageMetaService);
 
   submitting = false;
 
@@ -52,11 +54,25 @@ export class Registar implements OnInit {
 
   ngOnInit(): void {
     const modeData = this.route.snapshot.data['mode'];
+
     if (modeData === 'admin') {
       this.mode = 'admin';
+
+      this.pageMeta.replace({
+        titulo: 'Registrar Nuevo Usuario',
+        ruta: ['/admin/usuario/lista'],
+      });
     } else {
       this.mode = 'public';
+
+      this.pageMeta.replace({
+        titulo: 'Registrar Cuenta',
+        ruta: ['/login'],
+      });
     }
+  }
+  ngOnDestroy(): void {
+    this.pageMeta.clear();
   }
 
   async onSubmit() {

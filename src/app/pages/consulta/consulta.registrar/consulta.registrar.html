@@ -1,4 +1,4 @@
-<!-- ciudadano.registrar.html -->
+<!-- consulta.registrar.html -->
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-12 col-lg-8">
@@ -7,71 +7,200 @@
 
           <h5 class="mb-4">Registrar consulta</h5>
 
-          <!-- Formulario reactivo -->
           <form [formGroup]="form" novalidate [class.was-validated]="submitting">
 
-            <!-- Fila 1: Hechos de la consulta -->
+            @if (requiereCiudadano) {
+              <div class="card border mb-3">
+                <div class="card-body">
+                  <div class="form-label fw-semibold mb-2">Seleccionar ciudadano</div>
+
+                  <div class="row g-3 align-items-end">
+                    <div class="col-12 col-md-8">
+                      <label class="form-label">DNI</label>
+                      <input
+                        type="text"
+                        maxlength="11"
+                        class="form-control"
+                        formControlName="dniBusqueda"
+                        placeholder="Ingrese DNI">
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary w-100"
+                        (click)="limpiarCiudadano()">
+                        Limpiar
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mt-2">
+                    @if (buscandoCiudadano) {
+                      <div class="text-muted small">Buscando ciudadano…</div>
+                    } @else if (ciudadanoBuscado && !ciudadanoEncontrado) {
+                      <div class="text-muted small">No se encontró ciudadano con ese DNI.</div>
+                    } @else if (ciudadanoEncontrado) {
+                      <div class="text-success small">Ciudadano encontrado.</div>
+                    } @else {
+                      <div class="text-muted small">Ingrese al menos 8 dígitos para buscar.</div>
+                    }
+                  </div>
+
+                  <div class="row g-3 mt-1">
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Nombres</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [value]="ciudadanoEncontrado?.nombres || ''"
+                        readonly>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Apellido paterno</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [value]="ciudadanoEncontrado?.apellidoPaterno || ''"
+                        readonly>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                      <label class="form-label">Apellido materno</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        [value]="ciudadanoEncontrado?.apellidoMaterno || ''"
+                        readonly>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+
             <div class="mb-3">
               <label class="form-label fw-semibold">Hechos de la consulta</label>
-              <textarea class="form-control" formControlName="hechos" rows="3" maxlength="600" required></textarea>
+              <textarea
+                class="form-control"
+                formControlName="hechos"
+                rows="3"
+                maxlength="600"
+                required>
+              </textarea>
             </div>
-            <!-- Fila 2: Materia de la consulta -->
+
             <div class="row mb-3">
               <div class="col-12 col-md-6">
                 <label class="form-label fw-semibold">Materia de la consulta</label>
-                <select class="form-select" formControlName="materias">
-                  <option value="" disabled>Selecione una materia</option>
+                <select class="form-select" formControlName="materias" required>
+                  <option value="" disabled>Seleccione una materia</option>
                   @for (opt of materiaOpciones; track opt.value) {
                     <option [value]="opt.value">{{ opt.label }}</option>
                   }
                 </select>
               </div>
+
               <div class="col-12 col-md-6">
                 <label class="form-label">Especifique otros</label>
-                <input 
+                <input
                   maxlength="150"
-                  type="text" 
-                  class="form-control" 
-                  formControlName="materiaOtros" 
+                  type="text"
+                  class="form-control"
+                  formControlName="materiaOtros"
                   placeholder="Especifique la materia">
               </div>
             </div>
-            <!-- Fila 3: Absolucion de la consulta -->
+
             <div class="mb-3">
-              <label class="form-label fw-semibold"> Absolución de la consulta </label>
-              <textarea class="form-control" formControlName="absolucion" rows="3" maxlength="600" required></textarea>
+              <label class="form-label fw-semibold">Absolución de la consulta</label>
+              <textarea
+                class="form-control"
+                formControlName="absolucion"
+                rows="3"
+                maxlength="600"
+                required>
+              </textarea>
             </div>
-            <!-- Fila 4: Regresa de la consulta -->
+
             <div class="mb-3">
-              <div class="form-label fw-semibold mb-2">¿Regresa para seguimiento?</div>
+              <label class="form-label fw-semibold">¿Lleva el caso con nosotros?</label>
               <div class="row g-3 align-items-center">
-                <div class="col-auto">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" formControlName="regresa" value="SI" id="si">
-                    <label class="form-check-label" for="si">Si</label>
+                @for (opt of llevaCasoOpciones; track opt.value) {
+                  <div class="col-auto">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="radio"
+                        formControlName="llevaCaso"
+                        [value]="opt.value"
+                        [id]="'llevaCaso_' + opt.value">
+                      <label class="form-check-label" [for]="'llevaCaso_' + opt.value">
+                        {{ opt.label }}
+                      </label>
+                    </div>
                   </div>
+                }
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Resumen corto</label>
+              <textarea
+                class="form-control"
+                formControlName="resumen"
+                rows="1"
+                maxlength="200">
+              </textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Observaciones</label>
+              <textarea
+                class="form-control"
+                formControlName="observaciones"
+                rows="2"
+                maxlength="600">
+              </textarea>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12 col-md-5">
+                <label class="form-label fw-semibold d-block">Fecha registrada</label>
+
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <input
+                      class="form-check-input mt-0"
+                      type="checkbox"
+                      formControlName="usarFechaRegistrada"
+                      id="usarFechaRegistrada">
+                  </span>
+
+                  <input
+                    type="date"
+                    class="form-control"
+                    formControlName="fechaRegistrada">
                 </div>
-                <div class="col-auto">
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" formControlName="regresa" value="NO" id="no">
-                    <label class="form-check-label" for="no">No</label>
-                  </div>
+
+                <div class="form-text">
+                  Marcar solo si se desea registrar una fecha histórica.
                 </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label class="form-label fw-semibold"> Resumen corto </label>
-              <textarea class="form-control" formControlName="resumen" rows="1" maxlength="200"></textarea>
-            </div>
-            <!-- Botones -->
+
             <div class="d-flex justify-content-between mt-4">
-              <button type="button" class="btn btn-warning"
-                      (click)="onBack()">
+              <button
+                type="button"
+                class="btn btn-warning"
+                (click)="onBack()">
                 Regresar
               </button>
-              <button type="button" class="btn btn-success"
-                      (click)="onSubmit()"
-                      >
+
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="onSubmit()">
                 Registrar
               </button>
             </div>

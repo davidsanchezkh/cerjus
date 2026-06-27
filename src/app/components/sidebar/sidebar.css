@@ -104,11 +104,11 @@
 
 /* Si quiere mantener el estilo de .nav-link activa en otros lugares,
    limítelo al contexto del sidebar */
-.sidebar-nav .nav-link.active,
-.sidebar-nav .nav-link.active:focus,
-.sidebar-nav .nav-link.active:hover {
+.sidebar-item-link.active {
   background-color: #ffffff;
   color: #015675;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8);
 }
 
 /* Eliminamos el hover general agresivo que tenía antes para todo nav-link */

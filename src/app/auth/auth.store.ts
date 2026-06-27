@@ -64,7 +64,13 @@ export class AuthStore {
   getToken(): string | null {
     return this.token$.value;
   }
+  getLevel(): number | null {
+    return this.level$.value;
+  }
 
+  isLoggedIn(): boolean {
+    return this.loggedIn$.value;
+  }
   /** Observables por si los necesitas en layouts/sidebars */
   tokenChanges() { return this.token$.asObservable(); }
   levelChanges() { return this.level$.asObservable(); }
