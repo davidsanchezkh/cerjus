@@ -37,7 +37,7 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build Angular (staging)
+      - name: Build Angular (prod)
         run: |
           npm run build -- --configuration staging --base-href "/${REPO_NAME}/"
 
